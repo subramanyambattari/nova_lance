@@ -1,93 +1,76 @@
+"use client"
+
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarSeparator,
 } from "@/components/ui/sidebar"
 import {
   BriefcaseBusiness,
-  CalendarDays,
-  CircleHelp,
+  DollarSign,
   FileText,
   Home,
-  Inbox,
   LayoutDashboard,
-  LogOut,
-  Plus,
+  MessageSquare,
   Search,
   Settings,
   Sparkles,
-  Users,
+  User,
+  type LucideIcon,
 } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
-const mainNav = [
+const navItems: {
+  title: string
+  href: string
+  icon: LucideIcon
+}[] = [
   {
-    title: "Dashboard",
+    title: "Overview",
     href: "/",
-    icon: LayoutDashboard,
-    isActive: true,
+    icon: Home,
   },
   {
-    title: "Projects",
-    href: "/projects",
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Find Jobs",
+    href: "/find-jobs",
+    icon: Search,
+  },
+  {
+    title: "Proposals",
+    href: "/proposals",
+    icon: FileText,
+  },
+  {
+    title: "Active Jobs",
+    href: "/active-jobs",
     icon: BriefcaseBusiness,
-    badge: "12",
   },
   {
     title: "Messages",
     href: "/messages",
-    icon: Inbox,
-    badge: "4",
+    icon: MessageSquare,
   },
   {
-    title: "Calendar",
-    href: "/calendar",
-    icon: CalendarDays,
+    title: "Earnings",
+    href: "/earnings",
+    icon: DollarSign,
   },
   {
-    title: "Clients",
-    href: "/clients",
-    icon: Users,
-  },
-]
-
-const workspaceNav = [
-  {
-    title: "Proposals",
-    href: "/proposals",
-  },
-  {
-    title: "Contracts",
-    href: "/contracts",
-  },
-  {
-    title: "Invoices",
-    href: "/invoices",
-  },
-]
-
-const utilityNav = [
-  {
-    title: "Find Work",
-    href: "/search",
-    icon: Search,
-  },
-  {
-    title: "Docs",
-    href: "/docs",
-    icon: FileText,
+    title: "Profile",
+    href: "/profile",
+    icon: User,
   },
   {
     title: "Settings",
@@ -97,6 +80,8 @@ const utilityNav = [
 ]
 
 export function AppSidebar() {
+  const pathname = usePathname()
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -120,56 +105,20 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainNav.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={item.isActive}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  {item.badge ? (
-                    <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
-                  ) : null}
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarSeparator />
-        <SidebarGroup>
           <SidebarGroupLabel>Workspace</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Overview">
-                  <Link href="/workspace">
-                    <Home />
-                    <span>Overview</span>
-                  </Link>
-                </SidebarMenuButton>
-                <SidebarMenuSub>
-                  {workspaceNav.map((item) => (
-                    <SidebarMenuSubItem key={item.title}>
-                      <SidebarMenuSubButton asChild>
-                        <Link href={item.href}>
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </SidebarMenuItem>
-              {utilityNav.map((item) => (
+              {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={
+                      item.href === "/"
+                        ? pathname === "/"
+                        : pathname.startsWith(item.href)
+                    }
+                    tooltip={item.title}
+                  >
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -181,34 +130,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Create project">
-              <Link href="/projects/new">
-                <Plus />
-                <span>Create project</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Help">
-              <Link href="/help">
-                <CircleHelp />
-                <span>Help</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Sign out">
-              <Link href="/sign-out">
-                <LogOut />
-                <span>Sign out</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   )
 }
