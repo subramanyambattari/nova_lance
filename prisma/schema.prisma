@@ -7,27 +7,31 @@ datasource db {
   provider = "postgresql"
 }
 
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-  posts Post[]
-  jobs Job[]
-  proposals Proposal[] @relation("FreelancerProposals")
-  savedJobs SavedJob[]
-  savedSearches SavedSearch[]
-} 
-model Post { 
-  id        Int     @id @default(autoincrement()) 
+model User {
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  name           String?
+  posts          Post[]
+  jobs           Job[]
+  proposals      Proposal[]    @relation("FreelancerProposals")
+  freelancerJobs ActiveJob[]   @relation("FreelancerJobs")
+  clientJobs     ActiveJob[]   @relation("ClientJobs")
+  jobMessages    JobMessage[]  @relation("JobMessageSender")
+  savedJobs      SavedJob[]
+  savedSearches  SavedSearch[]
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
   title     String
   content   String?
-  published Boolean @default(false) 
+  published Boolean @default(false)
   authorId  Int
-  author    User    @relation(fields: [authorId], references: [id]) 
-} 
+  author    User    @relation(fields: [authorId], references: [id])
+}
 
 model Job {
-  id             String      @id @default(cuid())
+  id             String     @id @default(cuid())
   title          String
   description    String
   company        String
@@ -36,17 +40,17 @@ model Job {
   skills         String[]
   type           String
   experience     String
-  location       String      @default("Remote")
-  remote         Boolean     @default(true)
-  verifiedClient Boolean     @default(false)
-  source         String      @default("internal")
+  location       String     @default("Remote")
+  remote         Boolean    @default(true)
+  verifiedClient Boolean    @default(false)
+  source         String     @default("internal")
   externalId     String?
   externalUrl    String?
-  postedAt       DateTime    @default(now())
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  postedAt       DateTime   @default(now())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
   clientId       Int?
-  client         User?       @relation(fields: [clientId], references: [id])
+  client         User?      @relation(fields: [clientId], references: [id])
   proposals      Proposal[]
   savedJobs      SavedJob[]
 
@@ -56,13 +60,13 @@ model Job {
 }
 
 model Proposal {
-  id                   String               @id @default(cuid())
+  id                   String         @id @default(cuid())
   coverLetter          String
   budget               Float?
   timeline             String?
-  portfolioLinks       String[]             @default([])
+  portfolioLinks       String[]       @default([])
   resumeUrl            String?
-  status               ProposalStatus       @default(DRAFT)
+  status               ProposalStatus @default(DRAFT)
   externalJobId        String?
   externalJobUrl       String?
   clientMessage        String?
@@ -74,11 +78,12 @@ model Proposal {
   acceptedAt           DateTime?
   withdrawnAt          DateTime?
   lastClientActivityAt DateTime?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 
   freelancerId Int
   jobId        String?
+  activeJob    ActiveJob?
 
   freelancer  User                 @relation("FreelancerProposals", fields: [freelancerId], references: [id])
   job         Job?                 @relation(fields: [jobId], references: [id])
@@ -87,6 +92,93 @@ model Proposal {
   @@index([freelancerId, status])
   @@index([jobId])
   @@index([updatedAt])
+}
+
+model ActiveJob {
+  id            String        @id @default(cuid())
+  title         String
+  description   String
+  budget        Float?
+  progress      Int           @default(0)
+  status        JobStatus     @default(IN_PROGRESS)
+  priority      String?
+  deadline      DateTime?
+  paymentStatus PaymentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  proposalId String?   @unique
+  proposal   Proposal? @relation(fields: [proposalId], references: [id])
+
+  freelancerId Int
+  freelancer   User @relation("FreelancerJobs", fields: [freelancerId], references: [id])
+
+  clientId Int
+  client   User @relation("ClientJobs", fields: [clientId], references: [id])
+
+  milestones   Milestone[]
+  messages     JobMessage[]
+  deliverables Deliverable[]
+
+  @@index([freelancerId, status])
+  @@index([clientId, status])
+  @@index([deadline])
+  @@index([updatedAt])
+}
+
+model Milestone {
+  id            String        @id @default(cuid())
+  title         String
+  description   String?
+  amount        Float?
+  dueDate       DateTime?
+  completed     Boolean       @default(false)
+  completedAt   DateTime?
+  paymentStatus PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  jobId String
+  job   ActiveJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, completed])
+  @@index([dueDate])
+}
+
+model JobMessage {
+  id        String    @id @default(cuid())
+  message   String
+  fileUrl   String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  senderId Int
+  jobId    String
+
+  sender User      @relation("JobMessageSender", fields: [senderId], references: [id])
+  job    ActiveJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, createdAt])
+  @@index([senderId])
+}
+
+model Deliverable {
+  id             String            @id @default(cuid())
+  title          String
+  fileUrl        String
+  fileName       String?
+  fileType       String?
+  version        Int               @default(1)
+  revisionNotes  String?
+  approvalStatus DeliverableStatus @default(SUBMITTED)
+  uploadedAt     DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  jobId String
+  job   ActiveJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, uploadedAt])
 }
 
 model ProposalAttachment {
@@ -108,6 +200,27 @@ enum ProposalStatus {
   ACCEPTED
   REJECTED
   WITHDRAWN
+}
+
+enum JobStatus {
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  BLOCKED
+  AT_RISK
+}
+
+enum PaymentStatus {
+  PENDING
+  FUNDED
+  RELEASED
+  DISPUTED
+}
+
+enum DeliverableStatus {
+  SUBMITTED
+  REVISION_REQUESTED
+  APPROVED
 }
 
 model SavedJob {

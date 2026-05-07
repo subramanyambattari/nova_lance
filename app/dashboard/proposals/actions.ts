@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
+import { ensureAcceptedProposalJobs } from "@/lib/active-jobs"
 import { requireUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { getProposalDashboard, proposalMutationSchema, proposalStatusSchema, serializeProposal } from "@/lib/proposals"
@@ -31,6 +32,12 @@ export async function createProposal(input: unknown) {
     },
     include: { attachments: true, job: true },
   })
+
+  if (proposal.status === "ACCEPTED") {
+    await ensureAcceptedProposalJobs(user.id)
+    revalidatePath("/active-jobs")
+    revalidatePath("/dashboard/active-jobs")
+  }
 
   revalidateProposalPaths(proposal.id)
   return serializeProposal(proposal)

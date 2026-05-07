@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { z, ZodError } from "zod"
 
+import { ensureAcceptedProposalJobs } from "@/lib/active-jobs"
 import { requireUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { proposalStatusSchema, serializeProposal } from "@/lib/proposals"
@@ -50,6 +51,10 @@ export async function PATCH(request: NextRequest) {
       },
       include: { attachments: true, job: true },
     })
+
+    if (proposal.status === "ACCEPTED") {
+      await ensureAcceptedProposalJobs(user.id)
+    }
 
     return Response.json({ proposal: serializeProposal(proposal) })
   } catch (error) {
