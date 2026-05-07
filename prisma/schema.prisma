@@ -12,6 +12,10 @@ model User {
   email String  @unique
   name  String?
   posts Post[]
+  jobs Job[]
+  proposals Proposal[] @relation("FreelancerProposals")
+  savedJobs SavedJob[]
+  savedSearches SavedSearch[]
 } 
 model Post { 
   id        Int     @id @default(autoincrement()) 
@@ -21,3 +25,120 @@ model Post {
   authorId  Int
   author    User    @relation(fields: [authorId], references: [id]) 
 } 
+
+model Job {
+  id             String      @id @default(cuid())
+  title          String
+  description    String
+  company        String
+  budget         Float?
+  salary         String?
+  skills         String[]
+  type           String
+  experience     String
+  location       String      @default("Remote")
+  remote         Boolean     @default(true)
+  verifiedClient Boolean     @default(false)
+  source         String      @default("internal")
+  externalId     String?
+  externalUrl    String?
+  postedAt       DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  clientId       Int?
+  client         User?       @relation(fields: [clientId], references: [id])
+  proposals      Proposal[]
+  savedJobs      SavedJob[]
+
+  @@index([source, externalId])
+  @@index([postedAt])
+  @@index([clientId])
+}
+
+model Proposal {
+  id                   String               @id @default(cuid())
+  coverLetter          String
+  budget               Float?
+  timeline             String?
+  portfolioLinks       String[]             @default([])
+  resumeUrl            String?
+  status               ProposalStatus       @default(DRAFT)
+  externalJobId        String?
+  externalJobUrl       String?
+  clientMessage        String?
+  meetingUrl           String?
+  submittedAt          DateTime?
+  viewedAt             DateTime?
+  respondedAt          DateTime?
+  interviewAt          DateTime?
+  acceptedAt           DateTime?
+  withdrawnAt          DateTime?
+  lastClientActivityAt DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  freelancerId Int
+  jobId        String?
+
+  freelancer  User                 @relation("FreelancerProposals", fields: [freelancerId], references: [id])
+  job         Job?                 @relation(fields: [jobId], references: [id])
+  attachments ProposalAttachment[]
+
+  @@index([freelancerId, status])
+  @@index([jobId])
+  @@index([updatedAt])
+}
+
+model ProposalAttachment {
+  id         String @id @default(cuid())
+  fileName   String
+  fileUrl    String
+  proposalId String
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([proposalId])
+}
+
+enum ProposalStatus {
+  DRAFT
+  SUBMITTED
+  VIEWED
+  INTERVIEW
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model SavedJob {
+  id             String   @id @default(cuid())
+  userId         Int
+  jobId          String?
+  externalJobId  String?
+  externalJobUrl String?
+  title          String
+  company        String
+  source         String
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  job  Job? @relation(fields: [jobId], references: [id])
+
+  @@unique([userId, jobId])
+  @@unique([userId, externalJobId])
+  @@index([userId, createdAt])
+}
+
+model SavedSearch {
+  id        String   @id @default(cuid())
+  userId    Int
+  name      String
+  query     String
+  filters   Json
+  alerts    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}

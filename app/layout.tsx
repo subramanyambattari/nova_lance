@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/ui/app-sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +53,7 @@ export default function RootLayout({
                 </div>
                 {children}
               </main>
+              <Toaster />
             </SidebarProvider>
           </TooltipProvider>
         </ThemeProvider>

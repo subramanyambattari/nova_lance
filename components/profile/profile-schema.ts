@@ -1,0 +1,51 @@
+import { z } from "zod"
+
+export const profileSchema = z.object({
+  fullName: z.string().min(2, "Full name is required."),
+  username: z.string().min(3, "Username must be at least 3 characters."),
+  email: z.string().email("Enter a valid email address."),
+  phone: z.string().min(7, "Phone number is required."),
+  location: z.string().min(2, "Location is required."),
+  timezone: z.string().min(2, "Timezone is required."),
+  languages: z.string().min(2, "Add at least one language."),
+  title: z.string().min(3, "Professional title is required."),
+  bio: z.string().min(20, "Bio should be at least 20 characters."),
+  experienceLevel: z.string().min(1, "Select your experience level."),
+  hourlyRate: z.number().min(10, "Hourly rate must be at least $10."),
+  availability: z.string().min(1, "Select your availability."),
+  portfolioWebsite: z.string().url("Enter a valid URL."),
+  github: z.string().url("Enter a valid URL."),
+  linkedin: z.string().url("Enter a valid URL."),
+  preferredJobType: z.string().min(1, "Select a job type."),
+  budgetRange: z.string().min(1, "Select a budget range."),
+  weeklyAvailability: z.string().min(1, "Select weekly availability."),
+  remoteOnly: z.boolean(),
+  openToContract: z.boolean(),
+  twoFactor: z.boolean(),
+})
+
+export type ProfileFormValues = z.infer<typeof profileSchema>
+
+export const defaultProfileValues: ProfileFormValues = {
+  fullName: "Subbu Roy",
+  username: "subburoy",
+  email: "subbu@novalance.dev",
+  phone: "+1 415 555 0198",
+  location: "San Francisco, CA",
+  timezone: "Pacific Time",
+  languages: "English, Hindi",
+  title: "Full Stack Developer",
+  bio: "I build polished SaaS products, analytics dashboards, and high-performing web applications for teams that need senior execution.",
+  experienceLevel: "Expert",
+  hourlyRate: 85,
+  availability: "Available this week",
+  portfolioWebsite: "https://subburoy.dev",
+  github: "https://github.com/subburoy",
+  linkedin: "https://linkedin.com/in/subburoy",
+  preferredJobType: "Long-term contracts",
+  budgetRange: "$5k - $15k",
+  weeklyAvailability: "25 hours/week",
+  remoteOnly: true,
+  openToContract: true,
+  twoFactor: true,
+}

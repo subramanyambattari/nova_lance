@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar"
 import {
   BriefcaseBusiness,
+  CreditCard,
   DollarSign,
   FileText,
   Home,
@@ -71,6 +72,11 @@ const navItems: {
     title: "Profile",
     href: "/profile",
     icon: User,
+  },
+  {
+    title: "Billing",
+    href: "/billing",
+    icon: CreditCard,
   },
   {
     title: "Settings",
