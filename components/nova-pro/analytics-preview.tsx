@@ -42,7 +42,7 @@ export function AnalyticsPreview() {
   }, [])
 
   const chart = mounted ? (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
       <AreaChart data={growthData} margin={{ left: -18, right: 8 }}>
         <defs>
           <linearGradient id="proGrowth" x1="0" y1="0" x2="0" y2="1">
@@ -62,7 +62,7 @@ export function AnalyticsPreview() {
   )
 
   const bars = mounted ? (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
       <BarChart data={successData}>
         <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
         <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
@@ -87,14 +87,14 @@ export function AnalyticsPreview() {
         <CardHeader>
           <CardTitle className="text-base text-zinc-100">Earnings growth preview</CardTitle>
         </CardHeader>
-        <CardContent className="h-80">{chart}</CardContent>
+        <CardContent className="h-80 min-h-0 min-w-0">{chart}</CardContent>
       </Card>
       <div className="grid gap-4">
         <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
           <CardHeader>
             <CardTitle className="text-base text-zinc-100">Proposal success rate</CardTitle>
           </CardHeader>
-          <CardContent className="h-52">{bars}</CardContent>
+          <CardContent className="h-52 min-h-0 min-w-0">{bars}</CardContent>
         </Card>
         <Card className="rounded-2xl border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl">
           {[

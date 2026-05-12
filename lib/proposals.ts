@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { isDatabaseUnavailableError, withTimeout } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
 function isValidUrl(value: string) {
@@ -96,14 +97,18 @@ export function serializeProposal(proposal: ProposalWithRelations) {
 }
 
 export async function getProposalDashboard(freelancerId: number) {
-  const proposals = await prisma.proposal.findMany({
-    where: { freelancerId },
-    orderBy: { updatedAt: "desc" },
-    include: {
-      attachments: true,
-      job: true,
-    },
-  })
+  const proposals = await withTimeout(
+    prisma.proposal.findMany({
+      where: { freelancerId },
+      orderBy: { updatedAt: "desc" },
+      include: {
+        attachments: true,
+        job: true,
+      },
+    }),
+    2500,
+    "Proposal dashboard query"
+  )
 
   const submittedSet = proposals.filter((proposal) => proposal.status !== "DRAFT")
   const respondedSet = submittedSet.filter((proposal) =>
@@ -140,6 +145,39 @@ export async function getProposalDashboard(freelancerId: number) {
     proposals: proposals.map(serializeProposal),
     stats,
     activity,
+  }
+}
+
+export async function getProposalDashboardOrFallback(freelancerId?: number) {
+  if (!freelancerId) return emptyProposalDashboard()
+
+  try {
+    return await getProposalDashboard(freelancerId)
+  } catch (error) {
+    if (!isDatabaseUnavailableError(error)) {
+      console.error("Unable to load proposal dashboard.", error)
+    }
+
+    return emptyProposalDashboard()
+  }
+}
+
+export function emptyProposalDashboard() {
+  return {
+    proposals: [],
+    stats: {
+      submitted: 0,
+      drafts: 0,
+      responseRate: 0,
+      interviewRequests: 0,
+      accepted: 0,
+      rejected: 0,
+      earningsPotential: 0,
+      interviewRate: 0,
+      acceptanceRate: 0,
+      averageResponseHours: 0,
+    },
+    activity: proposalStatuses.map((status) => ({ status, count: 0 })),
   }
 }
 

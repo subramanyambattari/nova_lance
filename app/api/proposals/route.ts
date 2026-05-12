@@ -1,11 +1,11 @@
-import { requireUser } from "@/lib/auth"
-import { getProposalDashboard } from "@/lib/proposals"
+import { getOptionalUser } from "@/lib/auth"
+import { getProposalDashboardOrFallback } from "@/lib/proposals"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const user = await requireUser()
-  const data = await getProposalDashboard(user.id)
+  const user = await getOptionalUser()
+  const data = await getProposalDashboardOrFallback(user?.id)
 
   return Response.json(data, {
     headers: {

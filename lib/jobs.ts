@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { isDatabaseUnavailableError, withTimeout } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
 export type UnifiedJob = {
@@ -213,46 +214,20 @@ async function fetchExternalJobs(query: string): Promise<UnifiedJob[]> {
 }
 
 async function fetchInternalJobs() {
-  const count = await prisma.job.count()
+  const count = await withTimeout(prisma.job.count(), 2500, "Internal jobs count")
   if (count === 0) {
-    const user = await prisma.user.upsert({
-      where: { email: "client@novalance.dev" },
-      update: { name: "Nova Client" },
-      create: { email: "client@novalance.dev", name: "Nova Client" },
-    })
-    await prisma.job.createMany({
-      data: [
-        {
-          title: "Next.js SaaS Dashboard Build",
-          description: "Build a premium dashboard with charts, auth flows, and billing UX for a B2B SaaS team.",
-          company: "Relay Cloud",
-          budget: 6200,
-          skills: ["Next.js", "React", "TypeScript", "Tailwind", "Recharts"],
-          type: "Fixed price",
-          experience: "Expert",
-          verifiedClient: true,
-          clientId: user.id,
-        },
-        {
-          title: "Prisma Performance Audit",
-          description: "Review a Prisma and PostgreSQL app, optimize queries, and document production recommendations.",
-          company: "FinOps Studio",
-          budget: 2800,
-          skills: ["Prisma", "PostgreSQL", "Node", "TypeScript"],
-          type: "Contract",
-          experience: "Senior",
-          verifiedClient: true,
-          clientId: user.id,
-        },
-      ],
-    })
+    await seedInternalJobs()
   }
 
-  const jobs = await prisma.job.findMany({
-    orderBy: { postedAt: "desc" },
-    take: 50,
-    include: { _count: { select: { proposals: true } } },
-  })
+  const jobs = await withTimeout(
+    prisma.job.findMany({
+      orderBy: { postedAt: "desc" },
+      take: 50,
+      include: { _count: { select: { proposals: true } } },
+    }),
+    2500,
+    "Internal jobs query"
+  )
 
   return jobs.map<UnifiedJob>((job) => ({
     id: job.id,
@@ -275,12 +250,96 @@ async function fetchInternalJobs() {
   }))
 }
 
+async function seedInternalJobs() {
+  const user = await prisma.user.upsert({
+    where: { email: "client@novalance.dev" },
+    update: { name: "Nova Client" },
+    create: { email: "client@novalance.dev", name: "Nova Client" },
+  })
+  await prisma.job.createMany({
+    data: [
+      {
+        title: "Next.js SaaS Dashboard Build",
+        description: "Build a premium dashboard with charts, auth flows, and billing UX for a B2B SaaS team.",
+        company: "Relay Cloud",
+        budget: 6200,
+        skills: ["Next.js", "React", "TypeScript", "Tailwind", "Recharts"],
+        type: "Fixed price",
+        experience: "Expert",
+        verifiedClient: true,
+        clientId: user.id,
+      },
+      {
+        title: "Prisma Performance Audit",
+        description: "Review a Prisma and PostgreSQL app, optimize queries, and document production recommendations.",
+        company: "FinOps Studio",
+        budget: 2800,
+        skills: ["Prisma", "PostgreSQL", "Node", "TypeScript"],
+        type: "Contract",
+        experience: "Senior",
+        verifiedClient: true,
+        clientId: user.id,
+      },
+    ],
+  })
+}
+
+function fallbackInternalJobs(): UnifiedJob[] {
+  const now = new Date().toISOString()
+
+  return [
+    {
+      id: "demo:nextjs-dashboard",
+      title: "Next.js SaaS Dashboard Build",
+      company: "Relay Cloud",
+      description: "Build a premium dashboard with charts, auth flows, and billing UX for a B2B SaaS team.",
+      budget: 6200,
+      salary: "$6,200 fixed",
+      skills: ["Next.js", "React", "TypeScript", "Tailwind", "Recharts"],
+      type: "Fixed price",
+      experience: "Expert",
+      location: "Remote",
+      remote: true,
+      verifiedClient: true,
+      source: "internal",
+      postedAt: now,
+      match: 96,
+    },
+    {
+      id: "demo:prisma-audit",
+      title: "Prisma Performance Audit",
+      company: "FinOps Studio",
+      description: "Review a Prisma and PostgreSQL app, optimize queries, and document production recommendations.",
+      budget: 2800,
+      salary: "$2,800 fixed",
+      skills: ["Prisma", "PostgreSQL", "Node", "TypeScript"],
+      type: "Contract",
+      experience: "Senior",
+      location: "Remote",
+      remote: true,
+      verifiedClient: true,
+      source: "internal",
+      postedAt: now,
+      match: 88,
+    },
+  ]
+}
+
 export async function getUnifiedJobs(params: z.infer<typeof jobSearchSchema>, userId?: number) {
   const [internal, external, saved] = await Promise.all([
-    fetchInternalJobs(),
+    fetchInternalJobs().catch((error) => {
+      if (!isDatabaseUnavailableError(error)) {
+        console.error("Unable to load internal jobs.", error)
+      }
+      return fallbackInternalJobs()
+    }),
     fetchExternalJobs(params.q),
     userId
-      ? prisma.savedJob.findMany({ where: { userId }, select: { jobId: true, externalJobId: true } })
+      ? withTimeout(
+          prisma.savedJob.findMany({ where: { userId }, select: { jobId: true, externalJobId: true } }),
+          2500,
+          "Saved jobs query"
+        ).catch(() => [])
       : Promise.resolve([]),
   ])
 

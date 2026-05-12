@@ -24,8 +24,8 @@ export function ProposalAnalytics({
           <h2 className="text-lg font-semibold text-white">Response analytics</h2>
           <p className="text-sm text-zinc-500">Success, interview, and acceptance rates.</p>
         </div>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-64 min-h-0 min-w-0">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={funnel}>
               <defs>
                 <linearGradient id="proposalRates" x1="0" y1="0" x2="0" y2="1">
@@ -50,8 +50,8 @@ export function ProposalAnalytics({
           <h2 className="text-lg font-semibold text-white">Status mix</h2>
           <p className="text-sm text-zinc-500">Live proposal counts by stage.</p>
         </div>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-64 min-h-0 min-w-0">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart data={activity}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
               <XAxis dataKey="status" stroke="#71717a" tickFormatter={(value) => String(value).slice(0, 4)} />

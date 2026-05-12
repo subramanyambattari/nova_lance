@@ -277,8 +277,8 @@ function AnalyticsPanel({ data }: { data: ActiveJobsResponse }) {
             <Metric label="Milestones" value={`${data.analytics.milestoneCompletion}%`} />
             <Metric label="Overdue" value={String(data.analytics.overdueTasks)} />
           </div>
-          <div className="h-52">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-52 min-h-0 min-w-0">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={data.analytics.weeklyProductivity}>
                 <defs>
                   <linearGradient id="productivity" x1="0" x2="0" y1="0" y2="1">
@@ -300,8 +300,8 @@ function AnalyticsPanel({ data }: { data: ActiveJobsResponse }) {
         <CardHeader>
           <CardTitle className="text-base text-white">Status mix</CardTitle>
         </CardHeader>
-        <CardContent className="h-56">
-          <ResponsiveContainer width="100%" height="100%">
+        <CardContent className="h-56 min-h-0 min-w-0">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart data={data.analytics.statusCounts}>
               <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
               <XAxis dataKey="status" stroke="#71717a" fontSize={11} />

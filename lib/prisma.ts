@@ -6,8 +6,26 @@ const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient
 }
 
+function databaseUrl() {
+  const value = process.env.DATABASE_URL
+  if (!value) return value
+
+  try {
+    const url = new URL(value)
+    const sslMode = url.searchParams.get("sslmode")
+
+    if (sslMode === "prefer" || sslMode === "require" || sslMode === "verify-ca") {
+      url.searchParams.set("sslmode", "verify-full")
+    }
+
+    return url.toString()
+  } catch {
+    return value
+  }
+}
+
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: databaseUrl(),
 })
 
 export const prisma =

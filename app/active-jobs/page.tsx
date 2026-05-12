@@ -1,6 +1,6 @@
 import { ActiveJobsClient } from "@/components/active-jobs/active-jobs-client"
-import { getActiveJobsDashboard } from "@/lib/active-jobs"
-import { requireUser } from "@/lib/auth"
+import { getActiveJobsDashboardOrFallback } from "@/lib/active-jobs"
+import { getOptionalUser } from "@/lib/auth"
 
 export const dynamic = "force-dynamic"
 
@@ -9,8 +9,8 @@ export default async function ActiveJobsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const user = await requireUser()
-  const data = await getActiveJobsDashboard(user.id, await searchParams)
+  const user = await getOptionalUser()
+  const data = await getActiveJobsDashboardOrFallback(user?.id, await searchParams)
 
   return <ActiveJobsClient initialData={data} />
 }

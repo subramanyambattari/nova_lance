@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server"
 import { ZodError } from "zod"
 
-import { requireUser } from "@/lib/auth"
+import { getDemoUser, getOptionalUser, isDatabaseUnavailableError, requireUser, withTimeout } from "@/lib/auth"
 import { getConversationParticipantIds, typingSchema } from "@/lib/messages"
 import { prisma } from "@/lib/prisma"
 import { publishRealtime } from "@/lib/realtime"
@@ -9,8 +9,24 @@ import { publishRealtime } from "@/lib/realtime"
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const user = await requireUser()
-  const presence = await prisma.userPresence.findUnique({ where: { userId: user.id } })
+  const user = (await getOptionalUser()) ?? getDemoUser()
+  if (user.id === 0) {
+    return Response.json({
+      user,
+      presence: { online: false, lastActiveAt: new Date().toISOString() },
+    })
+  }
+
+  const presence = await withTimeout(
+    prisma.userPresence.findUnique({ where: { userId: user.id } }),
+    2500,
+    "Presence query"
+  ).catch((error) => {
+    if (!isDatabaseUnavailableError(error)) {
+      console.error("Unable to load user presence.", error)
+    }
+    return null
+  })
 
   return Response.json({
     user: { id: user.id, name: user.name, email: user.email },
@@ -58,31 +74,49 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH() {
-  const user = await requireUser()
+  const user = await getOptionalUser()
+  if (!user) return Response.json({ presence: null })
+
   const now = new Date()
 
-  const presence = await prisma.userPresence.upsert({
-    where: { userId: user.id },
-    update: { online: false, lastActiveAt: now },
-    create: { userId: user.id, online: false, lastActiveAt: now },
-  })
+  try {
+    const presence = await withTimeout(
+      prisma.userPresence.upsert({
+        where: { userId: user.id },
+        update: { online: false, lastActiveAt: now },
+        create: { userId: user.id, online: false, lastActiveAt: now },
+      }),
+      2500,
+      "Presence update"
+    )
 
-  const peers = await prisma.conversationParticipant.findMany({
-    where: {
-      conversation: { participants: { some: { userId: user.id } } },
-      userId: { not: user.id },
-    },
-    select: { userId: true },
-    distinct: ["userId"],
-  })
+    const peers = await withTimeout(
+      prisma.conversationParticipant.findMany({
+        where: {
+          conversation: { participants: { some: { userId: user.id } } },
+          userId: { not: user.id },
+        },
+        select: { userId: true },
+        distinct: ["userId"],
+      }),
+      2500,
+      "Presence peers query"
+    )
 
-  await publishRealtime(
-    peers.map((peer) => peer.userId),
-    {
-      type: "user-online",
-      payload: { userId: user.id, online: false, lastActiveAt: now.toISOString() },
+    await publishRealtime(
+      peers.map((peer) => peer.userId),
+      {
+        type: "user-online",
+        payload: { userId: user.id, online: false, lastActiveAt: now.toISOString() },
+      }
+    )
+
+    return Response.json({ presence })
+  } catch (error) {
+    if (!isDatabaseUnavailableError(error)) {
+      console.error("Unable to update user presence.", error)
     }
-  )
 
-  return Response.json({ presence })
+    return Response.json({ presence: null })
+  }
 }

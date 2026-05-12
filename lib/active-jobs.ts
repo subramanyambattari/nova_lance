@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 import type { ActiveJobGetPayload } from "@/app/generated/prisma/models/ActiveJob"
+import { isDatabaseUnavailableError, withTimeout } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
 export const jobStatuses = ["IN_PROGRESS", "REVIEW", "COMPLETED", "BLOCKED", "AT_RISK"] as const
@@ -72,7 +73,7 @@ export type ActiveJobsResponse = Awaited<ReturnType<typeof getActiveJobsDashboar
 export type ActiveJobDetail = Awaited<ReturnType<typeof getActiveJobDetail>>
 
 export async function getActiveJobsDashboard(userId: number, rawQuery: Record<string, string | string[] | undefined> = {}) {
-  await ensureAcceptedProposalJobs(userId)
+  await withTimeout(ensureAcceptedProposalJobs(userId), 2500, "Accepted proposal sync")
 
   const query = activeJobQuerySchema.parse(flattenQuery(rawQuery))
   const where = buildActiveJobWhere(userId, query)
@@ -85,21 +86,25 @@ export async function getActiveJobsDashboard(userId: number, rawQuery: Record<st
           ? [{ budget: "asc" as const }, { updatedAt: "desc" as const }]
           : [{ updatedAt: "desc" as const }]
 
-  const [jobs, total, allJobs] = await prisma.$transaction([
-    prisma.activeJob.findMany({
-      where,
-      include: activeJobInclude,
-      orderBy,
-      skip: (query.page - 1) * query.pageSize,
-      take: query.pageSize,
-    }),
-    prisma.activeJob.count({ where }),
-    prisma.activeJob.findMany({
-      where: { OR: [{ freelancerId: userId }, { clientId: userId }] },
-      include: activeJobInclude,
-      orderBy: { updatedAt: "desc" },
-    }),
-  ])
+  const [jobs, total, allJobs] = await withTimeout(
+    prisma.$transaction([
+      prisma.activeJob.findMany({
+        where,
+        include: activeJobInclude,
+        orderBy,
+        skip: (query.page - 1) * query.pageSize,
+        take: query.pageSize,
+      }),
+      prisma.activeJob.count({ where }),
+      prisma.activeJob.findMany({
+        where: { OR: [{ freelancerId: userId }, { clientId: userId }] },
+        include: activeJobInclude,
+        orderBy: { updatedAt: "desc" },
+      }),
+    ]),
+    2500,
+    "Active jobs dashboard query"
+  )
 
   const serializedAll = allJobs.map(serializeActiveJob)
 
@@ -120,8 +125,67 @@ export async function getActiveJobsDashboard(userId: number, rawQuery: Record<st
   }
 }
 
+export async function getActiveJobsDashboardOrFallback(
+  userId?: number,
+  rawQuery: Record<string, string | string[] | undefined> = {}
+) {
+  if (!userId) return emptyActiveJobsDashboard(rawQuery)
+
+  try {
+    return await getActiveJobsDashboard(userId, rawQuery)
+  } catch (error) {
+    if (!isDatabaseUnavailableError(error)) {
+      console.error("Unable to load active jobs dashboard.", error)
+    }
+
+    return emptyActiveJobsDashboard(rawQuery)
+  }
+}
+
+export function emptyActiveJobsDashboard(rawQuery: Record<string, string | string[] | undefined> = {}) {
+  const query = activeJobQuerySchema.parse(flattenQuery(rawQuery))
+
+  return {
+    jobs: [],
+    stats: {
+      inProgress: 0,
+      activeMilestones: 0,
+      atRisk: 0,
+      deadlinesThisWeek: 0,
+      totalActiveEarnings: 0,
+      completed: 0,
+    },
+    analytics: {
+      completionRate: 0,
+      milestoneCompletion: 0,
+      overdueTasks: 0,
+      activeEarnings: 0,
+      statusCounts: jobStatuses.map((status) => ({ status: status.replace("_", " "), count: 0 })),
+      weeklyProductivity: Array.from({ length: 7 }).map((_, index) => {
+        const day = new Date()
+        day.setDate(day.getDate() - (6 - index))
+        return {
+          day: day.toLocaleDateString("en", { weekday: "short" }),
+          completed: 0,
+          messages: 0,
+        }
+      }),
+    },
+    filters: {
+      clients: [],
+      priorities: [],
+    },
+    pagination: {
+      page: query.page,
+      pageSize: query.pageSize,
+      total: 0,
+      pageCount: 1,
+    },
+  }
+}
+
 export async function getActiveJobDetail(userId: number, id: string) {
-  await ensureAcceptedProposalJobs(userId)
+  await withTimeout(ensureAcceptedProposalJobs(userId), 2500, "Accepted proposal sync")
 
   const job = await prisma.activeJob.findFirst({
     where: { id, OR: [{ freelancerId: userId }, { clientId: userId }] },

@@ -1,22 +1,22 @@
 import { NextRequest } from "next/server"
 import { ZodError } from "zod"
 
-import { getActiveJobsDashboard } from "@/lib/active-jobs"
-import { requireUser } from "@/lib/auth"
+import { getActiveJobsDashboardOrFallback } from "@/lib/active-jobs"
+import { getOptionalUser } from "@/lib/auth"
 import { rateLimit } from "@/lib/rate-limit"
 
 export const dynamic = "force-dynamic"
 
 export async function GET(request: NextRequest) {
-  const user = await requireUser()
-  const limited = rateLimit(`active-jobs:list:${user.id}`, 120, 60_000)
+  const user = await getOptionalUser()
+  const limited = rateLimit(`active-jobs:list:${user?.id ?? "demo"}`, 120, 60_000)
 
   if (!limited.ok) {
     return Response.json({ error: "Too many active jobs requests." }, { status: 429 })
   }
 
   try {
-    const data = await getActiveJobsDashboard(user.id, Object.fromEntries(request.nextUrl.searchParams))
+    const data = await getActiveJobsDashboardOrFallback(user?.id, Object.fromEntries(request.nextUrl.searchParams))
     return Response.json(data)
   } catch (error) {
     if (error instanceof ZodError) {

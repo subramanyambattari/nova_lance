@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server"
 import { ZodError } from "zod"
 
-import { requireUser } from "@/lib/auth"
+import { getDemoUser, getOptionalUser, isDatabaseUnavailableError, requireUser, withTimeout } from "@/lib/auth"
 import { createConversationSchema } from "@/lib/messages"
 import { prisma } from "@/lib/prisma"
 import { rateLimit } from "@/lib/rate-limit"
@@ -10,88 +10,107 @@ import { publishRealtime } from "@/lib/realtime"
 export const dynamic = "force-dynamic"
 
 export async function GET(request: NextRequest) {
-  const user = await requireUser()
+  const user = (await getOptionalUser()) ?? getDemoUser()
   const query = request.nextUrl.searchParams.get("q")?.trim()
   const archived = request.nextUrl.searchParams.get("archived") === "true"
 
-  const conversations = await prisma.conversation.findMany({
-    where: {
-      participants: {
-        some: {
-          userId: user.id,
-          archived,
-        },
-      },
-      ...(query
-        ? {
-            OR: [
-              { title: { contains: query, mode: "insensitive" } },
-              { messages: { some: { content: { contains: query, mode: "insensitive" } } } },
-              {
-                participants: {
-                  some: {
-                    user: {
-                      OR: [
-                        { name: { contains: query, mode: "insensitive" } },
-                        { email: { contains: query, mode: "insensitive" } },
-                      ],
-                    },
-                  },
-                },
-              },
-            ],
-          }
-        : {}),
-    },
-    include: {
-      participants: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              presence: true,
+  try {
+    const conversations = await withTimeout(
+      prisma.conversation.findMany({
+        where: {
+          participants: {
+            some: {
+              userId: user.id,
+              archived,
             },
           },
+          ...(query
+            ? {
+                OR: [
+                  { title: { contains: query, mode: "insensitive" } },
+                  { messages: { some: { content: { contains: query, mode: "insensitive" } } } },
+                  {
+                    participants: {
+                      some: {
+                        user: {
+                          OR: [
+                            { name: { contains: query, mode: "insensitive" } },
+                            { email: { contains: query, mode: "insensitive" } },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              }
+            : {}),
         },
-      },
-      messages: {
-        orderBy: { createdAt: "desc" },
-        take: 1,
-        include: { sender: { select: { id: true, name: true, email: true } } },
-      },
-    },
-    orderBy: [{ participants: { _count: "desc" } }, { updatedAt: "desc" }],
-    take: 50,
-  })
+        include: {
+          participants: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  presence: true,
+                },
+              },
+            },
+          },
+          messages: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            include: { sender: { select: { id: true, name: true, email: true } } },
+          },
+        },
+        orderBy: [{ participants: { _count: "desc" } }, { updatedAt: "desc" }],
+        take: 50,
+      }),
+      2500,
+      "Conversations query"
+    )
 
-  const unreadCounts = await prisma.message.groupBy({
-    by: ["conversationId"],
-    where: {
-      senderId: { not: user.id },
-      seen: false,
-      conversation: {
-        participants: { some: { userId: user.id, archived } },
-      },
-    },
-    _count: true,
-  })
-  const unreadMap = new Map(unreadCounts.map((item) => [item.conversationId, item._count]))
+    const unreadCounts = await withTimeout(
+      prisma.message.groupBy({
+        by: ["conversationId"],
+        where: {
+          senderId: { not: user.id },
+          seen: false,
+          conversation: {
+            participants: { some: { userId: user.id, archived } },
+          },
+        },
+        _count: true,
+      }),
+      2500,
+      "Unread conversations query"
+    )
+    const unreadMap = new Map(unreadCounts.map((item) => [item.conversationId, item._count]))
 
-  return Response.json({
-    conversations: conversations.map((conversation) => {
-      const self = conversation.participants.find((participant) => participant.userId === user.id)
-      return {
-        ...conversation,
-        pinned: self?.pinned ?? false,
-        archived: self?.archived ?? false,
-        unreadCount: unreadMap.get(conversation.id) ?? 0,
-        latestMessage: conversation.messages[0] ?? null,
-      }
-    }),
-    currentUser: { id: user.id, name: user.name, email: user.email },
-  })
+    return Response.json({
+      conversations: conversations.map((conversation) => {
+        const self = conversation.participants.find((participant) => participant.userId === user.id)
+        return {
+          ...conversation,
+          pinned: self?.pinned ?? false,
+          archived: self?.archived ?? false,
+          unreadCount: unreadMap.get(conversation.id) ?? 0,
+          latestMessage: conversation.messages[0] ?? null,
+        }
+      }),
+      currentUser: { id: user.id, name: user.name, email: user.email },
+    })
+  } catch (error) {
+    if (!isDatabaseUnavailableError(error)) {
+      console.error("Unable to load conversations.", error)
+    }
+
+    return Response.json({
+      conversations: [],
+      currentUser: { id: user.id, name: user.name, email: user.email },
+    })
+  }
 }
 
 export async function POST(request: NextRequest) {

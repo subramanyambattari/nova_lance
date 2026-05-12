@@ -53,7 +53,7 @@ function chartCard(title: string, badge: string, children: React.ReactNode) {
         <CardTitle className="text-sm font-medium text-zinc-200">{title}</CardTitle>
         <Badge variant="premium">{badge}</Badge>
       </CardHeader>
-      <CardContent className="h-72 pt-4">{children}</CardContent>
+      <CardContent className="h-72 min-h-0 min-w-0 pt-4">{children}</CardContent>
     </Card>
   )
 }
@@ -97,7 +97,7 @@ export function EarningsChart() {
         {chartCard(
           "Earnings overview",
           "+18.7%",
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={earningsData} margin={{ left: -18, right: 8 }}>
               <defs>
                 <linearGradient id="earningsFill" x1="0" y1="0" x2="0" y2="1">
@@ -118,7 +118,7 @@ export function EarningsChart() {
       {chartCard(
         "Weekly activity",
         "128h",
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <BarChart data={activityData}>
             <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
             <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
@@ -132,7 +132,7 @@ export function EarningsChart() {
         {chartCard(
           "Proposal conversion",
           "19% close rate",
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <LineChart data={conversionData} margin={{ left: -18, right: 12 }}>
               <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
               <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
