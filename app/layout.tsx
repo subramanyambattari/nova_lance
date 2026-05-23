@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/ui/app-sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
+import { GeminiChatWidget } from "@/components/ai/gemini-chat-widget";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -53,6 +54,7 @@ export default function RootLayout({
                 </div>
                 {children}
               </main>
+              <GeminiChatWidget />
               <Toaster />
             </SidebarProvider>
           </TooltipProvider>
