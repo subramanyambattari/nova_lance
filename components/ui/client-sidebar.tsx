@@ -12,80 +12,73 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import {
+  BarChart3,
   BriefcaseBusiness,
-  CreditCard,
-  DollarSign,
   FileText,
-  Home,
   LayoutDashboard,
-  MessageSquare,
-  Search,
+  ListChecks,
+  Plus,
   Settings,
   Sparkles,
-  User,
+  Users,
   type LucideIcon,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-const navItems: {
+const clientNavItems: {
   title: string
   href: string
   icon: LucideIcon
 }[] = [
   {
     title: "Overview",
-    href: "/",
-    icon: Home,
-  },
-  {
-    title: "Dashboard",
-    href: "/dashboard",
+    href: "/client-dashboard",
     icon: LayoutDashboard,
   },
   {
-    title: "Find Jobs",
-    href: "/find-jobs",
-    icon: Search,
+    title: "AI Workspace",
+    href: "/client-dashboard#ai-workspace",
+    icon: Sparkles,
   },
   {
-    title: "Proposals",
-    href: "/proposals",
-    icon: FileText,
+    title: "Post Job",
+    href: "/client-dashboard#post-job",
+    icon: Plus,
   },
   {
-    title: "Active Jobs",
-    href: "/active-jobs",
+    title: "My Jobs",
+    href: "/client-dashboard#my-jobs",
     icon: BriefcaseBusiness,
   },
   {
-    title: "Messages",
-    href: "/messages",
-    icon: MessageSquare,
+    title: "Talent Matches",
+    href: "/client-dashboard#talent-matches",
+    icon: Users,
   },
   {
-    title: "Earnings",
-    href: "/earnings",
-    icon: DollarSign,
+    title: "Proposals",
+    href: "/client-dashboard#proposals",
+    icon: FileText,
   },
   {
-    title: "Profile",
-    href: "/profile",
-    icon: User,
+    title: "Operations",
+    href: "/client-dashboard#operations",
+    icon: ListChecks,
   },
   {
-    title: "Billing",
-    href: "/billing",
-    icon: CreditCard,
+    title: "Analytics",
+    href: "/client-dashboard#analytics",
+    icon: BarChart3,
   },
   {
     title: "Settings",
-    href: "/settings",
+    href: "/client-dashboard#settings",
     icon: Settings,
   },
 ]
 
-export function AppSidebar() {
+export function ClientSidebar() {
   const pathname = usePathname()
 
   return (
@@ -93,15 +86,15 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild size="lg" tooltip="Nova Lance">
-              <Link href="/">
+            <SidebarMenuButton asChild size="lg" tooltip="Nova Lance Client">
+              <Link href="/client-dashboard">
                 <span className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
                   <Sparkles className="size-4" />
                 </span>
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate font-semibold">Nova Lance</span>
                   <span className="truncate text-xs text-sidebar-foreground/70">
-                    Talent marketplace
+                    Client workspace
                   </span>
                 </span>
               </Link>
@@ -111,17 +104,16 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarGroupLabel>Client</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {clientNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     isActive={
-                      item.href === "/"
-                        ? pathname === "/"
-                        : pathname.startsWith(item.href)
+                      item.href === "/client-dashboard" &&
+                      pathname === "/client-dashboard"
                     }
                     tooltip={item.title}
                   >

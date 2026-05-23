@@ -85,7 +85,7 @@ const initialConversations: Conversation[] = [
         id: "nova-welcome",
         role: "model",
         content:
-          "Hi Subramanyam, I am Nova. I can help draft client replies, improve proposals, plan milestones, or answer questions while you work.",
+          "Hi Subramanyam, I am Nova. I can help hire freelancers, explain proposals, suggest budgets, generate job content, summarize chats and meetings, and recommend your best next action.",
         createdAt: new Date(),
       },
     ],

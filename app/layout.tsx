@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/ui/app-sidebar";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "@/components/mode-toggle";
-import { GeminiChatWidget } from "@/components/ai/gemini-chat-widget";
-import { Toaster } from "@/components/ui/sonner";
+import { AppShell } from "@/components/ui/app-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,29 +30,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TooltipProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <main className="flex min-w-0 flex-1 flex-col">
-                <div className="sticky top-0 z-20 flex h-12 items-center border-b bg-background/95 px-4 backdrop-blur">
-                  <SidebarTrigger />
-                  <div className="ml-auto">
-                    <ModeToggle />
-                  </div>
-                </div>
-                {children}
-              </main>
-              <GeminiChatWidget />
-              <Toaster />
-            </SidebarProvider>
-          </TooltipProvider>
-        </ThemeProvider>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
