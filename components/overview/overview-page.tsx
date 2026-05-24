@@ -199,13 +199,13 @@ export function OverviewPage() {
   }, [])
 
   return (
-    <div className="min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen overflow-hidden bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
       <div className="relative z-0 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <motion.header
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="grid gap-5 rounded-2xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl lg:grid-cols-[1fr_360px] lg:p-6"
+          className="grid gap-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035] dark:shadow-2xl dark:shadow-black/20 lg:grid-cols-[1fr_360px] lg:p-6"
         >
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -213,18 +213,18 @@ export function OverviewPage() {
                 <Sparkles className="size-3" />
                 Main overview
               </Badge>
-              <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-zinc-300">
+              <Badge variant="outline" className="border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
                 May 21, 2026
               </Badge>
             </div>
-            <h1 className="mt-4 text-3xl font-semibold tracking-normal text-white sm:text-4xl lg:text-5xl">
+            <h1 className="mt-4 text-3xl font-semibold tracking-normal text-zinc-950 dark:text-white sm:text-4xl lg:text-5xl">
               Command center for your freelance business
             </h1>
-            <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400 sm:text-base">
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-600 dark:text-zinc-400 sm:text-base">
               See what needs attention, where money is moving, which clients are active, and how the pipeline is converting across Nova Lance.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Button asChild className="rounded-xl bg-white text-zinc-950 hover:bg-sky-100">
+              <Button asChild className="rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-sky-100">
                 <Link href="/find-jobs">
                   <Search className="size-4" />
                   Find Jobs
@@ -233,7 +233,7 @@ export function OverviewPage() {
               <Button
                 asChild
                 variant="outline"
-                className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+                className="rounded-xl border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200 dark:hover:bg-white/[0.08]"
               >
                 <Link href="/proposals">
                   <FileText className="size-4" />
@@ -243,13 +243,13 @@ export function OverviewPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-zinc-950/65 p-4">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-white/10 dark:bg-zinc-950/65">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm text-zinc-500">Workspace health</p>
-                <p className="mt-1 text-2xl font-semibold text-white">86%</p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-500">Workspace health</p>
+                <p className="mt-1 text-2xl font-semibold text-zinc-950 dark:text-white">86%</p>
               </div>
-              <span className="flex size-11 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-200">
+              <span className="flex size-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
                 <TrendingUp className="size-5" />
               </span>
             </div>
@@ -260,9 +260,9 @@ export function OverviewPage() {
                 ["Booked", "86%"],
                 ["Rank", "Top 3%"],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <div key={label} className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-white/10 dark:bg-white/[0.03]">
                   <p className="text-xs text-zinc-500">{label}</p>
-                  <p className="mt-1 font-medium text-zinc-100">{value}</p>
+                  <p className="mt-1 font-medium text-zinc-950 dark:text-zinc-100">{value}</p>
                 </div>
               ))}
             </div>
@@ -277,12 +277,12 @@ export function OverviewPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: index * 0.05 }}
             >
-              <Card className="h-full rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="h-full rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
                 <CardContent className="p-5">
                   <stat.icon className={`size-5 ${stat.tone}`} />
                   <p className="mt-5 text-sm text-zinc-500">{stat.label}</p>
-                  <p className="mt-2 text-2xl font-semibold text-white">{stat.value}</p>
-                  <p className="mt-3 text-sm text-zinc-400">{stat.detail}</p>
+                  <p className="mt-2 text-2xl font-semibold text-zinc-950 dark:text-white">{stat.value}</p>
+                  <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{stat.detail}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -290,24 +290,24 @@ export function OverviewPage() {
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[1fr_1.15fr]">
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
             <CardHeader className="flex-row items-center justify-between gap-3">
-              <CardTitle className="text-base text-zinc-100">Priority actions</CardTitle>
-              <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-zinc-300">
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Priority actions</CardTitle>
+              <Badge variant="outline" className="border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
                 Today
               </Badge>
             </CardHeader>
             <CardContent className="space-y-3">
               {priorityActions.map((item) => (
-                <div key={item.title} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <div key={item.title} className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-white/10 dark:bg-white/[0.03]">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex min-w-0 gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-200">
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-zinc-700 dark:bg-white/[0.06] dark:text-zinc-200">
                         <item.icon className="size-5" />
                       </span>
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-medium text-zinc-100">{item.title}</p>
+                          <p className="font-medium text-zinc-950 dark:text-zinc-100">{item.title}</p>
                           <Badge variant="outline" className={item.tone}>
                             {item.badge}
                           </Badge>
@@ -319,7 +319,7 @@ export function OverviewPage() {
                   <Button
                     asChild
                     variant="outline"
-                    className="mt-4 w-full rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+                    className="mt-4 w-full rounded-xl border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200 dark:hover:bg-white/[0.08]"
                   >
                     <Link href={item.route}>
                       {item.cta}
@@ -331,9 +331,9 @@ export function OverviewPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
             <CardHeader className="flex-row items-center justify-between gap-3">
-              <CardTitle className="text-base text-zinc-100">Pipeline momentum</CardTitle>
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Pipeline momentum</CardTitle>
               <Badge variant="premium">42% close rate</Badge>
             </CardHeader>
             <CardContent className="h-96 min-h-0 min-w-0 pt-2">
@@ -350,17 +350,17 @@ export function OverviewPage() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <Skeleton className="h-full w-full bg-white/10" />
+                <Skeleton className="h-full w-full bg-zinc-100 dark:bg-white/10" />
               )}
             </CardContent>
           </Card>
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[1.35fr_0.85fr]">
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
             <CardHeader className="flex-row items-center justify-between gap-3">
-              <CardTitle className="text-base text-zinc-100">Active delivery</CardTitle>
-              <Button asChild variant="outline" size="sm" className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200">
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Active delivery</CardTitle>
+              <Button asChild variant="outline" size="sm" className="rounded-xl border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200 dark:hover:bg-white/[0.08]">
                 <Link href="/active-jobs">
                   View all
                   <ArrowUpRight className="size-4" />
@@ -370,7 +370,7 @@ export function OverviewPage() {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow className="border-white/10 hover:bg-transparent">
+                  <TableRow className="border-zinc-200 hover:bg-transparent dark:border-white/10">
                     <TableHead className="text-zinc-500">Project</TableHead>
                     <TableHead className="hidden text-zinc-500 sm:table-cell">Client</TableHead>
                     <TableHead className="text-zinc-500">State</TableHead>
@@ -380,15 +380,15 @@ export function OverviewPage() {
                 </TableHeader>
                 <TableBody>
                   {activeWork.map((project) => (
-                    <TableRow key={project.project} className="border-white/10 hover:bg-white/[0.03]">
-                      <TableCell className="font-medium text-zinc-100">{project.project}</TableCell>
-                      <TableCell className="hidden text-zinc-400 sm:table-cell">{project.client}</TableCell>
+                    <TableRow key={project.project} className="border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
+                      <TableCell className="font-medium text-zinc-950 dark:text-zinc-100">{project.project}</TableCell>
+                      <TableCell className="hidden text-zinc-600 dark:text-zinc-400 sm:table-cell">{project.client}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="border-sky-400/20 bg-sky-500/10 text-sky-200">
                           {project.state}
                         </Badge>
                       </TableCell>
-                      <TableCell className="hidden text-zinc-400 md:table-cell">{project.due}</TableCell>
+                      <TableCell className="hidden text-zinc-600 dark:text-zinc-400 md:table-cell">{project.due}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Progress value={project.progress} />
@@ -402,10 +402,10 @@ export function OverviewPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
             <CardHeader className="flex-row items-center justify-between gap-3">
-              <CardTitle className="text-base text-zinc-100">Client activity</CardTitle>
-              <Badge variant="outline" className="gap-1 border-white/10 bg-white/[0.04] text-zinc-300">
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Client activity</CardTitle>
+              <Badge variant="outline" className="gap-1 border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
                 <Bell className="size-3" />
                 3 unread
               </Badge>
@@ -415,19 +415,19 @@ export function OverviewPage() {
                 <Link
                   key={item.name}
                   href="/messages"
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-sky-400/30 hover:bg-white/[0.06]"
+                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 transition hover:border-sky-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-sky-400/30 dark:hover:bg-white/[0.06]"
                 >
-                  <Avatar className="size-10 border border-white/10">
-                    <AvatarFallback className="bg-zinc-800 text-xs text-zinc-100">
+                  <Avatar className="size-10 border border-zinc-200 dark:border-white/10">
+                    <AvatarFallback className="bg-zinc-200 text-xs text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100">
                       {item.initials}
                     </AvatarFallback>
                   </Avatar>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-medium text-zinc-100">{item.name}</span>
+                      <span className="truncate text-sm font-medium text-zinc-950 dark:text-zinc-100">{item.name}</span>
                       <span className="text-xs text-zinc-500">{item.time}</span>
                     </span>
-                    <span className="mt-1 block truncate text-sm text-zinc-400">{item.message}</span>
+                    <span className="mt-1 block truncate text-sm text-zinc-600 dark:text-zinc-400">{item.message}</span>
                   </span>
                 </Link>
               ))}
@@ -436,9 +436,9 @@ export function OverviewPage() {
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
             <CardHeader className="flex-row items-center justify-between gap-3">
-              <CardTitle className="text-base text-zinc-100">Earnings snapshot</CardTitle>
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Earnings snapshot</CardTitle>
               <Badge variant="success">+$12.4k MTD</Badge>
             </CardHeader>
             <CardContent className="h-80 min-h-0 min-w-0 pt-2">
@@ -460,28 +460,28 @@ export function OverviewPage() {
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <Skeleton className="h-full w-full bg-white/10" />
+                <Skeleton className="h-full w-full bg-zinc-100 dark:bg-white/10" />
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
             <CardHeader>
-              <CardTitle className="text-base text-zinc-100">Workspace shortcuts</CardTitle>
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Workspace shortcuts</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">
               {shortcuts.map((shortcut) => (
                 <Link
                   key={shortcut.title}
                   href={shortcut.href}
-                  className="group flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-sky-400/30 hover:bg-white/[0.06]"
+                  className="group flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 transition hover:border-sky-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-sky-400/30 dark:hover:bg-white/[0.06]"
                 >
                   <span className="flex min-w-0 items-center gap-3">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-200">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-zinc-700 dark:bg-white/[0.06] dark:text-zinc-200">
                       <shortcut.icon className="size-5" />
                     </span>
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium text-zinc-100">{shortcut.title}</span>
+                      <span className="block truncate text-sm font-medium text-zinc-950 dark:text-zinc-100">{shortcut.title}</span>
                       <span className="mt-1 block truncate text-xs text-zinc-500">{shortcut.detail}</span>
                     </span>
                   </span>
@@ -498,14 +498,14 @@ export function OverviewPage() {
             { title: "Proposal response", value: "3 waiting", detail: "Average reply time is 12 minutes", icon: Clock3 },
             { title: "Account readiness", value: "Verified", detail: "Profile, payout, and billing are active", icon: CheckCircle2 },
           ].map((item) => (
-            <Card key={item.title} className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+            <Card key={item.title} className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
               <CardContent className="flex items-center gap-4 p-5">
-                <span className="flex size-11 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-200">
+                <span className="flex size-11 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-white/[0.06] dark:text-zinc-200">
                   <item.icon className="size-5" />
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm text-zinc-500">{item.title}</p>
-                  <p className="mt-1 truncate font-medium text-zinc-100">{item.value}</p>
+                  <p className="mt-1 truncate font-medium text-zinc-950 dark:text-zinc-100">{item.value}</p>
                   <p className="mt-1 truncate text-xs text-zinc-500">{item.detail}</p>
                 </div>
               </CardContent>

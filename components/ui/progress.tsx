@@ -10,7 +10,7 @@ function Progress({ className, value = 0, ...props }: ProgressProps) {
   return (
     <div
       data-slot="progress"
-      className={cn("h-2 w-full overflow-hidden rounded-full bg-white/10", className)}
+      className={cn("h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-white/10", className)}
       {...props}
     >
       <div

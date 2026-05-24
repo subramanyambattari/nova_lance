@@ -48,9 +48,9 @@ const conversionData = [
 
 function chartCard(title: string, badge: string, children: React.ReactNode) {
   return (
-    <Card className="overflow-hidden rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+    <Card className="overflow-hidden rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
       <CardHeader className="flex-row items-center justify-between gap-3 pb-2">
-        <CardTitle className="text-sm font-medium text-zinc-200">{title}</CardTitle>
+        <CardTitle className="text-sm font-medium text-zinc-950 dark:text-zinc-200">{title}</CardTitle>
         <Badge variant="premium">{badge}</Badge>
       </CardHeader>
       <CardContent className="h-72 min-h-0 min-w-0 pt-4">{children}</CardContent>
@@ -76,11 +76,11 @@ export function EarningsChart() {
     return (
       <section className="grid gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          {chartCard("Earnings overview", "+18.7%", <Skeleton className="h-full w-full bg-white/10" />)}
+          {chartCard("Earnings overview", "+18.7%", <Skeleton className="h-full w-full bg-zinc-100 dark:bg-white/10" />)}
         </div>
-        {chartCard("Weekly activity", "128h", <Skeleton className="h-full w-full bg-white/10" />)}
+        {chartCard("Weekly activity", "128h", <Skeleton className="h-full w-full bg-zinc-100 dark:bg-white/10" />)}
         <div className="xl:col-span-3">
-          {chartCard("Proposal conversion", "19% close rate", <Skeleton className="h-full w-full bg-white/10" />)}
+          {chartCard("Proposal conversion", "19% close rate", <Skeleton className="h-full w-full bg-zinc-100 dark:bg-white/10" />)}
         </div>
       </section>
     )

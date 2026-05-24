@@ -48,14 +48,14 @@ const projects: Project[] = [
 export function CurrentWork() {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.2 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Current work</CardTitle>
+          <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Current work</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="border-white/10 hover:bg-transparent">
+              <TableRow className="border-zinc-200 hover:bg-transparent dark:border-white/10">
                 <TableHead>Project</TableHead>
                 <TableHead className="hidden sm:table-cell">Client</TableHead>
                 <TableHead>Status</TableHead>
@@ -65,18 +65,18 @@ export function CurrentWork() {
             </TableHeader>
             <TableBody>
               {projects.map((project) => (
-                <TableRow key={project.name} className="border-white/10 hover:bg-white/[0.03]">
-                  <TableCell className="font-medium text-zinc-100">{project.name}</TableCell>
-                  <TableCell className="hidden text-zinc-400 sm:table-cell">{project.client}</TableCell>
+                <TableRow key={project.name} className="border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
+                  <TableCell className="font-medium text-zinc-950 dark:text-zinc-100">{project.name}</TableCell>
+                  <TableCell className="hidden text-zinc-600 dark:text-zinc-400 sm:table-cell">{project.client}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="border-blue-400/20 bg-blue-500/10 text-blue-200">
                       {project.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="hidden text-zinc-400 md:table-cell">{project.deadline}</TableCell>
+                  <TableCell className="hidden text-zinc-600 dark:text-zinc-400 md:table-cell">{project.deadline}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-white/10">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-blue-400 to-violet-400"
                           style={{ width: `${project.progress}%` }}

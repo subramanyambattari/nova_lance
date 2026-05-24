@@ -36,10 +36,10 @@ const deadlines = [
 export function DeadlinesWidget() {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.35 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
         <CardHeader className="flex-row items-center justify-between">
-          <CardTitle className="text-base text-zinc-100">Upcoming deadlines</CardTitle>
-          <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-zinc-300">
+          <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Upcoming deadlines</CardTitle>
+          <Badge variant="outline" className="border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
             This week
           </Badge>
         </CardHeader>
@@ -48,12 +48,12 @@ export function DeadlinesWidget() {
             const Icon = item.icon
 
             return (
-              <div key={item.title} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-white/[0.05]">
+              <div key={item.title} className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-white/10 dark:bg-white/[0.03]">
+                <span className="flex size-9 items-center justify-center rounded-xl bg-white dark:bg-white/[0.05]">
                   <Icon className={`size-4 ${item.tone}`} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium text-zinc-100">{item.title}</span>
+                  <span className="block truncate text-sm font-medium text-zinc-950 dark:text-zinc-100">{item.title}</span>
                   <span className="mt-1 block text-xs text-zinc-500">{item.meta}</span>
                 </span>
               </div>
