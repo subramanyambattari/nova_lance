@@ -47,7 +47,7 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useTransition } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -428,7 +428,22 @@ function StatusBadge({ status }: { status: Job["status"] | ProposalStatus }) {
   )
 }
 
-export function ClientDashboardPage() {
+import { createJob } from "@/app/actions/client"
+import { generateJobDescription } from "@/app/actions/ai"
+// useTransition moved to top
+
+export function ClientDashboardPage({ 
+  initialJobs = [], 
+  initialProposals = [] 
+}: { 
+  initialJobs?: any[], 
+  initialProposals?: any[] 
+}) {
+  const [isPending, startTransition] = useTransition()
+  const [aiResponse, setAiResponse] = useState<string | null>(null)
+  const [isAiLoading, setIsAiLoading] = useState(false)
+
+
   const [skills, setSkills] = useState(initialSkills)
   const [skillDraft, setSkillDraft] = useState("")
   const [proposalFilter, setProposalFilter] = useState<"All" | ProposalStatus>("All")
@@ -439,8 +454,8 @@ export function ClientDashboardPage() {
   const filteredProposals = useMemo(() => {
     const visible =
       proposalFilter === "All"
-        ? proposals
-        : proposals.filter((proposal) => proposal.status === proposalFilter)
+        ? initialProposals
+        : initialProposals.filter((proposal) => proposal.status === proposalFilter)
 
     return [...visible].sort((first, second) => {
       if (proposalSort === "Budget") {
@@ -561,8 +576,8 @@ export function ClientDashboardPage() {
               <div>
                 <SectionHeader eyebrow="Project health" title="Progress overview" />
                 <div className="space-y-3">
-                  {jobs.map((job) => (
-                    <div key={job.title} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+                  {initialJobs.length > 0 ? initialJobs.map((job) => (
+                    <div key={job.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
@@ -583,7 +598,7 @@ export function ClientDashboardPage() {
                         <span className="w-10 text-right text-sm text-zinc-500">{job.progress}%</span>
                       </div>
                     </div>
-                  ))}
+                  )) : <p className="text-sm text-zinc-500">No active jobs found. Post a job to get started!</p>}
                 </div>
               </div>
 
@@ -682,12 +697,38 @@ export function ClientDashboardPage() {
                   <div className="mt-4 flex flex-wrap gap-2">
                     {["Explain proposals", "Suggest budgets", "Summarize meetings", "Generate job content"].map(
                       (prompt) => (
-                        <Button key={prompt} variant="outline" size="sm">
+                        <Button 
+                          key={prompt} 
+                          variant="outline" 
+                          size="sm"
+                          disabled={isAiLoading}
+                          onClick={async () => {
+                            if (prompt === "Generate job content") {
+                              setIsAiLoading(true)
+                              const res = await generateJobDescription("Create a job post for an AI engineer.")
+                              if (res.success) setAiResponse(res.text)
+                              setIsAiLoading(false)
+                            } else {
+                              setAiResponse(`Feature '${prompt}' is coming soon!`)
+                            }
+                          }}
+                        >
                           {prompt}
                         </Button>
                       )
                     )}
                   </div>
+                  {aiResponse && (
+                    <div className="mt-4 rounded-md bg-zinc-100 p-4 text-sm dark:bg-zinc-800">
+                      <div className="flex justify-between items-center mb-2">
+                        <strong className="text-blue-600 dark:text-blue-400">Nova AI Response:</strong>
+                        <Button variant="ghost" size="sm" onClick={() => setAiResponse(null)}>Clear</Button>
+                      </div>
+                      <p className="whitespace-pre-wrap leading-relaxed text-zinc-700 dark:text-zinc-300">
+                        {isAiLoading ? "Thinking..." : aiResponse}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -821,16 +862,30 @@ export function ClientDashboardPage() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button variant="outline">
-                      <Archive className="size-4" />
-                      Save draft
-                    </Button>
-                    <Button>
-                      <CheckCircle2 className="size-4" />
-                      Publish
-                    </Button>
-                  </div>
+                  <div className="mt-6 flex justify-end gap-3">
+                      <Button variant="outline">Save as draft</Button>
+                      <Button 
+                        disabled={isPending}
+                        onClick={() => {
+                          startTransition(async () => {
+                            await createJob({
+                              title: jobDraft.title,
+                              budget: jobDraft.budget,
+                              timeline: jobDraft.timeline,
+                              priority: jobDraft.priority,
+                              experience: jobDraft.experience,
+                              skills: skills
+                            })
+                            // Optional: show a toast or reset form
+                            setJobDraft(initialJobDraft)
+                            setSkills(initialSkills)
+                          })
+                        }}
+                      >
+                        {isPending ? "Posting..." : "Post job"}
+                        <ArrowUpRight className="size-4" />
+                      </Button>
+                    </div>
                 </div>
               </aside>
             </section>

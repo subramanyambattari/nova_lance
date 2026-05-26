@@ -45,7 +45,7 @@ const projects: Project[] = [
   },
 ]
 
-export function CurrentWork() {
+export function CurrentWork({ initialActiveJobs = [] }: { initialActiveJobs?: any[] }) {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.2 }}>
       <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
@@ -64,16 +64,18 @@ export function CurrentWork() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {projects.map((project) => (
-                <TableRow key={project.name} className="border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
-                  <TableCell className="font-medium text-zinc-950 dark:text-zinc-100">{project.name}</TableCell>
-                  <TableCell className="hidden text-zinc-600 dark:text-zinc-400 sm:table-cell">{project.client}</TableCell>
+              {initialActiveJobs.length > 0 ? initialActiveJobs.map((project) => (
+                <TableRow key={project.id} className="border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
+                  <TableCell className="font-medium text-zinc-950 dark:text-zinc-100">{project.title}</TableCell>
+                  <TableCell className="hidden text-zinc-600 dark:text-zinc-400 sm:table-cell">{project.client?.name || "Client"}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="border-blue-400/20 bg-blue-500/10 text-blue-200">
-                      {project.status}
+                      {project.status || "Active"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="hidden text-zinc-600 dark:text-zinc-400 md:table-cell">{project.deadline}</TableCell>
+                  <TableCell className="hidden text-zinc-600 dark:text-zinc-400 md:table-cell">
+                    {project.deadline ? new Date(project.deadline).toLocaleDateString() : "TBD"}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-white/10">
@@ -86,7 +88,11 @@ export function CurrentWork() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-zinc-500 py-6">No active work right now. Apply to some jobs!</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

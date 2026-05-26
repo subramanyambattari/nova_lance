@@ -62,10 +62,24 @@ const stats: StatCardData[] = [
   },
 ]
 
-export function StatsGrid() {
+export function StatsGrid({ initialStats }: { initialStats?: { activeJobs: number, earnings: string, openProposals: number } }) {
+  // Override the static stats with real stats if provided
+  const displayStats = stats.map(stat => {
+    if (stat.label === "Active Jobs" && initialStats) {
+      return { ...stat, value: initialStats.activeJobs.toString() }
+    }
+    if (stat.label === "Monthly Earnings" && initialStats) {
+      return { ...stat, value: initialStats.earnings }
+    }
+    if (stat.label === "Open Proposals" && initialStats) {
+      return { ...stat, value: initialStats.openProposals.toString() }
+    }
+    return stat
+  })
+
   return (
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {stats.map((stat, index) => (
+      {displayStats.map((stat, index) => (
         <StatsCard key={stat.label} stat={stat} index={index} />
       ))}
     </section>

@@ -5,8 +5,37 @@ import { EarningsChart } from "@/components/dashboard/earnings-chart"
 import { RecentMessages } from "@/components/dashboard/recent-messages"
 import { RecommendedJobs } from "@/components/dashboard/recommended-jobs"
 import { StatsGrid } from "@/components/dashboard/stats-grid"
+import { prisma } from "@/lib/prisma"
+import { requireUser } from "@/lib/auth"
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await requireUser()
+
+  const availableJobs = await prisma.job.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  })
+
+  const serializedJobs = availableJobs.map(job => ({
+    id: job.id,
+    title: job.title,
+    budget: job.salary || "$0",
+    skills: job.skills,
+  }))
+
+  const activeJobs = await prisma.activeJob.findMany({
+    where: { freelancerId: user.id },
+    include: { client: true },
+    orderBy: { updatedAt: "desc" },
+    take: 4,
+  })
+
+  const stats = {
+    activeJobs: activeJobs.length,
+    earnings: "$1,200", // Would be computed from Milestones
+    openProposals: await prisma.proposal.count({ where: { freelancerId: user.id, status: "DRAFT" } })
+  }
+
   return (
     <div className="min-h-screen overflow-hidden bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
       <DashboardNavbar />
@@ -19,7 +48,7 @@ export default function DashboardPage() {
           <div>
             <p className="text-sm font-medium text-blue-600 dark:text-blue-300">Freelancer dashboard</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950 dark:text-white sm:text-4xl">
-              Welcome back, Subbu
+              Welcome back, {user.name}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400 sm:text-base">
               Track your freelance performance and active work.
@@ -39,17 +68,17 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        <StatsGrid />
+        <StatsGrid initialStats={stats} />
 
         <EarningsChart />
 
         <section className="grid gap-4 xl:grid-cols-[1.6fr_0.9fr]">
-          <CurrentWork />
+          <CurrentWork initialActiveJobs={activeJobs} />
           <RecentMessages />
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
-          <RecommendedJobs />
+          <RecommendedJobs initialJobs={serializedJobs} />
           <DeadlinesWidget />
         </section>
       </div>

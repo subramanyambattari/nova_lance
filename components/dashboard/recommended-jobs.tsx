@@ -31,7 +31,7 @@ const jobs: Job[] = [
   },
 ]
 
-export function RecommendedJobs() {
+export function RecommendedJobs({ initialJobs = [] }: { initialJobs?: any[] }) {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.3 }}>
       <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
@@ -39,9 +39,9 @@ export function RecommendedJobs() {
           <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Recommended jobs</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 lg:grid-cols-3">
-          {jobs.map((job) => (
+          {initialJobs.length > 0 ? initialJobs.map((job) => (
             <div
-              key={job.title}
+              key={job.id}
               className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 transition hover:-translate-y-1 hover:border-violet-300 hover:bg-white dark:border-white/10 dark:bg-zinc-950/55 dark:hover:border-violet-400/30 dark:hover:bg-white/[0.06]"
             >
               <div className="flex items-start justify-between gap-3">
@@ -55,7 +55,7 @@ export function RecommendedJobs() {
                 </Badge>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                {job.skills.map((skill) => (
+                {job.skills?.map((skill: string) => (
                   <Badge key={skill} variant="secondary" className="bg-white text-zinc-700 dark:bg-white/5 dark:text-zinc-300">
                     {skill}
                   </Badge>
@@ -66,7 +66,7 @@ export function RecommendedJobs() {
                 <ArrowUpRight className="size-4" />
               </Button>
             </div>
-          ))}
+          )) : <p className="text-sm text-zinc-500 py-4 col-span-3">No recommended jobs right now.</p>}
         </CardContent>
       </Card>
     </motion.div>
