@@ -17,7 +17,7 @@ interface FieldProps {
 }
 
 const inputClass =
-  "h-10 rounded-xl border-white/10 bg-white/[0.04] text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-blue-500/30"
+  "h-10 rounded-xl border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.04] text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-blue-500/30"
 
 export function ProfileInput({
   label,
@@ -38,7 +38,7 @@ export function ProfileInput({
         {...register(name, type === "number" ? { valueAsNumber: true } : undefined)}
       />
       {errors[name]?.message ? (
-        <p className="text-xs text-rose-300">{String(errors[name]?.message)}</p>
+        <p className="text-xs text-rose-600 dark:text-rose-300">{String(errors[name]?.message)}</p>
       ) : null}
     </div>
   )
@@ -57,11 +57,11 @@ export function ProfileTextarea({
       <Textarea
         id={name}
         placeholder={placeholder}
-        className="min-h-32 rounded-xl border-white/10 bg-white/[0.04] text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-blue-500/30"
+        className="min-h-32 rounded-xl border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.04] text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-blue-500/30"
         {...register(name)}
       />
       {errors[name]?.message ? (
-        <p className="text-xs text-rose-300">{String(errors[name]?.message)}</p>
+        <p className="text-xs text-rose-600 dark:text-rose-300">{String(errors[name]?.message)}</p>
       ) : null}
     </div>
   )
@@ -79,17 +79,17 @@ export function ProfileSelect({
       <Label htmlFor={name}>{label}</Label>
       <Select
         id={name}
-        className="border-white/10 bg-zinc-950/80 text-zinc-100 focus-visible:ring-blue-500/30"
+        className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/80 text-zinc-900 dark:text-zinc-100 focus-visible:ring-blue-500/30"
         {...register(name)}
       >
         {options.map((option) => (
-          <option key={option} value={option} className="bg-zinc-950">
+          <option key={option} value={option} className="bg-white dark:bg-zinc-950">
             {option}
           </option>
         ))}
       </Select>
       {errors[name]?.message ? (
-        <p className="text-xs text-rose-300">{String(errors[name]?.message)}</p>
+        <p className="text-xs text-rose-600 dark:text-rose-300">{String(errors[name]?.message)}</p>
       ) : null}
     </div>
   )

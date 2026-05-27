@@ -67,11 +67,11 @@ export function ConversationsSidebar({
   onToggleArchived: (conversation: ConversationItem) => void
 }) {
   return (
-    <aside className="flex h-full min-h-0 flex-col border-r border-white/10 bg-zinc-950/95">
-      <div className="border-b border-white/10 p-4">
+    <aside className="flex h-full min-h-0 flex-col border-r border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-950/95">
+      <div className="border-b border-zinc-200 dark:border-white/10 p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-lg font-semibold text-white">Messages</h1>
+            <h1 className="text-lg font-semibold text-zinc-900 dark:text-white">Messages</h1>
             <p className="text-xs text-zinc-500">Live project conversations</p>
           </div>
           <Button
@@ -91,7 +91,7 @@ export function ConversationsSidebar({
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Search conversations"
-            className="h-10 border-white/10 bg-zinc-900/80 pl-9 text-zinc-100 placeholder:text-zinc-500"
+            className="h-10 border-zinc-200 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/80 pl-9 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-500"
           />
         </div>
       </div>
@@ -110,13 +110,13 @@ export function ConversationsSidebar({
                 onClick={() => onSelect(conversation)}
                 className={cn(
                   "group mb-1 grid w-full grid-cols-[1fr_auto] gap-2 rounded-lg p-3 text-left transition",
-                  isActive ? "bg-blue-500/15 ring-1 ring-blue-400/30" : "hover:bg-white/[0.055]"
+                  isActive ? "bg-blue-500/10 dark:bg-blue-500/15 ring-1 ring-blue-400/20 dark:ring-blue-400/30" : "hover:bg-zinc-100 dark:hover:bg-white/[0.055]"
                 )}
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <OnlineStatus online={peer?.presence?.online} />
-                    <p className="truncate text-sm font-medium text-zinc-100">
+                    <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
                       {labelFor(conversation, currentUserId)}
                     </p>
                     {conversation.pinned ? <Pin className="size-3 shrink-0 text-blue-300" /> : null}
@@ -140,7 +140,7 @@ export function ConversationsSidebar({
                         event.stopPropagation()
                         onTogglePinned(conversation)
                       }}
-                      className="rounded-md p-1 text-zinc-500 hover:bg-white/10 hover:text-zinc-100"
+                      className="rounded-md p-1 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10 hover:text-zinc-950 dark:hover:text-zinc-100"
                     >
                       <Pin className="size-3" />
                     </span>
@@ -151,7 +151,7 @@ export function ConversationsSidebar({
                         event.stopPropagation()
                         onToggleArchived(conversation)
                       }}
-                      className="rounded-md p-1 text-zinc-500 hover:bg-white/10 hover:text-zinc-100"
+                      className="rounded-md p-1 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10 hover:text-zinc-950 dark:hover:text-zinc-100"
                     >
                       <Archive className="size-3" />
                     </span>

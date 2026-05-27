@@ -6,6 +6,7 @@ import {
   Bot,
   Check,
   ChevronDown,
+  History,
   Loader2,
   Maximize2,
   MessageCircle,
@@ -162,6 +163,7 @@ function speakerLabel(conversation: Conversation) {
 
 export function GeminiChatWidget() {
   const [open, setOpen] = useState(false)
+  const [showInbox, setShowInbox] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [mobilePanel, setMobilePanel] = useState<"chat" | "inbox">("chat")
   const [activeTab, setActiveTab] = useState<ConversationTab>("Chats")
@@ -350,15 +352,17 @@ export function GeminiChatWidget() {
             exit={{ opacity: 0, y: 18, scale: 0.98 }}
             transition={{ duration: 0.18 }}
             className={cn(
-              "grid overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-2xl shadow-black/25 md:grid-cols-[minmax(320px,420px)_minmax(300px,440px)]",
+              "grid overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-2xl shadow-zinc-950/20 transition-all duration-300 ease-in-out",
               expanded
                 ? "h-[calc(100vh-2rem)] w-[calc(100vw-2rem)]"
-                : "h-[min(calc(100vh-5rem),620px)] w-[min(calc(100vw-2rem),860px)]"
+                : showInbox
+                  ? "h-[min(calc(100vh-5rem),640px)] w-[min(calc(100vw-2rem),760px)] md:grid-cols-[1fr_340px]"
+                  : "h-[min(calc(100vh-5rem),600px)] w-[min(calc(100vw-2rem),420px)] grid-cols-1"
             )}
           >
             <section
               className={cn(
-                "min-h-0 flex-col border-r border-zinc-200 bg-white",
+                "min-h-0 flex-col bg-white",
                 mobilePanel === "chat" ? "flex" : "hidden md:flex"
               )}
             >
@@ -409,6 +413,22 @@ export function GeminiChatWidget() {
                     </div>
                   ) : null}
                 </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  className={cn(
+                    "text-white hover:bg-white/15",
+                    showInbox && "bg-white/15"
+                  )}
+                  title={showInbox ? "Hide Chat History" : "Show Chat History"}
+                  onClick={() => {
+                    setShowInbox(!showInbox)
+                    setMobilePanel(showInbox ? "chat" : "inbox")
+                  }}
+                >
+                  <History className="size-4" />
+                </Button>
                 <Button
                   type="button"
                   variant="ghost"
@@ -535,8 +555,8 @@ export function GeminiChatWidget() {
 
             <aside
               className={cn(
-                "min-h-0 flex-col bg-white text-zinc-950",
-                mobilePanel === "inbox" ? "flex" : "hidden md:flex"
+                "min-h-0 flex-col bg-zinc-50/50 text-zinc-950 border-l border-zinc-100/80 transition-all",
+                mobilePanel === "inbox" ? "flex" : (showInbox ? "hidden md:flex" : "hidden")
               )}
             >
               <div className="flex h-[60px] shrink-0 items-center gap-3 bg-zinc-950 px-5 text-white">

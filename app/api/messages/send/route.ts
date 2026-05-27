@@ -11,6 +11,7 @@ import {
 import { prisma } from "@/lib/prisma"
 import { rateLimit } from "@/lib/rate-limit"
 import { publishRealtime } from "@/lib/realtime"
+import { triggerNovaClientReply } from "@/lib/ai-responder"
 
 export async function POST(request: NextRequest) {
   const user = await requireUser()
@@ -76,6 +77,9 @@ export async function POST(request: NextRequest) {
         body: message.content ?? message.fileName ?? "Sent an attachment",
       },
     })
+
+    // Trigger AI reply from Nova Client if they are in this conversation
+    void triggerNovaClientReply(body.conversationId)
 
     return Response.json({ message }, { status: 201 })
   } catch (error) {

@@ -136,20 +136,20 @@ export function EarningsPage() {
   }, [])
 
   return (
-    <div className="min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen overflow-hidden bg-transparent text-zinc-900 dark:text-zinc-100">
       <div className="relative z-0 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <motion.header
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6 lg:flex-row lg:items-end lg:justify-between"
+          className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.035] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl sm:p-6 lg:flex-row lg:items-end lg:justify-between"
         >
           <div>
-            <p className="text-sm font-medium text-emerald-300">Freelancer earnings</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-white sm:text-4xl">
+            <p className="text-sm font-medium text-emerald-500 dark:text-emerald-300">Freelancer earnings</p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-950 dark:text-white sm:text-4xl">
               Earnings
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400 sm:text-base">
               Track cash flow, payout timing, project income, and tax reserves from one workspace.
             </p>
           </div>
@@ -157,12 +157,12 @@ export function EarningsPage() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+              className="rounded-xl border-zinc-200 bg-zinc-50 text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200"
             >
               <Download className="size-4" />
               Export
             </Button>
-            <Button type="button" className="rounded-xl bg-white text-zinc-950 hover:bg-emerald-100">
+            <Button type="button" className="rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-emerald-100">
               <ArrowDownToLine className="size-4" />
               Withdraw
             </Button>
@@ -182,12 +182,12 @@ export function EarningsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.05 * index }}
             >
-              <Card className="h-full rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="h-full rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardContent className="p-5">
                   <stat.icon className={`size-5 ${stat.tone}`} />
                   <p className="mt-5 text-sm text-zinc-500">{stat.label}</p>
-                  <p className="mt-2 text-2xl font-semibold text-white">{stat.value}</p>
-                  <p className="mt-3 text-sm text-zinc-400">{stat.detail}</p>
+                  <p className="mt-2 text-2xl font-semibold text-zinc-950 dark:text-white">{stat.value}</p>
+                  <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{stat.detail}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -195,9 +195,9 @@ export function EarningsPage() {
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[1.45fr_0.75fr]">
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
             <CardHeader className="flex-row items-center justify-between gap-3">
-              <CardTitle className="text-base text-zinc-100">Revenue forecast</CardTitle>
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Revenue forecast</CardTitle>
               <Badge variant="premium">+18.7%</Badge>
             </CardHeader>
             <CardContent className="h-80 min-h-0 min-w-0 pt-2">
@@ -210,44 +210,44 @@ export function EarningsPage() {
                         <stop offset="95%" stopColor="#34d399" stopOpacity={0.02} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
+                    <CartesianGrid stroke="rgba(120,120,120,0.08)" vertical={false} />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
-                    <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "rgba(52,211,153,0.25)" }} />
+                    <Tooltip contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", borderRadius: 12 }} cursor={{ stroke: "rgba(52,211,153,0.25)" }} />
                     <Area type="monotone" dataKey="earned" fill="url(#earningsArea)" stroke="#34d399" strokeWidth={3} />
                     <Bar dataKey="pending" fill="#f59e0b" opacity={0.42} radius={[8, 8, 2, 2]} />
                     <Line type="monotone" dataKey="target" stroke="#38bdf8" strokeWidth={2} dot={false} />
                   </ComposedChart>
                 </ResponsiveContainer>
               ) : (
-                <Skeleton className="h-full w-full bg-white/10" />
+                <Skeleton className="h-full w-full bg-zinc-200 dark:bg-white/10" />
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
             <CardHeader>
-              <CardTitle className="text-base text-zinc-100">Payout status</CardTitle>
+              <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Payout status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {payoutSchedule.map((item) => (
-                <div key={item.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <div key={item.label} className="rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-white/[0.03] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm text-zinc-500">{item.label}</p>
-                      <p className="mt-2 text-xl font-semibold text-white">{item.value}</p>
-                      <p className="mt-1 text-sm text-zinc-400">{item.detail}</p>
+                      <p className="mt-2 text-xl font-semibold text-zinc-950 dark:text-white">{item.value}</p>
+                      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{item.detail}</p>
                     </div>
                     <item.icon className={`size-5 ${item.tone}`} />
                   </div>
                 </div>
               ))}
               <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-emerald-200">
+                <div className="flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-200">
                   <ShieldCheck className="size-4" />
                   Payout account verified
                 </div>
-                <p className="mt-2 text-xs leading-5 text-emerald-100/70">
+                <p className="mt-2 text-xs leading-5 text-emerald-800/80 dark:text-emerald-100/70">
                   ACH transfers are enabled for Nova Lance balance withdrawals.
                 </p>
               </div>
@@ -257,25 +257,25 @@ export function EarningsPage() {
 
         <Tabs defaultValue="transactions" className="grid gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
+            <TabsList className="w-full justify-start overflow-x-auto sm:w-auto bg-zinc-100 dark:bg-white/[0.04]">
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
               <TabsTrigger value="sources">Sources</TabsTrigger>
               <TabsTrigger value="taxes">Taxes</TabsTrigger>
             </TabsList>
-            <Badge variant="outline" className="w-fit border-white/10 bg-white/[0.04] text-zinc-300">
+            <Badge variant="outline" className="w-fit border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
               Updated May 21, 2026
             </Badge>
           </div>
 
           <TabsContent value="transactions">
-            <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+            <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
               <CardHeader className="flex-row items-center justify-between gap-3">
-                <CardTitle className="text-base text-zinc-100">Recent transactions</CardTitle>
+                <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Recent transactions</CardTitle>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+                  className="rounded-xl border-zinc-200 bg-zinc-50 text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200"
                 >
                   <FileText className="size-4" />
                   Statement
@@ -284,7 +284,7 @@ export function EarningsPage() {
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-white/10 hover:bg-transparent">
+                    <TableRow className="border-zinc-200 dark:border-white/10 hover:bg-transparent">
                       <TableHead className="text-zinc-500">Project</TableHead>
                       <TableHead className="text-zinc-500">Date</TableHead>
                       <TableHead className="text-right text-zinc-500">Gross</TableHead>
@@ -295,24 +295,24 @@ export function EarningsPage() {
                   </TableHeader>
                   <TableBody>
                     {transactions.map((transaction) => (
-                      <TableRow key={transaction.id} className="border-white/10 hover:bg-white/[0.03]">
+                      <TableRow key={transaction.id} className="border-zinc-200 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/[0.03]">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-200">
+                            <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
                               <ReceiptText className="size-5" />
                             </span>
                             <div>
-                              <p className="font-medium text-zinc-100">{transaction.project}</p>
+                              <p className="font-medium text-zinc-900 dark:text-zinc-100">{transaction.project}</p>
                               <p className="mt-1 text-xs text-zinc-500">
                                 {transaction.id} - {transaction.client}
                               </p>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-zinc-400">{transaction.date}</TableCell>
-                        <TableCell className="text-right text-zinc-300">{transaction.gross}</TableCell>
+                        <TableCell className="text-zinc-500 dark:text-zinc-400">{transaction.date}</TableCell>
+                        <TableCell className="text-right text-zinc-600 dark:text-zinc-300">{transaction.gross}</TableCell>
                         <TableCell className="text-right text-zinc-500">{transaction.fee}</TableCell>
-                        <TableCell className="text-right font-medium text-zinc-100">{transaction.net}</TableCell>
+                        <TableCell className="text-right font-medium text-zinc-950 dark:text-zinc-100">{transaction.net}</TableCell>
                         <TableCell className="text-right">{statusBadge(transaction.status)}</TableCell>
                       </TableRow>
                     ))}
@@ -324,39 +324,39 @@ export function EarningsPage() {
 
           <TabsContent value="sources">
             <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Income mix</CardTitle>
+                  <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Income mix</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {incomeSources.map((item) => (
                     <div key={item.source}>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-zinc-400">{item.source}</span>
-                        <span className="font-medium text-zinc-100">${item.amount.toLocaleString()}</span>
+                        <span className="text-zinc-500 dark:text-zinc-400">{item.source}</span>
+                        <span className="font-medium text-zinc-900 dark:text-zinc-100">${item.amount.toLocaleString()}</span>
                       </div>
                       <Progress className="mt-2" value={item.share} />
                     </div>
                   ))}
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Income by source</CardTitle>
+                  <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Income by source</CardTitle>
                 </CardHeader>
                 <CardContent className="h-80 min-h-0 min-w-0 pt-2">
                   {mounted ? (
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={incomeSources} layout="vertical" margin={{ left: 12, right: 16 }}>
-                        <CartesianGrid stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                        <CartesianGrid stroke="rgba(120,120,120,0.08)" horizontal={false} />
                         <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
-                        <YAxis dataKey="source" type="category" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} width={86} />
-                        <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+                        <YAxis dataKey="source" type="category" axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} width={86} />
+                        <Tooltip contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", borderRadius: 12 }} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
                         <Bar dataKey="amount" radius={[0, 8, 8, 0]} fill="#38bdf8" />
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
-                    <Skeleton className="h-full w-full bg-white/10" />
+                    <Skeleton className="h-full w-full bg-zinc-200 dark:bg-white/10" />
                   )}
                 </CardContent>
               </Card>
@@ -365,25 +365,25 @@ export function EarningsPage() {
 
           <TabsContent value="taxes">
             <section className="grid gap-4 xl:grid-cols-[0.8fr_1.2fr]">
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Tax snapshot</CardTitle>
+                  <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Tax snapshot</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {taxItems.map((item) => (
-                    <div key={item.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={item.label} className="rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-white/[0.03] p-4">
                       <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="text-zinc-400">{item.label}</span>
-                        <span className="font-medium text-zinc-100">{item.value}</span>
+                        <span className="text-zinc-500 dark:text-zinc-400">{item.label}</span>
+                        <span className="font-medium text-zinc-950 dark:text-zinc-100">{item.value}</span>
                       </div>
                       <Progress className="mt-3" value={item.progress} />
                     </div>
                   ))}
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Reserve trend</CardTitle>
+                  <CardTitle className="text-base text-zinc-950 dark:text-zinc-100">Reserve trend</CardTitle>
                 </CardHeader>
                 <CardContent className="h-80 min-h-0 min-w-0 pt-2">
                   {mounted ? (
@@ -395,15 +395,15 @@ export function EarningsPage() {
                             <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.02} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
+                        <CartesianGrid stroke="rgba(120,120,120,0.08)" vertical={false} />
+                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
                         <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
-                        <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "rgba(245,158,11,0.25)" }} />
+                        <Tooltip contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", borderRadius: 12 }} cursor={{ stroke: "rgba(245,158,11,0.25)" }} />
                         <Area type="monotone" dataKey="pending" stroke="#f59e0b" strokeWidth={3} fill="url(#taxReserve)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   ) : (
-                    <Skeleton className="h-full w-full bg-white/10" />
+                    <Skeleton className="h-full w-full bg-zinc-200 dark:bg-white/10" />
                   )}
                 </CardContent>
               </Card>
@@ -417,14 +417,14 @@ export function EarningsPage() {
             { title: "Protection", value: "Escrow covered", detail: "$7,900 secured", icon: CheckCircle2 },
             { title: "Documents", value: "4 statements", detail: "Ready for export", icon: Banknote },
           ].map((item) => (
-            <Card key={item.title} className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+            <Card key={item.title} className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
               <CardContent className="flex items-center gap-4 p-5">
-                <span className="flex size-11 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-200">
+                <span className="flex size-11 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-white/[0.06] dark:text-zinc-200">
                   <item.icon className="size-5" />
                 </span>
                 <div>
                   <p className="text-sm text-zinc-500">{item.title}</p>
-                  <p className="mt-1 font-medium text-zinc-100">{item.value}</p>
+                  <p className="mt-1 font-medium text-zinc-950 dark:text-zinc-100">{item.value}</p>
                   <p className="mt-1 text-xs text-zinc-500">{item.detail}</p>
                 </div>
               </CardContent>

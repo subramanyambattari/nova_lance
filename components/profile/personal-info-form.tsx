@@ -15,9 +15,9 @@ interface PersonalInfoFormProps {
 export function PersonalInfoForm({ register, errors }: PersonalInfoFormProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.1 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Personal information</CardTitle>
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Personal information</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <ProfileInput label="Full Name" name="fullName" register={register} errors={errors} />

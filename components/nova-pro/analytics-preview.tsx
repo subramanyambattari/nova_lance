@@ -46,33 +46,33 @@ export function AnalyticsPreview() {
       <AreaChart data={growthData} margin={{ left: -18, right: 8 }}>
         <defs>
           <linearGradient id="proGrowth" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.5} />
-            <stop offset="95%" stopColor="#60a5fa" stopOpacity={0.02} />
+            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
           </linearGradient>
         </defs>
-        <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
-        <Tooltip contentStyle={{ background: "rgba(9,9,11,.95)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12 }} />
+        <CartesianGrid stroke="currentColor" className="text-zinc-200/40 dark:text-white/5" vertical={false} />
+        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 12 }} className="text-zinc-400 dark:text-zinc-500" />
+        <YAxis axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 12 }} className="text-zinc-400 dark:text-zinc-500" />
+        <Tooltip contentStyle={{ backgroundColor: "hsl(var(--popover))", borderColor: "hsl(var(--border))", color: "hsl(var(--popover-foreground))", borderRadius: 12 }} />
         <Area type="monotone" dataKey="earnings" stroke="#a78bfa" strokeWidth={3} fill="url(#proGrowth)" />
       </AreaChart>
     </ResponsiveContainer>
   ) : (
-    <Skeleton className="h-full w-full bg-white/10" />
+    <Skeleton className="h-full w-full bg-zinc-100 dark:bg-white/10" />
   )
 
   const bars = mounted ? (
     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
       <BarChart data={successData}>
-        <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-        <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
-        <Tooltip contentStyle={{ background: "rgba(9,9,11,.95)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12 }} />
+        <CartesianGrid stroke="currentColor" className="text-zinc-200/40 dark:text-white/5" vertical={false} />
+        <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 12 }} className="text-zinc-400 dark:text-zinc-500" />
+        <YAxis axisLine={false} tickLine={false} tick={{ fill: "currentColor", fontSize: 12 }} className="text-zinc-400 dark:text-zinc-500" />
+        <Tooltip contentStyle={{ backgroundColor: "hsl(var(--popover))", borderColor: "hsl(var(--border))", color: "hsl(var(--popover-foreground))", borderRadius: 12 }} />
         <Bar dataKey="value" radius={[8, 8, 2, 2]} fill="#60a5fa" />
       </BarChart>
     </ResponsiveContainer>
   ) : (
-    <Skeleton className="h-full w-full bg-white/10" />
+    <Skeleton className="h-full w-full bg-zinc-100 dark:bg-white/10" />
   )
 
   return (
@@ -83,20 +83,20 @@ export function AnalyticsPreview() {
       transition={{ duration: 0.5 }}
       className="grid gap-4 xl:grid-cols-[1.4fr_0.8fr]"
     >
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Earnings growth preview</CardTitle>
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Earnings growth preview</CardTitle>
         </CardHeader>
         <CardContent className="h-80 min-h-0 min-w-0">{chart}</CardContent>
       </Card>
       <div className="grid gap-4">
-        <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
           <CardHeader>
-            <CardTitle className="text-base text-zinc-100">Proposal success rate</CardTitle>
+            <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Proposal success rate</CardTitle>
           </CardHeader>
           <CardContent className="h-52 min-h-0 min-w-0">{bars}</CardContent>
         </Card>
-        <Card className="rounded-2xl border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] p-5 shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
           {[
             ["Profile visibility increase", 84],
             ["Client engagement metrics", 68],
@@ -104,8 +104,8 @@ export function AnalyticsPreview() {
           ].map(([label, value]) => (
             <div key={label} className="mb-4 last:mb-0">
               <div className="mb-2 flex justify-between text-sm">
-                <span className="text-zinc-400">{label}</span>
-                <span className="text-zinc-100">{value}%</span>
+                <span className="text-zinc-550 dark:text-zinc-400">{label}</span>
+                <span className="text-zinc-800 dark:text-zinc-100">{value}%</span>
               </div>
               <Progress value={Number(value)} />
             </div>

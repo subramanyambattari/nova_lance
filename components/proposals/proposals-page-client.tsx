@@ -259,8 +259,8 @@ function ProposalsWorkspace({ initialData }: { initialData: ProposalsResponse })
   ).length
 
   return (
-    <div className="min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
-      <div className="pointer-events-none fixed inset-0 -z-0">
+    <div className="min-h-screen overflow-hidden bg-transparent text-zinc-900 dark:text-zinc-100">
+      <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute left-1/4 top-24 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
         <div className="absolute right-10 top-80 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl" />
       </div>
@@ -397,7 +397,7 @@ function percent(value: number, total: number) {
 
 function ProposalsLoading() {
   return (
-    <div className="min-h-screen bg-zinc-950 p-6 text-zinc-100">
+    <div className="min-h-screen bg-transparent p-6 text-zinc-900 dark:text-zinc-100">
       <div className="mx-auto grid w-full max-w-7xl gap-4">
         <div className="h-40 rounded-2xl border border-white/10 bg-white/[0.04]" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

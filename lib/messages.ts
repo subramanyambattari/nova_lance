@@ -9,8 +9,8 @@ export const messageContentSchema = z
   .optional()
 
 export const attachmentSchema = z.object({
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  fileUrl: z.string().url().optional().or(z.literal("")),
+  imageUrl: z.string().optional().or(z.literal("")),
+  fileUrl: z.string().optional().or(z.literal("")),
   fileName: z.string().max(180).optional().or(z.literal("")),
   fileType: z.string().max(120).optional().or(z.literal("")),
   fileSize: z.number().int().min(0).max(50 * 1024 * 1024).optional(),

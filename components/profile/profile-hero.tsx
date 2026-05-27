@@ -15,13 +15,13 @@ export function ProfileHero() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay: 0.05 }}
     >
-      <Card className="relative overflow-hidden rounded-2xl border-white/10 bg-white/[0.045] p-px shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="relative overflow-hidden rounded-2xl border-zinc-200 bg-white p-px shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-violet-500/15 to-transparent" />
-        <div className="relative rounded-2xl bg-zinc-950/80 p-5 sm:p-6">
+        <div className="relative rounded-2xl bg-white/70 dark:bg-zinc-950/80 p-5 sm:p-6">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="relative w-fit">
-                <Avatar className="size-24 border border-white/15 shadow-2xl shadow-blue-500/10">
+                <Avatar className="size-24 border border-zinc-200 dark:border-white/15 shadow-2xl shadow-blue-500/10">
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-3xl font-semibold text-white">
                     SR
                   </AvatarFallback>
@@ -29,16 +29,16 @@ export function ProfileHero() {
                 <button
                   type="button"
                   aria-label="Edit avatar"
-                  className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border border-white/10 bg-zinc-900 text-blue-200 shadow-xl transition hover:bg-zinc-800"
+                  className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-blue-600 shadow-xl transition hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900 dark:text-blue-200 dark:hover:bg-zinc-800"
                 >
                   <Camera className="size-4" />
                 </button>
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-2xl font-semibold text-white">Subbu Roy</h2>
-                  <span className="flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-1 text-xs text-emerald-300">
-                    <span className="size-2 rounded-full bg-emerald-400" />
+                  <h2 className="text-2xl font-semibold text-zinc-950 dark:text-white">Subbu Roy</h2>
+                  <span className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300">
+                    <span className="size-2 rounded-full bg-emerald-500" />
                     Online
                   </span>
                 </div>
@@ -50,11 +50,11 @@ export function ProfileHero() {
                   </Badge>
                 </div>
                 <div className="mt-5 max-w-md">
-                  <div className="flex items-center justify-between text-xs text-zinc-400">
+                  <div className="flex items-center justify-between text-xs text-zinc-500">
                     <span>Profile completion</span>
                     <span>85%</span>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-white/10">
                     <div className="h-full w-[85%] rounded-full bg-gradient-to-r from-blue-400 to-violet-400 shadow-[0_0_18px_rgba(96,165,250,0.55)]" />
                   </div>
                 </div>
@@ -64,7 +64,7 @@ export function ProfileHero() {
               <Button
                 type="button"
                 variant="outline"
-                className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200 hover:bg-white/[0.08]"
+                className="rounded-xl border-zinc-200 bg-zinc-50 text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200 dark:hover:bg-white/[0.08]"
               >
                 <Upload className="size-4" />
                 Upload profile image

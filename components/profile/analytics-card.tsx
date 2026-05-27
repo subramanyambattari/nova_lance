@@ -16,18 +16,18 @@ const metrics = [
 export function AnalyticsCard() {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.3 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Profile analytics</CardTitle>
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Profile analytics</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {metrics.map((metric) => {
             const Icon = metric.icon
 
             return (
-              <div key={metric.label} className="rounded-2xl border border-white/10 bg-zinc-950/55 p-4 transition hover:-translate-y-1 hover:border-blue-400/30">
+              <div key={metric.label} className="rounded-2xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-zinc-950/55 p-4 transition hover:-translate-y-1 hover:border-blue-500/30 dark:hover:border-blue-400/30">
                 <div className="flex items-center justify-between">
-                  <span className="flex size-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-200">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-200">
                     <Icon className="size-4" />
                   </span>
                   <div className="flex h-8 items-end gap-1">
@@ -40,8 +40,8 @@ export function AnalyticsCard() {
                     ))}
                   </div>
                 </div>
-                <p className="mt-5 text-2xl font-semibold text-white">{metric.value}</p>
-                <p className="mt-1 text-sm text-zinc-500">{metric.label}</p>
+                <p className="mt-5 text-2xl font-semibold text-zinc-900 dark:text-white">{metric.value}</p>
+                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{metric.label}</p>
               </div>
             )
           })}

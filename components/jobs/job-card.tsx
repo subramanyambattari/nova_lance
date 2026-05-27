@@ -32,7 +32,7 @@ export function JobCard({
 
   return (
     <motion.div layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} whileHover={{ y: -4 }}>
-      <Card className="group h-full rounded-2xl border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl transition hover:border-blue-400/30">
+      <Card className="group h-full rounded-2xl border-zinc-200 bg-white p-5 shadow-sm backdrop-blur-xl transition hover:border-blue-500/40 dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 dark:hover:border-blue-400/30">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="mb-3 flex flex-wrap gap-2">
@@ -42,40 +42,40 @@ export function JobCard({
               </Badge>
               {job.remote ? <Badge variant="success">Remote</Badge> : null}
               {job.verifiedClient ? (
-                <Badge variant="outline" className="gap-1 border-white/10 bg-white/[0.04] text-zinc-300">
+                <Badge variant="outline" className="gap-1 border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
                   <ShieldCheck className="size-3" />
                   Verified
                 </Badge>
               ) : null}
             </div>
-            <Link href={`/jobs/${encodeURIComponent(job.id)}`} className="text-lg font-semibold text-white transition hover:text-blue-200">
+            <Link href={`/jobs/${encodeURIComponent(job.id)}`} className="text-lg font-semibold text-zinc-950 transition hover:text-blue-600 dark:text-white dark:hover:text-blue-200">
               {job.title}
             </Link>
-            <p className="mt-2 text-sm text-zinc-400">{job.company}</p>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{job.company}</p>
           </div>
-          <Button type="button" variant="ghost" size="icon" onClick={() => onSave(job)} className="rounded-xl text-zinc-400 hover:bg-white/[0.08]">
+          <Button type="button" variant="ghost" size="icon" onClick={() => onSave(job)} className="rounded-xl text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08]">
             <SaveIcon className="size-4" />
           </Button>
         </div>
-        <p className="mt-4 line-clamp-3 text-sm leading-6 text-zinc-500">
+        <p className="mt-4 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
           {plainText(job.description).slice(0, 240)}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {job.skills.slice(0, 5).map((skill) => (
-            <Badge key={skill} variant="secondary" className="bg-white/5 text-zinc-300">{skill}</Badge>
+            <Badge key={skill} variant="secondary" className="bg-zinc-100 text-zinc-800 dark:bg-white/5 dark:text-zinc-300">{skill}</Badge>
           ))}
         </div>
-        <div className="mt-5 grid gap-2 text-sm text-zinc-400 sm:grid-cols-2">
-          <span className="flex items-center gap-2"><BriefcaseBusiness className="size-4 text-blue-300" />{job.salary}</span>
-          <span className="flex items-center gap-2"><MapPin className="size-4 text-violet-300" />{job.location}</span>
-          <span className="flex items-center gap-2"><Clock3 className="size-4 text-emerald-300" />{postedAgo(job.postedAt)}</span>
+        <div className="mt-5 grid gap-2 text-sm text-zinc-500 dark:text-zinc-400 sm:grid-cols-2">
+          <span className="flex items-center gap-2"><BriefcaseBusiness className="size-4 text-blue-500 dark:text-blue-300" />{job.salary}</span>
+          <span className="flex items-center gap-2"><MapPin className="size-4 text-violet-500 dark:text-violet-300" />{job.location}</span>
+          <span className="flex items-center gap-2"><Clock3 className="size-4 text-emerald-500 dark:text-emerald-300" />{postedAgo(job.postedAt)}</span>
           <span className="flex items-center gap-2"><ExternalLink className="size-4 text-zinc-500" />{job.source}</span>
         </div>
         <div className="mt-5 flex gap-2">
-          <Button type="button" onClick={() => onApply(job)} className="flex-1 rounded-xl bg-white text-zinc-950 hover:bg-blue-100">
+          <Button type="button" onClick={() => onApply(job)} className="flex-1 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100">
             Apply Now
           </Button>
-          <Button asChild type="button" variant="outline" className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200">
+          <Button asChild type="button" variant="outline" className="rounded-xl border-zinc-200 bg-zinc-50 text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200">
             <Link href={`/jobs/${encodeURIComponent(job.id)}`}>Details</Link>
           </Button>
         </div>

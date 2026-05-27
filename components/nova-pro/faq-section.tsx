@@ -21,9 +21,9 @@ const faqs = [
 export function FaqSection() {
   return (
     <motion.section initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.45 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Frequently asked questions</CardTitle>
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Frequently asked questions</CardTitle>
         </CardHeader>
         <CardContent>
           <Accordion type="single" collapsible className="w-full">

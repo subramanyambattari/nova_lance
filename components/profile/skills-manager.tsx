@@ -32,9 +32,9 @@ export function SkillsManager() {
           value={nextSkill}
           onChange={(event) => setNextSkill(event.target.value)}
           placeholder="Add a skill..."
-          className="h-10 rounded-xl border-white/10 bg-white/[0.04] text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-blue-500/30"
+          className="h-10 rounded-xl border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.04] text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:ring-blue-500/30"
         />
-        <Button type="button" onClick={addSkill} className="rounded-xl bg-white text-zinc-950 hover:bg-blue-100">
+        <Button type="button" onClick={addSkill} className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100">
           <Plus className="size-4" />
           Add skill
         </Button>
@@ -48,7 +48,7 @@ export function SkillsManager() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
             >
-              <Badge variant="outline" className="gap-1 border-blue-400/20 bg-blue-500/10 px-3 py-1 text-blue-100">
+              <Badge variant="outline" className="gap-1 border-blue-500/20 bg-blue-50 dark:border-blue-400/20 dark:bg-blue-500/10 px-3 py-1 text-blue-700 dark:text-blue-100">
                 {skill}
                 <button
                   type="button"

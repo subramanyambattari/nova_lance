@@ -17,22 +17,22 @@ export function MyApplications() {
   const proposals = query.data?.proposals ?? []
 
   return (
-    <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+    <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
       <CardHeader className="flex-row items-center gap-2">
-        <FileText className="size-4 text-emerald-300" />
-        <CardTitle className="text-base text-zinc-100">My Applications</CardTitle>
+        <FileText className="size-4 text-emerald-600 dark:text-emerald-300" />
+        <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">My Applications</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {proposals.length === 0 ? (
-          <p className="text-sm text-zinc-500">Submitted, viewed, interview, accepted, and rejected applications will appear here.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Submitted, viewed, interview, accepted, and rejected applications will appear here.</p>
         ) : (
           proposals.slice(0, 5).map((proposal: { id: string; status: string; budget: number | null; job?: { title: string } | null; externalJobId?: string }) => (
-            <div key={proposal.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+            <div key={proposal.id} className="rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="truncate text-sm font-medium text-zinc-100">{proposal.job?.title ?? proposal.externalJobId}</p>
+                <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">{proposal.job?.title ?? proposal.externalJobId}</p>
                 <Badge variant="success">{proposal.status}</Badge>
               </div>
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                 {proposal.budget ? `$${proposal.budget.toLocaleString()} proposed` : "Budget open"}
               </p>
             </div>

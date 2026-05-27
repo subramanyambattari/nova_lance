@@ -18,7 +18,7 @@ export function JobsSearch({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Search Next.js Developer, React Remote Jobs, UI/UX Designer..."
-        className="h-12 rounded-2xl border-white/10 bg-white/[0.045] pl-10 text-zinc-100 placeholder:text-zinc-500 shadow-2xl shadow-black/10 focus-visible:ring-blue-500/30"
+        className="h-12 rounded-2xl border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.045] pl-10 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-450 dark:placeholder:text-zinc-500 shadow-sm dark:shadow-2xl dark:shadow-black/10 focus-visible:ring-blue-500/30"
       />
     </div>
   )

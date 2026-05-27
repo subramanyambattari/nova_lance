@@ -46,17 +46,17 @@ export function ProposalsTable({
     <motion.section
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/20 backdrop-blur-xl"
+      className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.035] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl"
     >
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-white">Proposal pipeline</h2>
+          <h2 className="text-lg font-semibold text-zinc-950 dark:text-white">Proposal pipeline</h2>
           <p className="text-sm text-zinc-500">{proposals.length} proposals in view</p>
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow className="border-white/10 hover:bg-transparent">
+          <TableRow className="border-zinc-200 dark:border-white/10 hover:bg-transparent">
             <TableHead>Job Title</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Budget</TableHead>
@@ -68,12 +68,12 @@ export function ProposalsTable({
         </TableHeader>
         <TableBody>
           {proposals.map((proposal) => (
-            <TableRow key={proposal.id} className="border-white/10 hover:bg-white/[0.04]">
+            <TableRow key={proposal.id} className="border-zinc-200 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/[0.04]">
               <TableCell>
                 <div className="max-w-72">
                   <Link
                     href={`/dashboard/proposals/${proposal.id}`}
-                    className="font-medium text-zinc-100 hover:text-blue-200"
+                    className="font-medium text-zinc-900 hover:text-blue-600 dark:text-zinc-100 dark:hover:text-blue-200"
                   >
                     {proposal.job?.title ?? proposal.externalJobId ?? "Untitled proposal"}
                   </Link>
@@ -82,17 +82,17 @@ export function ProposalsTable({
                   </p>
                 </div>
               </TableCell>
-              <TableCell className="text-zinc-300">{proposal.job?.company ?? "External client"}</TableCell>
-              <TableCell className="text-zinc-100">
+              <TableCell className="text-zinc-600 dark:text-zinc-300">{proposal.job?.company ?? "External client"}</TableCell>
+              <TableCell className="text-zinc-900 dark:text-zinc-100">
                 {proposal.budget ? currency.format(proposal.budget) : "Open"}
               </TableCell>
               <TableCell>
                 <ProposalStatusBadge status={proposal.status} />
               </TableCell>
-              <TableCell className="text-zinc-400">
+              <TableCell className="text-zinc-500 dark:text-zinc-400">
                 {proposal.submittedAt ? new Date(proposal.submittedAt).toLocaleDateString() : "Draft"}
               </TableCell>
-              <TableCell className="text-zinc-300">{proposal.timeline ?? "Flexible"}</TableCell>
+              <TableCell className="text-zinc-600 dark:text-zinc-300">{proposal.timeline ?? "Flexible"}</TableCell>
               <TableCell className="text-right">
                 <Tooltip>
                   <DropdownMenu>
@@ -103,7 +103,7 @@ export function ProposalsTable({
                         </Button>
                       </DropdownMenuTrigger>
                     </TooltipTrigger>
-                    <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950 text-zinc-100">
+                    <DropdownMenuContent align="end" className="border-zinc-200 bg-white text-zinc-950 dark:border-white/10 dark:bg-zinc-950 dark:text-zinc-100">
                       <DropdownMenuItem onClick={() => onEdit(proposal)} className="gap-2">
                         <Edit3 className="size-4" />
                         Edit
@@ -131,7 +131,7 @@ export function ProposalsTable({
                         <Undo2 className="size-4" />
                         Withdraw
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onDelete(proposal)} className="gap-2 text-rose-300">
+                      <DropdownMenuItem onClick={() => onDelete(proposal)} className="gap-2 text-rose-500 dark:text-rose-300">
                         <Trash2 className="size-4" />
                         Delete
                       </DropdownMenuItem>
@@ -143,7 +143,7 @@ export function ProposalsTable({
             </TableRow>
           ))}
           {!proposals.length ? (
-            <TableRow className="border-white/10 hover:bg-transparent">
+            <TableRow className="border-zinc-200 dark:border-white/10 hover:bg-transparent">
               <TableCell colSpan={7} className="py-10 text-center text-zinc-500">
                 No proposals match the current filters.
               </TableCell>

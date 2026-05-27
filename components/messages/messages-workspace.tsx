@@ -250,7 +250,7 @@ function WorkspaceInner() {
   }
 
   return (
-    <div className="h-[calc(100vh-3rem)] overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="h-[calc(100vh-3rem)] overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       <div className="grid h-full min-h-0 lg:grid-cols-[360px_minmax(0,1fr)_300px]">
         <div className={cn(mobileChatOpen && "hidden lg:block")}>
           <ConversationsSidebar
@@ -289,27 +289,27 @@ function WorkspaceInner() {
           onSeen={markSeen}
         />
 
-        <aside className="hidden min-h-0 border-l border-white/10 bg-zinc-950/95 lg:flex lg:flex-col">
-          <div className="border-b border-white/10 p-4">
+        <aside className="hidden min-h-0 border-l border-zinc-200 dark:border-white/10 bg-white/95 dark:bg-zinc-950/95 lg:flex lg:flex-col">
+          <div className="border-b border-zinc-200 dark:border-white/10 p-4">
             <div className="flex items-center gap-2">
               <Info className="size-4 text-blue-300" />
-              <h2 className="text-sm font-semibold text-white">Conversation</h2>
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Conversation</h2>
             </div>
             <p className="mt-2 text-xs text-zinc-500">
               {activePeers.length ? activePeers.map((peer) => peer.name ?? peer.email).join(", ") : "No active chat selected"}
             </p>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto p-4">
-            <div className="rounded-lg border border-white/10 bg-zinc-900/70 p-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-zinc-100">
+            <div className="rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/70 p-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 <Users className="size-4 text-blue-300" />
                 Participants
               </div>
             <div className="mt-3 space-y-3">
                 {[currentUser, ...activePeers].map((user) => (
                   <div key={user.id} className="flex items-center justify-between gap-3 text-sm">
-                    <span className="truncate text-zinc-300">{user.name ?? user.email}</span>
-                    <Badge variant="secondary" className="shrink-0 border-white/10 bg-white/5 text-[10px] text-zinc-300">
+                    <span className="truncate text-zinc-700 dark:text-zinc-300">{user.name ?? user.email}</span>
+                    <Badge variant="secondary" className="shrink-0 border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 text-[10px] text-zinc-800 dark:text-zinc-300">
                       {user.id === currentUser.id ? "You" : user.presence?.online ? "Online" : "Away"}
                     </Badge>
                   </div>
@@ -317,8 +317,8 @@ function WorkspaceInner() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg border border-white/10 bg-zinc-900/70 p-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-zinc-100">
+            <div className="mt-4 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/70 p-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 <MessageSquarePlus className="size-4 text-blue-300" />
                 Start chat
               </div>
@@ -326,18 +326,18 @@ function WorkspaceInner() {
                 value={userQuery}
                 onChange={(event) => setUserQuery(event.target.value)}
                 placeholder="Search users by name or email"
-                className="mt-3 h-9 border-white/10 bg-zinc-950/80 text-xs text-zinc-100"
+                className="mt-3 h-9 border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-950/80 text-xs text-zinc-900 dark:text-zinc-100"
               />
               <div className="mt-3 space-y-2">
                 {(usersQuery.data?.users ?? []).map((user) => (
                   <button
                     key={user.id}
                     type="button"
-                    className="flex w-full items-center justify-between gap-3 rounded-md bg-zinc-950/70 p-2 text-left text-xs text-zinc-300 hover:bg-white/10"
+                    className="flex w-full items-center justify-between gap-3 rounded-md bg-zinc-200/50 dark:bg-zinc-950/70 p-2 text-left text-xs text-zinc-750 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10"
                     onClick={() => createConversationMutation.mutate(user.id)}
                   >
                     <span className="min-w-0 truncate">{user.name ?? user.email}</span>
-                    <Badge variant="secondary" className="shrink-0 bg-white/5 text-[10px]">
+                    <Badge variant="secondary" className="shrink-0 bg-zinc-200 dark:bg-white/5 text-[10px]">
                       Chat
                     </Badge>
                   </button>
@@ -348,16 +348,16 @@ function WorkspaceInner() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg border border-white/10 bg-zinc-900/70 p-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-zinc-100">
+            <div className="mt-4 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/70 p-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 <Bell className="size-4 text-blue-300" />
                 Notifications
                 {notificationsQuery.data?.unread ? <Badge className="ml-auto bg-blue-600">{notificationsQuery.data.unread}</Badge> : null}
               </div>
               <div className="mt-3 space-y-2">
                 {(notificationsQuery.data?.notifications ?? []).slice(0, 5).map((item) => (
-                  <div key={item.id} className="rounded-md bg-zinc-950/70 p-2">
-                    <p className="truncate text-xs font-medium text-zinc-200">{item.title}</p>
+                  <div key={item.id} className="rounded-md bg-zinc-200/50 dark:bg-zinc-950/70 p-2">
+                    <p className="truncate text-xs font-medium text-zinc-800 dark:text-zinc-200">{item.title}</p>
                     {item.body ? <p className="mt-1 line-clamp-2 text-xs text-zinc-500">{item.body}</p> : null}
                   </div>
                 ))}
@@ -367,19 +367,19 @@ function WorkspaceInner() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg border border-white/10 bg-zinc-900/70 p-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-zinc-100">
+            <div className="mt-4 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/70 p-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 <FileText className="size-4 text-blue-300" />
                 Shared files
               </div>
               <p className="mt-2 text-xs text-zinc-500">Use message search filters to show files or images in this thread.</p>
             </div>
           </div>
-          <div className="border-t border-white/10 p-4">
+          <div className="border-t border-zinc-200 dark:border-white/10 p-4">
             <Button
               type="button"
               variant="secondary"
-              className="w-full border-white/10 bg-white/5"
+              className="w-full border-zinc-200 dark:border-white/10 bg-zinc-150 dark:bg-white/5 text-zinc-800 dark:text-zinc-100"
               onClick={() => void fetch("/api/notifications", { method: "PATCH" }).then(() => client.invalidateQueries({ queryKey: ["notifications"] }))}
             >
               Mark notifications read

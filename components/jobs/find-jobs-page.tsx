@@ -40,8 +40,8 @@ function FindJobsContent() {
   }, [])
 
   return (
-    <div className="min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
-      <div className="pointer-events-none fixed inset-0 -z-0">
+    <div className="min-h-screen overflow-hidden bg-transparent text-zinc-900 dark:text-zinc-100">
+      <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute left-1/4 top-16 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
         <div className="absolute right-10 top-96 h-96 w-96 rounded-full bg-violet-500/10 blur-3xl" />
       </div>

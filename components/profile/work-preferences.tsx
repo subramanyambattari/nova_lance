@@ -22,9 +22,9 @@ export function WorkPreferences({
 }: WorkPreferencesProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.2 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Work preferences</CardTitle>
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Work preferences</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <ProfileSelect
@@ -52,7 +52,7 @@ export function WorkPreferences({
             control={control}
             name="remoteOnly"
             render={({ field }) => (
-              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="flex items-center justify-between rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
                 <Label>Remote only</Label>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
               </div>
@@ -62,7 +62,7 @@ export function WorkPreferences({
             control={control}
             name="openToContract"
             render={({ field }) => (
-              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4 md:col-span-2">
+              <div className="flex items-center justify-between rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4 md:col-span-2">
                 <Label>Open to contract work</Label>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
               </div>

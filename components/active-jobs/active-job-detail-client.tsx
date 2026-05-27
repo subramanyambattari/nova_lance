@@ -60,14 +60,14 @@ function ActiveJobWorkspace({ initialJob }: { initialJob: ActiveJobItem }) {
   })
 
   return (
-    <main className="min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
-      <div className="pointer-events-none fixed inset-0 -z-0">
+    <main className="min-h-screen overflow-hidden bg-transparent text-zinc-900 dark:text-zinc-100">
+      <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute left-1/4 top-20 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
         <div className="absolute right-8 top-72 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl" />
       </div>
       <div className="relative z-0 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        <header className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
-          <Button asChild variant="ghost" className="-ml-3 text-zinc-300 hover:text-white">
+        <header className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
+          <Button asChild variant="ghost" className="-ml-3 text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:text-white dark:hover:bg-white/[0.08]">
             <Link href="/active-jobs">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Active jobs
@@ -76,29 +76,29 @@ function ActiveJobWorkspace({ initialJob }: { initialJob: ActiveJobItem }) {
           <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_260px]">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline" className="border-blue-400/30 bg-blue-500/10 text-blue-200">
+                <Badge variant="outline" className="border-blue-400/30 bg-blue-500/10 text-blue-600 dark:text-blue-200">
                   {job.status.replace("_", " ")}
                 </Badge>
-                <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-zinc-300">
+                <Badge variant="outline" className="border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
                   {job.paymentStatus}
                 </Badge>
                 <span className="text-xs text-zinc-500">{isFetching ? "Syncing live data" : "Live data current"}</span>
               </div>
-              <h1 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">{job.title}</h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">{job.description}</p>
+              <h1 className="mt-4 text-3xl font-semibold text-zinc-950 dark:text-white sm:text-4xl">{job.title}</h1>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">{job.description}</p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-zinc-950/50 p-4">
+            <div className="rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-950/50 p-4">
               <p className="text-xs text-zinc-500">Contract value</p>
-              <p className="mt-1 text-2xl font-semibold text-white">{currency(job.budget ?? 0)}</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-950 dark:text-white">{currency(job.budget ?? 0)}</p>
               <div className="mt-4 flex items-center justify-between text-sm">
-                <span className="text-zinc-400">Progress</span>
-                <span>{job.progress}%</span>
+                <span className="text-zinc-500 dark:text-zinc-400">Progress</span>
+                <span className="font-medium text-zinc-900 dark:text-white">{job.progress}%</span>
               </div>
               <Progress value={job.progress} className="mt-2 h-2" />
               <Select
                 value={job.status}
                 onChange={(event) => statusMutation.mutate(event.target.value)}
-                className="mt-4 bg-zinc-950/70"
+                className="mt-4 border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/70 text-zinc-900 dark:text-zinc-100"
               >
                 <option value="IN_PROGRESS">In Progress</option>
                 <option value="REVIEW">Review</option>
@@ -118,7 +118,7 @@ function ActiveJobWorkspace({ initialJob }: { initialJob: ActiveJobItem }) {
         </section>
 
         <Tabs defaultValue="milestones" className="grid gap-4">
-          <TabsList className="w-full justify-start bg-white/[0.04]">
+          <TabsList className="w-full justify-start bg-zinc-100 dark:bg-white/[0.04]">
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
             <TabsTrigger value="chat">Live chat</TabsTrigger>
             <TabsTrigger value="deliverables">Deliverables</TabsTrigger>
@@ -185,26 +185,26 @@ function MilestonesPanel({ job }: { job: ActiveJobItem }) {
   })
 
   return (
-    <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+    <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
       <CardHeader>
-        <CardTitle className="text-base text-white">Milestone tracking</CardTitle>
+        <CardTitle className="text-base text-zinc-950 dark:text-white">Milestone tracking</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-3">
         {job.milestones.map((milestone) => (
-          <div key={milestone.id} className="grid gap-3 rounded-xl border border-white/10 bg-zinc-950/45 p-4 md:grid-cols-[1fr_180px_150px] md:items-center">
+          <div key={milestone.id} className="grid gap-3 rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-950/45 p-4 md:grid-cols-[1fr_180px_150px] md:items-center">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-medium text-white">{milestone.title}</h3>
+                <h3 className="font-medium text-zinc-900 dark:text-white">{milestone.title}</h3>
                 {milestone.overdue ? (
-                  <Badge variant="outline" className="border-amber-400/30 bg-amber-500/10 text-amber-200">
+                  <Badge variant="outline" className="border-amber-400/30 bg-amber-500/10 text-amber-600 dark:text-amber-200">
                     Overdue
                   </Badge>
                 ) : null}
-                {milestone.completed ? <CheckCircle2 className="h-4 w-4 text-emerald-300" /> : null}
+                {milestone.completed ? <CheckCircle2 className="h-4 w-4 text-emerald-500 dark:text-emerald-300" /> : null}
               </div>
-              <p className="mt-1 text-sm text-zinc-500">{milestone.description ?? "No description"}</p>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{milestone.description ?? "No description"}</p>
             </div>
-            <div className="text-sm text-zinc-400">
+            <div className="text-sm text-zinc-600 dark:text-zinc-400">
               <p>{milestone.dueDate ? formatDate(milestone.dueDate) : "No due date"}</p>
               <p>{currency(milestone.amount ?? 0)} / {milestone.paymentStatus}</p>
             </div>
@@ -257,9 +257,9 @@ function ChatPanel({ job }: { job: ActiveJobItem }) {
   }
 
   return (
-    <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+    <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base text-white">
+        <CardTitle className="flex items-center gap-2 text-base text-zinc-950 dark:text-white">
           <MessageSquare className="h-4 w-4" />
           Live client messaging
         </CardTitle>
@@ -267,33 +267,33 @@ function ChatPanel({ job }: { job: ActiveJobItem }) {
       <CardContent className="grid gap-4">
         <div className="grid max-h-[440px] gap-3 overflow-y-auto pr-1">
           {job.messages.map((item) => (
-            <div key={item.id} className="rounded-xl border border-white/10 bg-zinc-950/45 p-4">
+            <div key={item.id} className="rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-950/45 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-medium text-white">{item.sender.name}</p>
+                <p className="text-sm font-medium text-zinc-950 dark:text-white">{item.sender.name}</p>
                 <p className="text-xs text-zinc-500">
                   {formatDateTime(item.createdAt)} / {item.readAt ? "Read" : "Unread"}
                 </p>
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-zinc-300">{item.message}</p>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-zinc-700 dark:text-zinc-300">{item.message}</p>
               {item.fileUrl ? (
-                <a href={item.fileUrl} className="mt-2 inline-flex text-sm text-blue-300" target="_blank" rel="noreferrer">
+                <a href={item.fileUrl} className="mt-2 inline-flex text-sm text-blue-500 dark:text-blue-300" target="_blank" rel="noreferrer">
                   Attachment
                 </a>
               ) : null}
             </div>
           ))}
-          {!job.messages.length ? <p className="rounded-xl border border-white/10 p-6 text-center text-sm text-zinc-500">No messages yet.</p> : null}
+          {!job.messages.length ? <p className="rounded-xl border border-zinc-200 dark:border-white/10 p-6 text-center text-sm text-zinc-500">No messages yet.</p> : null}
         </div>
         <form onSubmit={onSubmit} className="grid gap-3">
-          <Textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Message the client" className="border-white/10 bg-zinc-950/60" />
+          <Textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Message the client" className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100" />
           <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-            <Input value={fileUrl} onChange={(event) => setFileUrl(event.target.value)} placeholder="Optional attachment URL" className="border-white/10 bg-zinc-950/60" />
+            <Input value={fileUrl} onChange={(event) => setFileUrl(event.target.value)} placeholder="Optional attachment URL" className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100" />
             <Button type="submit" disabled={mutation.isPending}>
               <Send className="mr-2 h-4 w-4" />
               Send
             </Button>
           </div>
-          {message.trim() ? <p className="text-xs text-blue-300">Typing...</p> : null}
+          {message.trim() ? <p className="text-xs text-blue-500 dark:text-blue-300">Typing...</p> : null}
           <p className="text-xs text-zinc-500">Messages, attachments, timestamps, and read receipts sync from the database every 10 seconds.</p>
         </form>
       </CardContent>
@@ -325,45 +325,45 @@ function DeliverablesPanel({ job }: { job: ActiveJobItem }) {
 
   return (
     <section className="grid gap-4 lg:grid-cols-[0.9fr_1.2fr]">
-      <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+      <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base text-white">
+          <CardTitle className="flex items-center gap-2 text-base text-zinc-950 dark:text-white">
             <UploadCloud className="h-4 w-4" />
             Submit deliverable
           </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3">
-          <Input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Deliverable title" className="border-white/10 bg-zinc-950/60" />
-          <Input value={form.fileUrl} onChange={(event) => setForm({ ...form, fileUrl: event.target.value })} placeholder="File URL" className="border-white/10 bg-zinc-950/60" />
-          <Input value={form.fileName} onChange={(event) => setForm({ ...form, fileName: event.target.value })} placeholder="File name" className="border-white/10 bg-zinc-950/60" />
-          <Input value={form.fileType} onChange={(event) => setForm({ ...form, fileType: event.target.value })} placeholder="PDF, ZIP, image, doc" className="border-white/10 bg-zinc-950/60" />
-          <Textarea value={form.revisionNotes} onChange={(event) => setForm({ ...form, revisionNotes: event.target.value })} placeholder="Revision notes" className="border-white/10 bg-zinc-950/60" />
+          <Input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Deliverable title" className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100" />
+          <Input value={form.fileUrl} onChange={(event) => setForm({ ...form, fileUrl: event.target.value })} placeholder="File URL" className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100" />
+          <Input value={form.fileName} onChange={(event) => setForm({ ...form, fileName: event.target.value })} placeholder="File name" className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100" />
+          <Input value={form.fileType} onChange={(event) => setForm({ ...form, fileType: event.target.value })} placeholder="PDF, ZIP, image, doc" className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100" />
+          <Textarea value={form.revisionNotes} onChange={(event) => setForm({ ...form, revisionNotes: event.target.value })} placeholder="Revision notes" className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100" />
           <Button onClick={() => mutation.mutate()} disabled={mutation.isPending || !form.title || !form.fileUrl}>
             <FileUp className="mr-2 h-4 w-4" />
             Submit
           </Button>
         </CardContent>
       </Card>
-      <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+      <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-white">Version history</CardTitle>
+          <CardTitle className="text-base text-zinc-950 dark:text-white">Version history</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3">
           {job.deliverables.map((deliverable) => (
-            <div key={deliverable.id} className="rounded-xl border border-white/10 bg-zinc-950/45 p-4">
+            <div key={deliverable.id} className="rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-950/45 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="font-medium text-white">{deliverable.title}</h3>
-                <Badge variant="outline" className="border-violet-400/30 bg-violet-500/10 text-violet-200">
+                <h3 className="font-medium text-zinc-950 dark:text-white">{deliverable.title}</h3>
+                <Badge variant="outline" className="border-violet-400/30 bg-violet-500/10 text-violet-600 dark:text-violet-200">
                   v{deliverable.version} / {deliverable.approvalStatus}
                 </Badge>
               </div>
               <p className="mt-1 text-sm text-zinc-500">{deliverable.fileName ?? deliverable.fileType ?? "Attached file"}</p>
-              <a href={deliverable.fileUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-sm text-blue-300">
+              <a href={deliverable.fileUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-sm text-blue-500 dark:text-blue-300">
                 Open file
               </a>
             </div>
           ))}
-          {!job.deliverables.length ? <p className="rounded-xl border border-white/10 p-6 text-center text-sm text-zinc-500">No deliverables submitted.</p> : null}
+          {!job.deliverables.length ? <p className="rounded-xl border border-zinc-200 dark:border-white/10 p-6 text-center text-sm text-zinc-500">No deliverables submitted.</p> : null}
         </CardContent>
       </Card>
     </section>
@@ -381,9 +381,9 @@ function PaymentsPanel({ job }: { job: ActiveJobItem }) {
 
   return (
     <section className="grid gap-4 lg:grid-cols-[0.9fr_1.2fr]">
-      <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+      <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base text-white">
+          <CardTitle className="flex items-center gap-2 text-base text-zinc-950 dark:text-white">
             <CreditCard className="h-4 w-4" />
             Payment status
           </CardTitle>
@@ -395,16 +395,16 @@ function PaymentsPanel({ job }: { job: ActiveJobItem }) {
           <InfoRow label="Pending" value={currency(pending)} />
           <div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-zinc-400">Payment progress</span>
-              <span className="text-white">{job.paymentProgress}%</span>
+              <span className="text-zinc-500 dark:text-zinc-400">Payment progress</span>
+              <span className="text-zinc-900 dark:text-white">{job.paymentProgress}%</span>
             </div>
             <Progress value={job.paymentProgress} className="mt-2 h-2" />
           </div>
         </CardContent>
       </Card>
-      <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+      <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base text-white">
+          <CardTitle className="flex items-center gap-2 text-base text-zinc-950 dark:text-white">
             <FileText className="h-4 w-4" />
             Contract info
           </CardTitle>
@@ -434,16 +434,16 @@ function TimelinePanel({ job }: { job: ActiveJobItem }) {
   ].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
 
   return (
-    <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+    <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
       <CardHeader>
-        <CardTitle className="text-base text-white">Activity timeline</CardTitle>
+        <CardTitle className="text-base text-zinc-950 dark:text-white">Activity timeline</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-3">
         {events.map((event) => (
-          <div key={event.id} className="flex gap-3 rounded-xl border border-white/10 bg-zinc-950/45 p-4">
-            <span className="mt-1 h-2 w-2 rounded-full bg-blue-300" />
+          <div key={event.id} className="flex gap-3 rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-950/45 p-4">
+            <span className="mt-1 h-2 w-2 rounded-full bg-blue-500 dark:bg-blue-300" />
             <div>
-              <p className="text-sm font-medium text-white">{event.title}</p>
+              <p className="text-sm font-medium text-zinc-950 dark:text-white">{event.title}</p>
               <p className="mt-1 text-xs text-zinc-500">{formatDateTime(event.at)}</p>
             </div>
           </div>
@@ -455,19 +455,19 @@ function TimelinePanel({ job }: { job: ActiveJobItem }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-zinc-950/45 px-3 py-2">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-950/45 px-3 py-2">
       <span className="text-sm text-zinc-500">{label}</span>
-      <span className="text-sm font-medium text-white">{value}</span>
+      <span className="text-sm font-medium text-zinc-900 dark:text-white">{value}</span>
     </div>
   )
 }
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <Card className="border-white/10 bg-white/[0.045] backdrop-blur-xl">
+    <Card className="border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] backdrop-blur-xl">
       <CardContent className="p-4">
         <p className="text-xs text-zinc-500">{label}</p>
-        <p className="mt-2 truncate text-sm font-semibold text-white">{value}</p>
+        <p className="mt-2 truncate text-sm font-semibold text-zinc-950 dark:text-white">{value}</p>
       </CardContent>
     </Card>
   )

@@ -38,8 +38,8 @@ export function MessageBubble({
       className={cn("flex gap-3", mine && "justify-end", grouped && "mt-1")}
     >
       {!mine && !grouped ? (
-        <Avatar className="mt-1 size-8 border border-white/10">
-          <AvatarFallback className="bg-zinc-800 text-xs text-zinc-200">
+        <Avatar className="mt-1 size-8 border border-zinc-200 dark:border-white/10">
+          <AvatarFallback className="bg-zinc-200 dark:bg-zinc-800 text-xs text-zinc-800 dark:text-zinc-200">
             {initials(message.sender.name, message.sender.email)}
           </AvatarFallback>
         </Avatar>
@@ -59,7 +59,7 @@ export function MessageBubble({
             "rounded-2xl px-3.5 py-2.5 text-sm leading-6 shadow-lg",
             mine
               ? "rounded-br-md bg-blue-600 text-white shadow-blue-950/30"
-              : "rounded-bl-md border border-white/10 bg-zinc-900/90 text-zinc-100 shadow-black/20"
+              : "rounded-bl-md border border-zinc-200 dark:border-white/10 bg-zinc-100/95 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 shadow-zinc-950/5 dark:shadow-black/20"
           )}
         >
           {message.content ? <p className="whitespace-pre-wrap break-words">{message.content}</p> : null}

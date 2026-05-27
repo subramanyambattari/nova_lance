@@ -49,13 +49,13 @@ export const completeMilestoneSchema = z.object({
 export const sendMessageSchema = z.object({
   jobId: z.string(),
   message: z.string().min(1).max(4000),
-  fileUrl: z.string().url().optional().or(z.literal("")),
+  fileUrl: z.string().optional().or(z.literal("")),
 })
 
 export const uploadDeliverableSchema = z.object({
   jobId: z.string(),
   title: z.string().min(2),
-  fileUrl: z.string().url(),
+  fileUrl: z.string(),
   fileName: z.string().optional(),
   fileType: z.string().optional(),
   revisionNotes: z.string().optional(),

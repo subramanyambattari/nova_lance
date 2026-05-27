@@ -19,9 +19,9 @@ export function ProposalAnalytics({
 
   return (
     <section className="grid gap-4 xl:grid-cols-[1fr_0.85fr]">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 backdrop-blur-xl">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4 backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035]">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-white">Response analytics</h2>
+          <h2 className="text-lg font-semibold text-zinc-950 dark:text-white">Response analytics</h2>
           <p className="text-sm text-zinc-500">Success, interview, and acceptance rates.</p>
         </div>
         <div className="h-64 min-h-0 min-w-0">
@@ -33,11 +33,11 @@ export function ProposalAnalytics({
                   <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(120,120,120,0.12)" />
               <XAxis dataKey="name" stroke="#71717a" />
               <YAxis stroke="#71717a" unit="%" />
               <ChartTooltip
-                contentStyle={{ background: "#09090b", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12 }}
+                contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", borderRadius: 12, color: "var(--foreground)" }}
               />
               <Area type="monotone" dataKey="value" stroke="#60a5fa" fill="url(#proposalRates)" />
             </AreaChart>
@@ -45,19 +45,19 @@ export function ProposalAnalytics({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 backdrop-blur-xl">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4 backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035]">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-white">Status mix</h2>
+          <h2 className="text-lg font-semibold text-zinc-950 dark:text-white">Status mix</h2>
           <p className="text-sm text-zinc-500">Live proposal counts by stage.</p>
         </div>
         <div className="h-64 min-h-0 min-w-0">
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart data={activity}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(120,120,120,0.12)" />
               <XAxis dataKey="status" stroke="#71717a" tickFormatter={(value) => String(value).slice(0, 4)} />
               <YAxis stroke="#71717a" allowDecimals={false} />
               <ChartTooltip
-                contentStyle={{ background: "#09090b", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12 }}
+                contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", borderRadius: 12, color: "var(--foreground)" }}
               />
               <Bar dataKey="count" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
             </BarChart>

@@ -96,13 +96,13 @@ export function ChatWindow({
 
   if (!conversation) {
     return (
-      <section className="hidden h-full min-h-0 flex-col bg-zinc-950 lg:flex">
+      <section className="hidden h-full min-h-0 flex-col bg-white dark:bg-zinc-950 lg:flex">
         <div className="grid h-full place-items-center p-6 text-center">
           <div>
-            <div className="mx-auto grid size-14 place-items-center rounded-2xl border border-white/10 bg-zinc-900">
+            <div className="mx-auto grid size-14 place-items-center rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900">
               <Bell className="size-6 text-blue-300" />
             </div>
-            <h2 className="mt-4 text-lg font-semibold text-white">Select a conversation</h2>
+            <h2 className="mt-4 text-lg font-semibold text-zinc-900 dark:text-white">Select a conversation</h2>
             <p className="mt-2 max-w-sm text-sm text-zinc-500">
               Messages, typing updates, read receipts, and notifications will sync here in real time.
             </p>
@@ -115,18 +115,18 @@ export function ChatWindow({
   return (
     <section
       className={cn(
-        "h-full min-h-0 flex-col bg-zinc-950",
+        "h-full min-h-0 flex-col bg-white dark:bg-zinc-950",
         mobileOpen ? "fixed inset-0 z-40 flex lg:static" : "hidden lg:flex"
       )}
     >
-      <header className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 bg-zinc-950/95 px-4 backdrop-blur-xl">
+      <header className="flex h-16 shrink-0 items-center gap-3 border-b border-zinc-200 dark:border-white/10 bg-white/95 dark:bg-zinc-950/95 px-4 backdrop-blur-xl">
         <Button type="button" variant="ghost" size="icon" className="size-9 lg:hidden" onClick={onBack}>
           <ArrowLeft className="size-4" />
         </Button>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <OnlineStatus online={primaryPeer?.presence?.online} />
-            <h2 className="truncate text-sm font-semibold text-white">
+            <h2 className="truncate text-sm font-semibold text-zinc-900 dark:text-white">
               {conversationTitle(conversation, currentUserId)}
             </h2>
           </div>
@@ -142,14 +142,14 @@ export function ChatWindow({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search messages"
-              className="h-9 w-52 border-white/10 bg-zinc-900/80 pl-8 text-xs text-zinc-100"
+              className="h-9 w-52 border-zinc-200 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/80 pl-8 text-xs text-zinc-900 dark:text-zinc-100"
             />
           </div>
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="gap-2 text-zinc-300"
+            className="gap-2 text-zinc-600 dark:text-zinc-300"
             onClick={() => setFilter((value) => (value === "all" ? "files" : value === "files" ? "images" : "all"))}
           >
             <Filter className="size-4" />
@@ -185,7 +185,7 @@ export function ChatWindow({
           <div className="grid h-full place-items-center text-center">
             <div>
               <CheckCheck className="mx-auto size-8 text-blue-300" />
-              <p className="mt-3 text-sm font-medium text-zinc-200">No messages yet</p>
+              <p className="mt-3 text-sm font-medium text-zinc-900 dark:text-zinc-200">No messages yet</p>
               <p className="mt-1 text-xs text-zinc-500">Start the project discussion below.</p>
             </div>
           </div>

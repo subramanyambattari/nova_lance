@@ -20,9 +20,9 @@ export function ProfessionalInfoForm({
 }: ProfessionalInfoFormProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.15 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Professional information</CardTitle>
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Professional information</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <ProfileInput label="Professional Title" name="title" register={register} errors={errors} />
@@ -43,14 +43,14 @@ export function ProfessionalInfoForm({
             errors={errors}
             options={["Available this week", "Available next week", "Limited availability", "Not available"]}
           />
-          <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-4">
+          <div className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50/50 dark:border-white/15 dark:bg-white/[0.03] p-4">
             <div className="flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-200">
+              <span className="flex size-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-200">
                 <FileUp className="size-5" />
               </span>
               <div>
-                <p className="text-sm font-medium text-zinc-100">Resume Upload</p>
-                <p className="text-xs text-zinc-500">PDF or DOCX, up to 10MB</p>
+                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">Resume Upload</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">PDF or DOCX, up to 10MB</p>
               </div>
             </div>
           </div>

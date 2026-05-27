@@ -17,17 +17,17 @@ interface SecuritySettingsProps {
 export function SecuritySettings({ control }: SecuritySettingsProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.25 }}>
-      <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+      <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="text-base text-zinc-100">Security settings</CardTitle>
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Security settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex items-center justify-between rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
             <div className="flex items-center gap-3">
-              <KeyRound className="size-4 text-blue-300" />
+              <KeyRound className="size-4 text-blue-600 dark:text-blue-300" />
               <Label>Change password</Label>
             </div>
-            <Button type="button" variant="outline" className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200">
+            <Button type="button" variant="outline" className="rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200">
               Update
             </Button>
           </div>
@@ -35,9 +35,9 @@ export function SecuritySettings({ control }: SecuritySettingsProps) {
             control={control}
             name="twoFactor"
             render={({ field }) => (
-              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="flex items-center justify-between rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
                 <div className="flex items-center gap-3">
-                  <ShieldCheck className="size-4 text-emerald-300" />
+                  <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-300" />
                   <Label>Two-factor authentication</Label>
                 </div>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -45,15 +45,15 @@ export function SecuritySettings({ control }: SecuritySettingsProps) {
             )}
           />
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <Code2 className="size-4 text-violet-300" />
-              <p className="mt-3 text-sm font-medium text-zinc-100">Connected accounts</p>
-              <p className="mt-1 text-xs text-zinc-500">GitHub and LinkedIn connected</p>
+            <div className="rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
+              <Code2 className="size-4 text-violet-650 dark:text-violet-300" />
+              <p className="mt-3 text-sm font-medium text-zinc-800 dark:text-zinc-100">Connected accounts</p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">GitHub and LinkedIn connected</p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <Laptop className="size-4 text-blue-300" />
-              <p className="mt-3 text-sm font-medium text-zinc-100">Login sessions</p>
-              <p className="mt-1 text-xs text-zinc-500">2 active devices</p>
+            <div className="rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
+              <Laptop className="size-4 text-blue-600 dark:text-blue-300" />
+              <p className="mt-3 text-sm font-medium text-zinc-800 dark:text-zinc-100">Login sessions</p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">2 active devices</p>
             </div>
           </div>
           <Button type="button" variant="destructive" className="w-full rounded-xl">

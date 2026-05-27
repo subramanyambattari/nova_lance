@@ -66,10 +66,10 @@ const initialMethods: PaymentMethod[] = [
 ]
 
 const brandStyles: Record<PaymentType, string> = {
-  Visa: "from-blue-500/40 to-cyan-400/10 text-blue-100",
-  Mastercard: "from-orange-500/40 to-rose-500/10 text-orange-100",
-  "American Express": "from-emerald-500/35 to-blue-500/10 text-emerald-100",
-  PayPal: "from-sky-500/40 to-blue-600/10 text-sky-100",
+  Visa: "from-blue-500/40 to-cyan-400/10 text-blue-800 dark:text-blue-100",
+  Mastercard: "from-orange-500/40 to-rose-500/10 text-orange-800 dark:text-orange-100",
+  "American Express": "from-emerald-500/35 to-blue-500/10 text-emerald-800 dark:text-emerald-100",
+  PayPal: "from-sky-500/40 to-blue-600/10 text-sky-800 dark:text-sky-100",
 }
 
 function emptyDraft(): PaymentMethod {
@@ -150,18 +150,18 @@ export function PaymentMethods1() {
   }
 
   return (
-    <Card className="overflow-hidden rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+    <Card className="overflow-hidden rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
       <CardHeader className="flex-row items-center justify-between gap-3">
         <div>
-          <CardTitle className="text-base text-zinc-100">Payment methods</CardTitle>
-          <p className="mt-2 text-sm text-zinc-500">
+          <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Payment methods</CardTitle>
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             Manage cards and payout billing sources for Nova Lance fees.
           </p>
         </div>
         <Button
           type="button"
           onClick={startAdd}
-          className="rounded-xl bg-white text-zinc-950 hover:bg-blue-100"
+          className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100"
         >
           <Plus className="size-4" />
           Add method
@@ -177,7 +177,7 @@ export function PaymentMethods1() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96 }}
-                className="group rounded-2xl border border-white/10 bg-zinc-950/55 p-4 transition hover:-translate-y-1 hover:border-blue-400/30 hover:bg-white/[0.06]"
+                className="group rounded-2xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-zinc-950/55 p-4 transition hover:-translate-y-1 hover:border-blue-400/30 hover:bg-white/[0.06]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex min-w-0 gap-3">
@@ -195,7 +195,7 @@ export function PaymentMethods1() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-medium text-zinc-100">{method.label}</p>
+                        <p className="font-medium text-zinc-800 dark:text-zinc-100">{method.label}</p>
                         {method.default ? (
                           <Badge variant="success" className="gap-1">
                             <BadgeCheck className="size-3" />
@@ -203,7 +203,7 @@ export function PaymentMethods1() {
                           </Badge>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-sm text-zinc-500">
+                      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                         {method.type} · {method.detail}
                         {method.expiry ? ` · Expires ${method.expiry}` : ""}
                       </p>
@@ -215,14 +215,14 @@ export function PaymentMethods1() {
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="rounded-xl text-zinc-400 hover:bg-white/[0.08]"
+                        className="rounded-xl text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/[0.08]"
                       >
                         <Ellipsis className="size-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="border-white/10 bg-zinc-950/95 text-zinc-100"
+                      className="border-zinc-200 bg-white text-zinc-950 dark:border-white/10 dark:bg-zinc-950/95 dark:text-zinc-100 shadow-md"
                     >
                       <DropdownMenuItem onClick={() => startEdit(method)}>
                         <Pencil className="mr-2 size-4" />
@@ -233,7 +233,7 @@ export function PaymentMethods1() {
                         Set as default
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-rose-300 hover:text-rose-200"
+                        className="text-rose-600 dark:text-rose-300 hover:text-rose-550 dark:hover:text-rose-200"
                         onClick={() => removeMethod(method.id)}
                       >
                         <Trash2 className="mr-2 size-4" />
@@ -247,16 +247,16 @@ export function PaymentMethods1() {
           </AnimatePresence>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-zinc-950/55 p-4">
+        <div className="rounded-2xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-zinc-950/55 p-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-200">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-200">
               <ShieldCheck className="size-5" />
             </span>
             <div>
-              <h3 className="text-sm font-medium text-zinc-100">
+              <h3 className="text-sm font-medium text-zinc-850 dark:text-zinc-100">
                 {editingId ? "Edit payment method" : "Secure billing vault"}
               </h3>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Card details are represented as masked demo data.
               </p>
             </div>
@@ -274,11 +274,11 @@ export function PaymentMethods1() {
                       type: event.target.value as PaymentType,
                     }))
                   }
-                  className="border-white/10 bg-zinc-950/80 text-zinc-100"
+                  className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/80 text-zinc-900 dark:text-zinc-100"
                 >
                   {(["Visa", "Mastercard", "American Express", "PayPal"] as PaymentType[]).map(
                     (type) => (
-                      <option key={type} value={type} className="bg-zinc-950">
+                      <option key={type} value={type} className="bg-white dark:bg-zinc-950">
                         {type}
                       </option>
                     )
@@ -293,7 +293,7 @@ export function PaymentMethods1() {
                     setDraft((current) => ({ ...current, label: event.target.value }))
                   }
                   placeholder="Business card"
-                  className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-100"
+                  className="rounded-xl border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.04] text-zinc-900 dark:text-zinc-100"
                 />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -308,7 +308,7 @@ export function PaymentMethods1() {
                       }))
                     }
                     placeholder={draft.type === "PayPal" ? "you@example.com" : "4242"}
-                    className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-100"
+                    className="rounded-xl border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.04] text-zinc-900 dark:text-zinc-100"
                   />
                 </div>
                 {draft.type !== "PayPal" ? (
@@ -323,7 +323,7 @@ export function PaymentMethods1() {
                         }))
                       }
                       placeholder="12/29"
-                      className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-100"
+                      className="rounded-xl border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.04] text-zinc-900 dark:text-zinc-100"
                     />
                   </div>
                 ) : null}
@@ -333,13 +333,13 @@ export function PaymentMethods1() {
                 onClick={() =>
                   setDraft((current) => ({ ...current, default: !current.default }))
                 }
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left"
+                className="flex items-center justify-between rounded-xl border border-zinc-150 bg-zinc-50/30 dark:border-white/10 dark:bg-white/[0.03] p-3 text-left"
               >
                 <span>
-                  <span className="block text-sm font-medium text-zinc-100">
+                  <span className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
                     Set as default
                   </span>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
                     Use this method for subscription renewals.
                   </span>
                 </span>
@@ -347,8 +347,8 @@ export function PaymentMethods1() {
                   className={cn(
                     "size-5 rounded-full border transition",
                     draft.default
-                      ? "border-blue-300 bg-blue-400 shadow-[0_0_16px_rgba(96,165,250,0.55)]"
-                      : "border-white/20"
+                      ? "border-blue-600 bg-blue-500 dark:border-blue-300 dark:bg-blue-400 shadow-[0_0_16px_rgba(96,165,250,0.55)]"
+                      : "border-zinc-300 dark:border-white/20"
                   )}
                 />
               </button>
@@ -357,14 +357,14 @@ export function PaymentMethods1() {
                   type="button"
                   variant="outline"
                   onClick={() => setEditingId(null)}
-                  className="flex-1 rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+                  className="flex-1 rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="button"
                   onClick={saveDraft}
-                  className="flex-1 rounded-xl bg-white text-zinc-950 hover:bg-blue-100"
+                  className="flex-1 rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100"
                 >
                   Save method
                 </Button>
@@ -372,12 +372,12 @@ export function PaymentMethods1() {
             </div>
           ) : (
             <div className="mt-5 space-y-3">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <Landmark className="size-4 text-violet-300" />
-                <p className="mt-3 text-sm font-medium text-zinc-100">
+              <div className="rounded-xl border border-zinc-150 bg-zinc-50/30 dark:border-white/10 dark:bg-white/[0.03] p-4">
+                <Landmark className="size-4 text-violet-600 dark:text-violet-300" />
+                <p className="mt-3 text-sm font-medium text-zinc-850 dark:text-zinc-100">
                   Freelancer billing ready
                 </p>
-                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
                   Keep a backup card for platform fees, featured proposals, and
                   Nova Pro renewals.
                 </p>
@@ -386,7 +386,7 @@ export function PaymentMethods1() {
                 type="button"
                 variant="outline"
                 onClick={startAdd}
-                className="w-full rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+                className="w-full rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200"
               >
                 <Plus className="size-4" />
                 Add another method

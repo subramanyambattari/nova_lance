@@ -27,19 +27,19 @@ export function ProposalsStats({ stats }: { stats: ProposalStats }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
             whileHover={{ y: -4, scale: 1.01 }}
-            className="rounded-[18px] bg-gradient-to-br from-blue-400/35 via-white/10 to-violet-500/30 p-px shadow-xl shadow-black/20"
+            className="rounded-[18px] bg-gradient-to-br from-blue-400/30 via-zinc-200 to-violet-500/30 p-px shadow-sm dark:from-blue-400/35 dark:via-white/10 dark:to-violet-500/30 dark:shadow-xl dark:shadow-black/20"
           >
-            <div className="h-full rounded-[17px] border border-white/10 bg-zinc-950/80 p-4 backdrop-blur-xl">
+            <div className="h-full rounded-[17px] border border-zinc-200 bg-white p-4 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/80">
               <div className="flex items-start justify-between gap-3">
-                <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2 text-blue-200">
+                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-2 text-blue-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-blue-200">
                   <Icon className="size-5" />
                 </div>
-                <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-200">
+                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200">
                   {card.trend}
                 </span>
               </div>
               <p className="mt-5 text-sm text-zinc-500">{card.label}</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{card.value}</p>
+              <p className="mt-2 text-2xl font-semibold text-zinc-950 dark:text-white">{card.value}</p>
             </div>
           </motion.div>
         )

@@ -113,14 +113,14 @@ function SettingToggle({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
       <div className="flex min-w-0 items-start gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-200">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-white/[0.06] dark:text-zinc-200">
           <Icon className="size-4" />
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-zinc-100">{label}</p>
-          <p className="mt-1 text-xs leading-5 text-zinc-500">{description}</p>
+          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">{label}</p>
+          <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">{description}</p>
         </div>
       </div>
       <Switch checked={checked} onCheckedChange={onChange} aria-label={label} />
@@ -158,20 +158,20 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen overflow-hidden bg-transparent text-zinc-900 dark:text-zinc-100">
       <div className="relative z-0 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <motion.header
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6 lg:flex-row lg:items-end lg:justify-between"
+          className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white dark:border-white/10 dark:bg-white/[0.035] p-5 shadow-sm dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl sm:p-6 lg:flex-row lg:items-end lg:justify-between"
         >
           <div>
-            <p className="text-sm font-medium text-sky-300">Workspace controls</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-white sm:text-4xl">
+            <p className="text-sm font-medium text-sky-600 dark:text-sky-300">Workspace controls</p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-normal text-zinc-900 dark:text-white sm:text-4xl">
               Settings
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400 sm:text-base">
               Manage account preferences, notification rules, security, privacy, and workspace defaults.
             </p>
           </div>
@@ -181,7 +181,7 @@ export function SettingsPage() {
               variant="outline"
               onClick={resetChanges}
               disabled={!isDirty}
-              className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+              className="rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200"
             >
               <RotateCcw className="size-4" />
               Reset
@@ -190,7 +190,7 @@ export function SettingsPage() {
               type="button"
               onClick={saveChanges}
               disabled={!isDirty}
-              className="rounded-xl bg-white text-zinc-950 hover:bg-sky-100"
+              className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-sky-100"
             >
               <Save className="size-4" />
               Save
@@ -200,9 +200,9 @@ export function SettingsPage() {
 
         <section className="grid gap-4 md:grid-cols-3">
           {[
-            { label: "Security", value: settings.twoFactor ? "Strong" : "Action needed", detail: settings.twoFactor ? "2FA enabled" : "2FA recommended", icon: ShieldCheck, tone: "text-emerald-300" },
-            { label: "Notifications", value: settings.emailNotifications ? "On" : "Limited", detail: "Messages, proposals, and payouts", icon: Bell, tone: "text-sky-300" },
-            { label: "Workspace", value: settings.workspaceName, detail: `$${settings.defaultRate}/hr default rate`, icon: BriefcaseBusiness, tone: "text-amber-300" },
+            { label: "Security", value: settings.twoFactor ? "Strong" : "Action needed", detail: settings.twoFactor ? "2FA enabled" : "2FA recommended", icon: ShieldCheck, tone: "text-emerald-600 dark:text-emerald-300" },
+            { label: "Notifications", value: settings.emailNotifications ? "On" : "Limited", detail: "Messages, proposals, and payouts", icon: Bell, tone: "text-sky-600 dark:text-sky-300" },
+            { label: "Workspace", value: settings.workspaceName, detail: `$${settings.defaultRate}/hr default rate`, icon: BriefcaseBusiness, tone: "text-amber-600 dark:text-amber-300" },
           ].map((item, index) => (
             <motion.div
               key={item.label}
@@ -210,12 +210,12 @@ export function SettingsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.05 * index }}
             >
-              <Card className="h-full rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="h-full rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardContent className="p-5">
                   <item.icon className={`size-5 ${item.tone}`} />
-                  <p className="mt-5 text-sm text-zinc-500">{item.label}</p>
-                  <p className="mt-2 truncate text-2xl font-semibold text-white">{item.value}</p>
-                  <p className="mt-3 text-sm text-zinc-400">{item.detail}</p>
+                  <p className="mt-5 text-sm text-zinc-500 dark:text-zinc-400">{item.label}</p>
+                  <p className="mt-2 truncate text-2xl font-semibold text-zinc-900 dark:text-white">{item.value}</p>
+                  <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{item.detail}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -232,9 +232,9 @@ export function SettingsPage() {
 
           <TabsContent value="account">
             <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Account preferences</CardTitle>
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Account preferences</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4 sm:grid-cols-2">
                   <div className="grid gap-2">
@@ -243,7 +243,7 @@ export function SettingsPage() {
                       id="displayName"
                       value={settings.displayName}
                       onChange={(event) => update("displayName", event.target.value)}
-                      className="h-10 border-white/10 bg-zinc-900/80 text-zinc-100"
+                      className="h-10 border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -253,7 +253,7 @@ export function SettingsPage() {
                       type="email"
                       value={settings.email}
                       onChange={(event) => update("email", event.target.value)}
-                      className="h-10 border-white/10 bg-zinc-900/80 text-zinc-100"
+                      className="h-10 border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -288,33 +288,33 @@ export function SettingsPage() {
                       id="bio"
                       value={settings.bio}
                       onChange={(event) => update("bio", event.target.value)}
-                      className="border-white/10 bg-zinc-900/80 text-zinc-100"
+                      className="border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100"
                     />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Account health</CardTitle>
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Account health</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {complianceItems.map((item) => (
-                    <div key={item.label}>
+                     <div key={item.label}>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-zinc-400">{item.label}</span>
-                        <span className="text-zinc-100">{item.value}%</span>
+                        <span className="text-zinc-500 dark:text-zinc-400">{item.label}</span>
+                        <span className="text-zinc-850 dark:text-zinc-100">{item.value}%</span>
                       </div>
                       <Progress className="mt-2" value={item.value} />
                     </div>
                   ))}
-                  <Separator className="bg-white/10" />
-                  <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-emerald-200">
+                  <Separator className="bg-zinc-200 dark:bg-white/10" />
+                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-50 dark:border-emerald-400/20 dark:bg-emerald-400/10 p-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-emerald-800 dark:text-emerald-200">
                       <Check className="size-4" />
                       Profile visible to matched clients
                     </div>
-                    <p className="mt-2 text-xs leading-5 text-emerald-100/70">
+                    <p className="mt-2 text-xs leading-5 text-emerald-700/80 dark:text-emerald-100/70">
                       Your core profile, billing, and payout details are ready for active work.
                     </p>
                   </div>
@@ -325,9 +325,9 @@ export function SettingsPage() {
 
           <TabsContent value="notifications">
             <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Delivery channels</CardTitle>
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Delivery channels</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <SettingToggle
@@ -354,9 +354,9 @@ export function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Notification rules</CardTitle>
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Notification rules</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <SettingToggle
@@ -394,20 +394,20 @@ export function SettingsPage() {
 
           <TabsContent value="security">
             <section className="grid gap-4 xl:grid-cols-[1fr_1fr]">
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Security controls</CardTitle>
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Security controls</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                  <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
                     <div className="flex items-center gap-3">
-                      <KeyRound className="size-4 text-sky-300" />
+                      <KeyRound className="size-4 text-sky-600 dark:text-sky-300" />
                       <div>
-                        <p className="text-sm font-medium text-zinc-100">Password</p>
-                        <p className="mt-1 text-xs text-zinc-500">Last updated 43 days ago</p>
+                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">Password</p>
+                        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Last updated 43 days ago</p>
                       </div>
                     </div>
-                    <Button type="button" variant="outline" className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200">
+                    <Button type="button" variant="outline" className="rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200">
                       Update
                     </Button>
                   </div>
@@ -428,28 +428,28 @@ export function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader className="flex-row items-center justify-between gap-3">
-                  <CardTitle className="text-base text-zinc-100">Active sessions</CardTitle>
-                  <Badge variant="outline" className="border-white/10 bg-white/[0.04] text-zinc-300">
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Active sessions</CardTitle>
+                  <Badge variant="outline" className="border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300">
                     2 devices
                   </Badge>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {sessions.map((session) => (
-                    <div key={session.device} className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={session.device} className="flex items-center justify-between gap-4 rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
                       <div className="flex items-center gap-3">
-                        <span className="flex size-10 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-200">
+                        <span className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-white/[0.06] dark:text-zinc-200">
                           <session.icon className="size-5" />
                         </span>
                         <div>
-                          <p className="text-sm font-medium text-zinc-100">{session.device}</p>
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">{session.device}</p>
+                          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                             {session.location} - {session.lastSeen}
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="size-4 text-zinc-500" />
+                      <ChevronRight className="size-4 text-zinc-400 dark:text-zinc-500" />
                     </div>
                   ))}
                   <Button type="button" variant="destructive" className="w-full rounded-xl">
@@ -462,9 +462,9 @@ export function SettingsPage() {
 
           <TabsContent value="workspace">
             <section className="grid gap-4 xl:grid-cols-[1fr_1fr]">
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Workspace defaults</CardTitle>
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Workspace defaults</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4 sm:grid-cols-2">
                   <div className="grid gap-2 sm:col-span-2">
@@ -473,7 +473,7 @@ export function SettingsPage() {
                       id="workspaceName"
                       value={settings.workspaceName}
                       onChange={(event) => update("workspaceName", event.target.value)}
-                      className="h-10 border-white/10 bg-zinc-900/80 text-zinc-100"
+                      className="h-10 border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -483,7 +483,7 @@ export function SettingsPage() {
                       type="number"
                       value={settings.defaultRate}
                       onChange={(event) => update("defaultRate", event.target.value)}
-                      className="h-10 border-white/10 bg-zinc-900/80 text-zinc-100"
+                      className="h-10 border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/60 text-zinc-900 dark:text-zinc-100"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -516,26 +516,26 @@ export function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="rounded-2xl border-white/10 bg-white/[0.045] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-base text-zinc-100">Connected services</CardTitle>
+                  <CardTitle className="text-base text-zinc-800 dark:text-zinc-100">Connected services</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {integrations.map((integration) => (
-                    <div key={integration.name} className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div key={integration.name} className="flex items-center justify-between gap-4 rounded-xl border border-zinc-150 bg-zinc-50/50 dark:border-white/10 dark:bg-white/[0.03] p-4">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-zinc-100">{integration.name}</p>
-                        <p className="mt-1 text-xs leading-5 text-zinc-500">{integration.detail}</p>
+                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">{integration.name}</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">{integration.detail}</p>
                       </div>
                       <Badge
                         variant={integration.status === "Connected" ? "success" : "outline"}
-                        className={integration.status === "Available" ? "border-white/10 bg-white/[0.04] text-zinc-300" : undefined}
+                        className={integration.status === "Available" ? "border-zinc-200 bg-zinc-100 text-zinc-650 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300" : undefined}
                       >
                         {integration.status}
                       </Badge>
                     </div>
                   ))}
-                  <Separator className="bg-white/10" />
+                  <Separator className="bg-zinc-200 dark:bg-white/10" />
                   <div className="grid gap-3 sm:grid-cols-3">
                     {[
                       { label: "Profile", icon: UserRound },
@@ -546,7 +546,7 @@ export function SettingsPage() {
                         key={item.label}
                         type="button"
                         variant="outline"
-                        className="h-20 flex-col rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+                        className="h-20 flex-col rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200"
                       >
                         <item.icon className="size-4" />
                         {item.label}
@@ -559,13 +559,13 @@ export function SettingsPage() {
           </TabsContent>
         </Tabs>
 
-        <div className="sticky bottom-4 z-20 rounded-2xl border border-white/10 bg-zinc-950/85 p-3 shadow-2xl shadow-black/40 backdrop-blur-xl">
+        <div className="sticky bottom-4 z-20 rounded-2xl border border-zinc-200 bg-white/95 dark:border-white/10 dark:bg-zinc-950/85 p-3 shadow-lg dark:shadow-2xl dark:shadow-black/40 backdrop-blur-xl">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-zinc-100">
+              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
                 {isDirty ? "Unsaved settings changes" : "Settings are up to date"}
               </p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Changes stay local until a backend settings API is connected.
               </p>
             </div>
@@ -575,7 +575,7 @@ export function SettingsPage() {
                 variant="outline"
                 onClick={resetChanges}
                 disabled={!isDirty}
-                className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-200"
+                className="rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200"
               >
                 <RotateCcw className="size-4" />
                 Reset
@@ -584,7 +584,7 @@ export function SettingsPage() {
                 type="button"
                 onClick={saveChanges}
                 disabled={!isDirty}
-                className="rounded-xl bg-white text-zinc-950 hover:bg-sky-100"
+                className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-sky-100"
               >
                 <Save className="size-4" />
                 Save Changes
@@ -598,9 +598,9 @@ export function SettingsPage() {
         <motion.div
           initial={{ opacity: 0, y: 18, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="fixed right-4 top-20 z-50 flex items-center gap-2 rounded-xl border border-white/10 bg-zinc-950/95 px-4 py-3 text-sm text-zinc-100 shadow-2xl shadow-black/40 backdrop-blur-xl"
+          className="fixed right-4 top-20 z-50 flex items-center gap-2 rounded-xl border border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950/95 px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 shadow-lg dark:shadow-2xl dark:shadow-black/40 backdrop-blur-xl"
         >
-          <Check className="size-4 text-emerald-300" />
+          <Check className="size-4 text-emerald-600 dark:text-emerald-300" />
           {toast}
         </motion.div>
       ) : null}

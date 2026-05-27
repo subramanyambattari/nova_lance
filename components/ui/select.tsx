@@ -13,7 +13,7 @@ function Select({
       <select
         data-slot="select"
         className={cn(
-          "h-10 w-full appearance-none rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 pr-9 text-sm text-white outline-none transition-colors focus:border-zinc-700 focus:bg-zinc-900 focus-visible:border-blue-400/60 focus-visible:ring-3 focus-visible:ring-blue-400/20 disabled:cursor-not-allowed disabled:opacity-50 [&_option]:bg-zinc-900 [&_option]:text-white [&_option:checked]:bg-zinc-800 [&_option:hover]:bg-zinc-800",
+          "h-10 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 py-2 pr-9 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-350 focus:bg-white focus-visible:border-blue-400/60 focus-visible:ring-3 focus-visible:ring-blue-400/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-zinc-900 dark:text-white dark:focus:border-zinc-700 dark:focus:bg-zinc-900 [&_option]:bg-white [&_option]:text-zinc-900 [&_option:checked]:bg-zinc-100 [&_option:hover]:bg-zinc-100 dark:[&_option]:bg-zinc-950 dark:[&_option]:text-white dark:[&_option:checked]:bg-zinc-800 dark:[&_option:hover]:bg-zinc-800",
           className
         )}
         {...props}

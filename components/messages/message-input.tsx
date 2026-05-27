@@ -1,8 +1,8 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { FileUp, ImagePlus, Link2, Loader2, Send, Smile } from "lucide-react"
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 
 import { FilePreview } from "@/components/messages/file-preview"
 import { Button } from "@/components/ui/button"
@@ -19,30 +19,47 @@ type AttachmentDraft = {
   previewUrl?: string
 }
 
-async function uploadToCloudinary(file: File) {
+async function uploadFile(file: File) {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
 
-  if (!cloudName || !uploadPreset) {
-    throw new Error("Cloudinary upload env vars are not configured.")
+  if (cloudName && uploadPreset) {
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("upload_preset", uploadPreset)
+      formData.append("folder", "nova-lance/messages")
+
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+        method: "POST",
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = (await response.json()) as { secure_url: string }
+        return data.secure_url
+      }
+    } catch (e) {
+      console.warn("Cloudinary upload failed, trying local upload fallback...", e)
+    }
   }
 
+  // Local fallback upload to our custom upload API route
   const formData = new FormData()
   formData.append("file", file)
-  formData.append("upload_preset", uploadPreset)
-  formData.append("folder", "nova-lance/messages")
 
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+  const response = await fetch("/api/upload", {
     method: "POST",
     body: formData,
   })
 
   if (!response.ok) {
-    throw new Error("Upload failed.")
+    const errorData = (await response.json().catch(() => ({}))) as { error?: string }
+    throw new Error(errorData.error ?? "Failed to upload file.")
   }
 
-  const data = (await response.json()) as { secure_url: string; resource_type?: string }
-  return data.secure_url
+  const data = (await response.json()) as { url: string }
+  return data.url
 }
 
 export function MessageInput({
@@ -58,8 +75,22 @@ export function MessageInput({
   const [attachment, setAttachment] = useState<AttachmentDraft | null>(null)
   const [sending, setSending] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [emojiOpen, setEmojiOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const emojiRef = useRef<HTMLDivElement>(null)
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const popularEmojis = ["😀", "😂", "🥰", "👍", "🔥", "✨", "🎉", "🚀", "💡", "🙌", "👏", "💻", "💼", "✔️", "❌"]
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (emojiRef.current && !emojiRef.current.contains(event.target as Node)) {
+        setEmojiOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   function updateTyping(value: string) {
     setContent(value)
@@ -78,7 +109,7 @@ export function MessageInput({
     setUploading(true)
 
     try {
-      const url = await uploadToCloudinary(file)
+      const url = await uploadFile(file)
       const isImage = file.type.startsWith("image/")
       setAttachment({
         imageUrl: isImage ? url : undefined,
@@ -90,7 +121,7 @@ export function MessageInput({
       })
       toast.success("Attachment uploaded", file.name)
     } catch (error) {
-      toast.error("Upload unavailable", error instanceof Error ? error.message : "Check Cloudinary configuration.")
+      toast.error("Upload failed", error instanceof Error ? error.message : "Unable to upload file.")
     } finally {
       setUploading(false)
     }
@@ -129,7 +160,7 @@ export function MessageInput({
   }
 
   return (
-    <div className="border-t border-white/10 bg-zinc-950/90 p-3 backdrop-blur-xl">
+    <div className="relative border-t border-zinc-200 dark:border-white/10 bg-white/90 dark:bg-zinc-950/90 p-3 backdrop-blur-xl">
       {attachment ? (
         <div className="mb-3 max-w-lg">
           <FilePreview
@@ -142,7 +173,7 @@ export function MessageInput({
         </div>
       ) : null}
 
-      <div className="flex items-end gap-2 rounded-xl border border-white/10 bg-zinc-900/90 p-2">
+      <div className="flex items-end gap-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/90 p-2">
         <input
           ref={fileRef}
           type="file"
@@ -183,17 +214,46 @@ export function MessageInput({
         >
           <Link2 className="size-4" />
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-9 shrink-0 text-zinc-400 hover:text-zinc-100"
-          onClick={() => setContent((value) => `${value}${value ? " " : ""}:sparkles:`)}
-          disabled={disabled}
-          title="Add emoji"
-        >
-          <Smile className="size-4" />
-        </Button>
+        
+        <div ref={emojiRef} className="relative">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-9 shrink-0 text-zinc-400 hover:text-zinc-100"
+            onClick={() => setEmojiOpen(!emojiOpen)}
+            disabled={disabled}
+            title="Add emoji"
+          >
+            <Smile className="size-4" />
+          </Button>
+
+          <AnimatePresence>
+            {emojiOpen ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute bottom-12 left-0 z-50 grid grid-cols-5 gap-1 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-950/95 p-2 shadow-2xl backdrop-blur-xl min-w-[200px]"
+              >
+                {popularEmojis.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    className="grid size-8 place-items-center rounded-lg text-base transition-all hover:bg-white/10 active:scale-95"
+                    onClick={() => {
+                      setContent((value) => `${value}${emoji}`)
+                      setEmojiOpen(false)
+                    }}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
+
         <Textarea
           value={content}
           onChange={(event) => updateTyping(event.target.value)}
@@ -204,7 +264,7 @@ export function MessageInput({
             }
           }}
           placeholder={disabled ? "Select a conversation" : "Message Nova Lance"}
-          className="max-h-36 min-h-10 flex-1 resize-none border-0 bg-transparent px-1 py-2 text-sm text-zinc-100 shadow-none placeholder:text-zinc-500 focus-visible:ring-0"
+          className="max-h-36 min-h-10 flex-1 resize-none border-0 bg-transparent px-1 py-2 text-sm text-zinc-900 dark:text-zinc-100 shadow-none placeholder:text-zinc-500 focus-visible:ring-0"
           disabled={disabled}
         />
         <motion.div whileTap={{ scale: 0.94 }}>

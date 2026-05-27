@@ -14,6 +14,7 @@ import {
 } from "@/lib/messages"
 import { prisma } from "@/lib/prisma"
 import { publishRealtime } from "@/lib/realtime"
+import { triggerNovaClientReply } from "@/lib/ai-responder"
 
 export async function sendMessage(input: unknown) {
   const user = await requireUser()
@@ -43,6 +44,9 @@ export async function sendMessage(input: unknown) {
     type: "receive-message",
     payload: { message, conversationId: body.conversationId },
   })
+
+  // Trigger AI reply from Nova Client if they are in this conversation
+  void triggerNovaClientReply(body.conversationId)
 
   revalidatePath("/messages")
   return message
