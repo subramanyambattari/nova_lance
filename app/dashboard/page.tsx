@@ -30,6 +30,15 @@ export default async function DashboardPage() {
     take: 4,
   })
 
+  const serializedActiveJobs = activeJobs.map(job => ({
+    id: job.id,
+    title: job.title,
+    client: job.client ? { name: job.client.name } : null,
+    status: job.status,
+    deadline: job.deadline ? job.deadline.toISOString() : null,
+    progress: job.progress,
+  }))
+
   const stats = {
     activeJobs: activeJobs.length,
     earnings: "$1,200", // Would be computed from Milestones
@@ -73,7 +82,7 @@ export default async function DashboardPage() {
         <EarningsChart />
 
         <section className="grid gap-4 xl:grid-cols-[1.6fr_0.9fr]">
-          <CurrentWork initialActiveJobs={activeJobs} />
+          <CurrentWork initialActiveJobs={serializedActiveJobs} />
           <RecentMessages />
         </section>
 
