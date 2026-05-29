@@ -47,7 +47,7 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react"
-import { useMemo, useState, useTransition } from "react"
+import { useMemo, useState, useTransition, useEffect } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -429,7 +429,8 @@ function StatusBadge({ status }: { status: Job["status"] | ProposalStatus }) {
 }
 
 import { createJob } from "@/app/actions/client"
-import { generateJobDescription } from "@/app/actions/ai"
+import { generateJobDescription, analyzeProposals } from "@/app/actions/ai"
+import { toast } from "@/lib/toast"
 // useTransition moved to top
 
 export function ClientDashboardPage({ 
@@ -443,6 +444,9 @@ export function ClientDashboardPage({
   const [aiResponse, setAiResponse] = useState<string | null>(null)
   const [isAiLoading, setIsAiLoading] = useState(false)
 
+  const [activeTab, setActiveTab] = useState("overview")
+  const [jobsState, setJobsState] = useState<Job[]>(initialJobs && initialJobs.length > 0 ? initialJobs : jobs)
+  const [proposalsState, setProposalsState] = useState<Proposal[]>(initialProposals && initialProposals.length > 0 ? initialProposals : proposals)
 
   const [skills, setSkills] = useState(initialSkills)
   const [skillDraft, setSkillDraft] = useState("")
@@ -451,11 +455,53 @@ export function ClientDashboardPage({
   const [attachments, setAttachments] = useState<string[]>([])
   const [jobDraft, setJobDraft] = useState(initialJobDraft)
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "")
+      const hashToTabMap: Record<string, string> = {
+        "overview": "overview",
+        "ai-workspace": "ai",
+        "post-job": "post",
+        "my-jobs": "jobs",
+        "talent-matches": "talent",
+        "proposals": "proposals",
+        "operations": "operations",
+        "analytics": "analytics",
+        "settings": "settings",
+      }
+      if (hashToTabMap[hash]) {
+        setActiveTab(hashToTabMap[hash])
+      }
+    }
+
+    handleHashChange()
+    window.addEventListener("hashchange", handleHashChange)
+    return () => window.removeEventListener("hashchange", handleHashChange)
+  }, [])
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    const tabToHashMap: Record<string, string> = {
+      "overview": "overview",
+      "ai": "ai-workspace",
+      "post": "post-job",
+      "jobs": "my-jobs",
+      "talent": "talent-matches",
+      "proposals": "proposals",
+      "operations": "operations",
+      "analytics": "analytics",
+      "settings": "settings",
+    }
+    if (tabToHashMap[value]) {
+      window.history.pushState(null, "", `#${tabToHashMap[value]}`)
+    }
+  }
+
   const filteredProposals = useMemo(() => {
     const visible =
       proposalFilter === "All"
-        ? initialProposals
-        : initialProposals.filter((proposal) => proposal.status === proposalFilter)
+        ? proposalsState
+        : proposalsState.filter((proposal) => proposal.status === proposalFilter)
 
     return [...visible].sort((first, second) => {
       if (proposalSort === "Budget") {
@@ -556,7 +602,7 @@ export function ClientDashboardPage({
           ))}
         </section>
 
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <div className="overflow-x-auto pb-1">
             <TabsList className="h-auto min-w-max justify-start rounded-lg border-zinc-200 bg-white p-1 text-zinc-600 dark:border-white/10 dark:bg-white/[0.04]">
               <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -576,7 +622,7 @@ export function ClientDashboardPage({
               <div>
                 <SectionHeader eyebrow="Project health" title="Progress overview" />
                 <div className="space-y-3">
-                  {initialJobs.length > 0 ? initialJobs.map((job) => (
+                  {jobsState.length > 0 ? jobsState.map((job) => (
                     <div key={job.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
@@ -706,6 +752,11 @@ export function ClientDashboardPage({
                             if (prompt === "Generate job content") {
                               setIsAiLoading(true)
                               const res = await generateJobDescription("Create a job post for an AI engineer.")
+                              if (res.success) setAiResponse(res.text)
+                              setIsAiLoading(false)
+                            } else if (prompt === "Explain proposals") {
+                              setIsAiLoading(true)
+                              const res = await analyzeProposals("Analyze recent proposals.")
                               if (res.success) setAiResponse(res.text)
                               setIsAiLoading(false)
                             } else {
@@ -876,9 +927,18 @@ export function ClientDashboardPage({
                               experience: jobDraft.experience,
                               skills: skills
                             })
-                            // Optional: show a toast or reset form
+                            setJobsState(prev => [{
+                              title: jobDraft.title,
+                              status: "Active",
+                              proposals: 0,
+                              hired: 0,
+                              progress: 0,
+                              budget: jobDraft.budget
+                            }, ...prev])
+                            toast.success("Job posted successfully!")
                             setJobDraft(initialJobDraft)
                             setSkills(initialSkills)
+                            handleTabChange("jobs")
                           })
                         }}
                       >
@@ -897,14 +957,14 @@ export function ClientDashboardPage({
                 eyebrow="Job management"
                 title="My jobs"
                 action={
-                  <Button>
+                  <Button onClick={() => handleTabChange("post")}>
                     <Plus className="size-4" />
                     New job
                   </Button>
                 }
               />
               <div className="grid gap-3 lg:grid-cols-2">
-                {jobs.map((job) => (
+                {jobsState.map((job) => (
                   <div key={job.title} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -923,19 +983,29 @@ export function ClientDashboardPage({
                       <span className="text-sm text-zinc-500">{job.progress}%</span>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => toast.success(`Editing job: ${job.title}`)}>
                         <Edit3 className="size-4" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        const duplicate: Job = { ...job, title: `${job.title} (Copy)`, status: "Draft", proposals: 0, hired: 0, progress: 0 }
+                        setJobsState(prev => [duplicate, ...prev])
+                        toast.success(`Duplicated job: ${job.title}`)
+                      }}>
                         <Copy className="size-4" />
                         Duplicate
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setJobsState(prev => prev.map(j => j.title === job.title ? { ...j, status: "Paused" } : j))
+                        toast.success(`Paused job: ${job.title}`)
+                      }}>
                         <Pause className="size-4" />
                         Pause
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setJobsState(prev => prev.map(j => j.title === job.title ? { ...j, status: "Active" } : j))
+                        toast.success(`Reopened job: ${job.title}`)
+                      }}>
                         <RefreshCw className="size-4" />
                         Reopen
                       </Button>
@@ -984,11 +1054,11 @@ export function ClientDashboardPage({
                       </div>
                     </div>
                     <div className="mt-4 flex gap-2">
-                      <Button className="flex-1">
+                      <Button className="flex-1" onClick={() => toast.success(`Invited ${talent.name} to apply.`)}>
                         <Send className="size-4" />
                         Invite
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button variant="outline" className="flex-1" onClick={() => toast.success(`Shortlisted ${talent.name}.`)}>
                         <Star className="size-4" />
                         Shortlist
                       </Button>
@@ -1058,23 +1128,32 @@ export function ClientDashboardPage({
                       </div>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <Button size="sm">
+                      <Button size="sm" onClick={() => {
+                        setProposalsState(prev => prev.map(p => p.name === proposal.name ? { ...p, status: "Interview" } : p))
+                        toast.success(`Accepted proposal from ${proposal.name}. Moved to Interview.`)
+                      }}>
                         <CheckCircle2 className="size-4" />
                         Accept
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setProposalsState(prev => prev.filter(p => p.name !== proposal.name))
+                        toast.success(`Rejected proposal from ${proposal.name}.`)
+                      }}>
                         <XCircle className="size-4" />
                         Reject
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setProposalsState(prev => prev.map(p => p.name === proposal.name ? { ...p, status: "Saved" } : p))
+                        toast.success(`Saved proposal from ${proposal.name}.`)
+                      }}>
                         <Star className="size-4" />
                         Save
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => toast.success(`Opened notes for ${proposal.name}.`)}>
                         <FileText className="size-4" />
                         Notes
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => toast.success(`AI Summary for ${proposal.name}: ${proposal.summary}`)}>
                         <Sparkles className="size-4" />
                         AI summary
                       </Button>

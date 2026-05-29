@@ -114,9 +114,13 @@ export function JobsGrid({
       return response.json()
     },
     onSuccess: () => {
+      import("@/lib/toast").then(({ toast }) => toast.success("Proposal submitted successfully"))
       setSelectedJob(null)
       queryClient.invalidateQueries({ queryKey: ["proposals"] })
     },
+    onError: (error) => {
+      import("@/lib/toast").then(({ toast }) => toast.error(error instanceof Error ? error.message : "Failed to submit proposal"))
+    }
   })
 
   if (query.isLoading) {

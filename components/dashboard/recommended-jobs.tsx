@@ -2,12 +2,14 @@
 
 import { ArrowUpRight, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface Job {
+  id?: string
   title: string
   budget: string
   skills: string[]
@@ -61,9 +63,11 @@ export function RecommendedJobs({ initialJobs = [] }: { initialJobs?: any[] }) {
                   </Badge>
                 ))}
               </div>
-              <Button className="mt-5 w-full rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100">
-                Apply
-                <ArrowUpRight className="size-4" />
+              <Button asChild className="mt-5 w-full rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100">
+                <Link href={`/jobs/${job.id}`}>
+                  Apply
+                  <ArrowUpRight className="size-4" />
+                </Link>
               </Button>
             </div>
           )) : <p className="text-sm text-zinc-500 py-4 col-span-3">No recommended jobs right now.</p>}

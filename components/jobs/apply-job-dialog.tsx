@@ -63,7 +63,6 @@ export function ApplyJobDialog({
               placeholder="Explain why you are a strong fit, your relevant work, and how you would approach delivery..."
               className="min-h-40 rounded-xl border-white/10 bg-white/[0.04] text-zinc-100"
             />
-            <p className="text-xs text-zinc-500">Minimum 80 characters for spam prevention.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -85,7 +84,14 @@ export function ApplyJobDialog({
           </div>
           <Button
             type="button"
-            disabled={submitting || coverLetter.length < 80}
+            disabled={
+              submitting ||
+              !coverLetter.trim() ||
+              !budget ||
+              !timeline.trim() ||
+              !portfolioLinks.trim() ||
+              !resumeUrl.trim()
+            }
             onClick={() =>
               onSubmit({
                 jobId: job.id,

@@ -10,7 +10,7 @@ const applySchema = z.object({
   source: z.string(),
   externalId: z.string().optional(),
   externalUrl: z.string().optional(),
-  coverLetter: z.string().min(80, "Cover letter must be at least 80 characters."),
+  coverLetter: z.string().min(1, "Cover letter is required."),
   budget: z.coerce.number().min(50),
   timeline: z.string().min(2),
   portfolioLinks: z.string().optional().default(""),

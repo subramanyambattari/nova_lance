@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/table"
 
 interface Project {
+  id?: string
   name: string
   client: string
   status: "In review" | "Active" | "Design sprint"
@@ -46,6 +48,8 @@ const projects: Project[] = [
 ]
 
 export function CurrentWork({ initialActiveJobs = [] }: { initialActiveJobs?: any[] }) {
+  const router = useRouter()
+
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.2 }}>
       <Card className="rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
@@ -65,7 +69,11 @@ export function CurrentWork({ initialActiveJobs = [] }: { initialActiveJobs?: an
             </TableHeader>
             <TableBody>
               {initialActiveJobs.length > 0 ? initialActiveJobs.map((project) => (
-                <TableRow key={project.id} className="border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
+                <TableRow 
+                  key={project.id} 
+                  onClick={() => router.push(`/active-jobs/${project.id}`)}
+                  className="cursor-pointer border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]"
+                >
                   <TableCell className="font-medium text-zinc-950 dark:text-zinc-100">{project.title}</TableCell>
                   <TableCell className="hidden text-zinc-600 dark:text-zinc-400 sm:table-cell">{project.client?.name || "Client"}</TableCell>
                   <TableCell>

@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { toast } from "@/lib/toast"
 
 const deadlines = [
   {
@@ -48,15 +49,20 @@ export function DeadlinesWidget() {
             const Icon = item.icon
 
             return (
-              <div key={item.title} className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-white/10 dark:bg-white/[0.03]">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-white dark:bg-white/[0.05]">
+              <button 
+                key={item.title} 
+                type="button"
+                onClick={() => toast(`Navigating to: ${item.title}`)}
+                className="w-full text-left flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.05] transition"
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-white/[0.05]">
                   <Icon className={`size-4 ${item.tone}`} />
                 </span>
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium text-zinc-950 dark:text-zinc-100">{item.title}</span>
                   <span className="mt-1 block text-xs text-zinc-500">{item.meta}</span>
                 </span>
-              </div>
+              </button>
             )
           })}
         </CardContent>

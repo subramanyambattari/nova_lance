@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { toast } from "@/lib/toast"
 
 interface Message {
   name: string
@@ -48,6 +49,8 @@ export function RecentMessages() {
           {messages.map((item) => (
             <button
               key={item.name}
+              type="button"
+              onClick={() => toast(`Opening message thread with ${item.name}...`)}
               className="flex w-full items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-left transition hover:border-blue-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-blue-400/30 dark:hover:bg-white/[0.06]"
             >
               <div className="relative">

@@ -39,10 +39,19 @@ function DetailsContent({ id }: { id: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-      if (!response.ok) throw new Error("Unable to apply")
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        throw new Error(data.error ?? "Unable to apply")
+      }
       return response.json()
     },
-    onSuccess: () => setApplyOpen(false),
+    onSuccess: () => {
+      import("@/lib/toast").then(({ toast }) => toast.success("Proposal submitted successfully"))
+      setApplyOpen(false)
+    },
+    onError: (error) => {
+      import("@/lib/toast").then(({ toast }) => toast.error(error instanceof Error ? error.message : "Failed to apply"))
+    }
   })
 
   if (query.isLoading) {
