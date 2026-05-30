@@ -1,9 +1,9 @@
 "use client"
 
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, BriefcaseBusiness, CheckCircle2, Clock3, ExternalLink, MapPin, ShieldCheck } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { ApplyJobDialog, type ProposalPayload } from "@/components/jobs/apply-job-dialog"
 import { JobsQueryProvider } from "@/components/jobs/query-provider"
@@ -31,7 +31,20 @@ async function fetchJob(id: string) {
 
 function DetailsContent({ id }: { id: string }) {
   const [applyOpen, setApplyOpen] = useState(false)
+  const queryClient = useQueryClient()
   const query = useQuery({ queryKey: ["job", id], queryFn: () => fetchJob(id) })
+  
+  useEffect(() => {
+    const handleProposalUpdate = (e: Event) => {
+      const payload = (e as CustomEvent).detail;
+      if (payload.jobId === id) {
+        queryClient.invalidateQueries({ queryKey: ["job", id] })
+      }
+    };
+    window.addEventListener('ws-proposal-update', handleProposalUpdate);
+    return () => window.removeEventListener('ws-proposal-update', handleProposalUpdate);
+  }, [id, queryClient]);
+
   const applyMutation = useMutation({
     mutationFn: async (payload: ProposalPayload) => {
       const response = await fetch("/api/jobs/apply", {

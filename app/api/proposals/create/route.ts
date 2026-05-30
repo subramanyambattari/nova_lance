@@ -67,7 +67,30 @@ export async function POST(request: NextRequest) {
       include: { attachments: true, job: true },
     })
 
-    return Response.json({ proposal: serializeProposal(proposal) })
+    const serializedProposal = serializeProposal(proposal)
+
+    // Broadcast real-time update
+    if (jobId) {
+      try {
+        const protocol = request.headers.get("x-forwarded-proto") || "http";
+        const host = request.headers.get("host") || "localhost:3000";
+        await fetch(`${protocol}://${host}/api/internal/ws-broadcast`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            payload: {
+              type: "ws-proposal-update",
+              jobId: jobId,
+              proposal: serializedProposal,
+            },
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to broadcast proposal update", e);
+      }
+    }
+
+    return Response.json({ proposal: serializedProposal })
   } catch (error) {
     if (error instanceof ZodError) {
       const issue = error.issues[0]

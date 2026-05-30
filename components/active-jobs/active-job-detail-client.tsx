@@ -38,6 +38,18 @@ function ActiveJobWorkspace({ initialJob }: { initialJob: ActiveJobItem }) {
     initialData: { job: initialJob },
     refetchInterval: 10_000,
   })
+
+  useEffect(() => {
+    const handleDeliverableUpdate = (e: Event) => {
+      const payload = (e as CustomEvent).detail;
+      if (payload.jobId === initialJob.id) {
+        queryClient.invalidateQueries({ queryKey: ["active-job", initialJob.id] })
+        toast.info("A new deliverable was submitted.");
+      }
+    };
+    window.addEventListener('ws-deliverable-upload', handleDeliverableUpdate);
+    return () => window.removeEventListener('ws-deliverable-upload', handleDeliverableUpdate);
+  }, [initialJob.id, queryClient]);
   const job = data.job
 
   const statusMutation = useMutation({

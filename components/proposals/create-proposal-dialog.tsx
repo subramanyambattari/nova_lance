@@ -82,6 +82,7 @@ export function CreateProposalDialog({
   onSubmit: (payload: Record<string, unknown>) => void
 }) {
   const [attachments, setAttachments] = useState<ProposalAttachmentItem[]>([])
+  const [aiLoading, setAiLoading] = useState(false)
   const isEditing = Boolean(proposal)
 
   const defaults = useMemo<ProposalForm>(() => {
@@ -198,11 +199,31 @@ export function CreateProposalDialog({
     form.clearErrors(["attachmentName", "attachmentUrl"])
   }
 
-  function useAiSuggestion() {
+  async function useAiSuggestion() {
     const current = form.getValues("coverLetter")
-    const intro =
-      "I reviewed the project goals and can deliver a focused implementation with clear milestones, frequent updates, and production-ready handoff."
-    form.setValue("coverLetter", current ? `${current}\n\n${intro}` : intro, { shouldValidate: true })
+    const jobId = form.getValues("jobId")
+    
+    setAiLoading(true)
+    try {
+      const res = await fetch("/api/ai/proposal-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coverLetter: current || "I want to apply to this job.", jobId })
+      })
+      const data = await res.json()
+      
+      if (data.suggestion) {
+        form.setValue(
+          "coverLetter", 
+          current ? `${current}\n\n[AI Feedback]: ${data.suggestion}` : data.suggestion, 
+          { shouldValidate: true }
+        )
+      }
+    } catch (e) {
+      console.error("AI feedback failed", e)
+    } finally {
+      setAiLoading(false)
+    }
   }
 
   return (
@@ -243,9 +264,9 @@ export function CreateProposalDialog({
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3">
                 <Label>Cover letter editor</Label>
-                <Button type="button" variant="outline" size="sm" onClick={useAiSuggestion} className="rounded-xl border-violet-400/20 bg-violet-500/10 text-violet-100 hover:bg-violet-500/20">
-                  <Sparkles className="size-3.5" />
-                  AI improve
+                <Button type="button" variant="outline" size="sm" onClick={useAiSuggestion} disabled={aiLoading} className="rounded-xl border-violet-400/20 bg-violet-500/10 text-violet-100 hover:bg-violet-500/20">
+                  {aiLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
+                  {aiLoading ? "Thinking..." : "AI improve"}
                 </Button>
               </div>
               <Textarea

@@ -52,6 +52,26 @@ export async function POST(request: NextRequest) {
     })
 
     await prisma.activeJob.update({ where: { id: body.jobId }, data: { status: "REVIEW" } })
+    
+    // Broadcast real-time update
+    try {
+      const protocol = request.headers.get("x-forwarded-proto") || "http";
+      const host = request.headers.get("host") || "localhost:3000";
+      await fetch(`${protocol}://${host}/api/internal/ws-broadcast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          payload: {
+            type: "ws-deliverable-upload",
+            jobId: body.jobId,
+            deliverable,
+          },
+        }),
+      });
+    } catch (e) {
+      console.error("Failed to broadcast deliverable update", e);
+    }
+
     return Response.json({ deliverable }, { status: 201 })
   } catch (error) {
     if (error instanceof ZodError) {
