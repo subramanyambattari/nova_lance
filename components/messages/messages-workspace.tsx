@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/lib/toast"
 import { cn } from "@/lib/utils"
+import { useWebSocket } from "@/components/websocket-provider"
 
 type ConversationsResponse = {
   conversations: ConversationItem[]
@@ -86,48 +87,30 @@ function WorkspaceInner() {
   const activeConversation = conversations.find((conversation) => conversation.id === activeId) ?? conversations[0]
 
   useEffect(() => {
-    const source = new EventSource("/api/realtime")
-
-    source.addEventListener("receive-message", (event) => {
-      const payload = JSON.parse((event as MessageEvent).data) as { message: MessageItem; conversationId: string }
+    const handleMessage = (e: Event) => {
+      const payload = (e as CustomEvent).detail;
       setLiveMessages((items) => {
         if (items.some((item) => item.id === payload.message.id)) return items
         return [...items, payload.message]
       })
       void client.invalidateQueries({ queryKey: ["conversations"] })
       void client.invalidateQueries({ queryKey: ["messages", payload.conversationId] })
-    })
+    };
 
-    source.addEventListener("conversation-update", () => {
-      void client.invalidateQueries({ queryKey: ["conversations"] })
-    })
-
-    source.addEventListener("typing-start", (event) => {
-      const payload = JSON.parse((event as MessageEvent).data) as { conversationId: string; user: UserSummary }
+    const handleTyping = (e: Event) => {
+      const payload = (e as CustomEvent).detail;
       setTyping((value) => ({ ...value, [payload.conversationId]: payload.user }))
       window.setTimeout(() => {
         setTyping((value) => ({ ...value, [payload.conversationId]: undefined }))
       }, 2200)
-    })
+    };
 
-    source.addEventListener("typing-stop", (event) => {
-      const payload = JSON.parse((event as MessageEvent).data) as { conversationId: string }
-      setTyping((value) => ({ ...value, [payload.conversationId]: undefined }))
-    })
-
-    source.addEventListener("mark-seen", () => {
-      void client.invalidateQueries({ queryKey: ["messages"] })
-      void client.invalidateQueries({ queryKey: ["conversations"] })
-    })
-
-    source.addEventListener("notification", (event) => {
-      const payload = JSON.parse((event as MessageEvent).data) as { title: string; body?: string }
-      toast.info(payload.title, payload.body)
-      void client.invalidateQueries({ queryKey: ["notifications"] })
-    })
+    window.addEventListener("ws-chat-message", handleMessage);
+    window.addEventListener("ws-typing", handleTyping);
 
     return () => {
-      source.close()
+      window.removeEventListener("ws-chat-message", handleMessage);
+      window.removeEventListener("ws-typing", handleTyping);
       void fetch("/api/users/status", { method: "PATCH" })
     }
   }, [client])
@@ -208,16 +191,19 @@ function WorkspaceInner() {
     })
   }, [activeConversation, client])
 
+  const { sendMessage } = useWebSocket();
+
   const sendTyping = useCallback(
     (isTyping: boolean) => {
       if (!activeConversation) return
+      sendMessage("typing", { conversationId: activeConversation.id, isTyping });
       void fetch("/api/users/status", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ conversationId: activeConversation.id, typing: isTyping }),
       })
     },
-    [activeConversation]
+    [activeConversation, sendMessage]
   )
 
   const activePeers = useMemo(() => {
