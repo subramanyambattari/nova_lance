@@ -79,6 +79,7 @@ type Talent = {
 }
 
 type Job = {
+  id?: string
   title: string
   status: "Active" | "Draft" | "Paused" | "Closed"
   proposals: number

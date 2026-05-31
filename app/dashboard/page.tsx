@@ -39,9 +39,19 @@ export default async function DashboardPage() {
     progress: job.progress,
   }))
 
+  const milestones = await prisma.milestone.findMany({
+    where: {
+      job: { freelancerId: user.id },
+      completed: true,
+    }
+  })
+
+  const totalEarnings = milestones.reduce((sum, m) => sum + (m.amount || 0), 0)
+  const formattedEarnings = `$${totalEarnings.toLocaleString()}`
+
   const stats = {
     activeJobs: activeJobs.length,
-    earnings: "$1,200", // Would be computed from Milestones
+    earnings: formattedEarnings,
     openProposals: await prisma.proposal.count({ where: { freelancerId: user.id, status: "DRAFT" } })
   }
 

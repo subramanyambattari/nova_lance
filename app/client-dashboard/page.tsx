@@ -8,7 +8,11 @@ export default async function ClientDashboardRoute() {
   const dbJobs = await prisma.job.findMany({
     where: { clientId: user.id },
     include: {
-      proposals: true,
+      proposals: {
+        include: {
+          activeJob: true
+        }
+      },
       _count: { select: { proposals: true } },
     },
     orderBy: { createdAt: "desc" }
@@ -17,16 +21,22 @@ export default async function ClientDashboardRoute() {
   // We map the DB jobs to the shape expected by the component if needed, 
   // or we pass them down and modify the component to accept them.
   // For now we'll pass them directly.
-  const serializedJobs = dbJobs.map(job => ({
-    id: job.id,
-    title: job.title,
-    status: "Active", // Or derived from another field
-    proposals: job._count.proposals,
-    hired: 0, // Mock for now or compute
-    progress: 0, // Mock for now or compute
-    budget: job.salary || "$0",
-    skills: job.skills,
-  }))
+  const serializedJobs = dbJobs.map(job => {
+    const hiredProposals = job.proposals.filter(p => p.activeJob !== null);
+    const hired = hiredProposals.length;
+    const progress = hired > 0 ? hiredProposals.reduce((sum, p) => sum + (p.activeJob?.progress || 0), 0) / hired : 0;
+
+    return {
+      id: job.id,
+      title: job.title,
+      status: hired > 0 ? "Active" : "Draft",
+      proposals: job._count.proposals,
+      hired,
+      progress: Math.round(progress),
+      budget: job.salary || (job.budget ? `$${job.budget}` : "$0"),
+      skills: job.skills,
+    }
+  })
 
   const dbProposals = await prisma.proposal.findMany({
     where: { job: { clientId: user.id } },

@@ -201,10 +201,7 @@ export function OverviewPage() {
   return (
     <div className="min-h-screen overflow-hidden bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
       <div className="relative z-0 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        <motion.header
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
+        <header
           className="grid gap-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035] dark:shadow-2xl dark:shadow-black/20 lg:grid-cols-[1fr_360px] lg:p-6"
         >
           <div>
@@ -267,16 +264,11 @@ export function OverviewPage() {
               ))}
             </div>
           </div>
-        </motion.header>
+        </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {commandStats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: index * 0.05 }}
-            >
+            <div key={stat.label}>
               <Card className="h-full rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
                 <CardContent className="p-5">
                   <stat.icon className={`size-5 ${stat.tone}`} />
@@ -285,7 +277,7 @@ export function OverviewPage() {
                   <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{stat.detail}</p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
         </section>
 

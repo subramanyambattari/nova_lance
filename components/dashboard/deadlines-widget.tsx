@@ -52,7 +52,7 @@ export function DeadlinesWidget() {
               <button 
                 key={item.title} 
                 type="button"
-                onClick={() => toast(`Navigating to: ${item.title}`)}
+                onClick={() => toast.info(`Navigating to: ${item.title}`)}
                 className="w-full text-left flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.05] transition"
               >
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-white/[0.05]">
