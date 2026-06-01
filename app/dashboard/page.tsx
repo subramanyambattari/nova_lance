@@ -11,26 +11,45 @@ import { requireUser } from "@/lib/auth"
 export default async function DashboardPage() {
   const user = await requireUser()
 
-  const availableJobs = await prisma.job.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  })
+  let availableJobs: any[] = []
+  let activeJobs: any[] = []
+  let milestones: any[] = []
+  let openProposals = 0
 
-  const serializedJobs = availableJobs.map(job => ({
+  try {
+    availableJobs = await prisma.job.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    })
+
+    activeJobs = await prisma.activeJob.findMany({
+      where: { freelancerId: user.id },
+      include: { client: true },
+      orderBy: { updatedAt: "desc" },
+      take: 4,
+    })
+
+    milestones = await prisma.milestone.findMany({
+      where: {
+        job: { freelancerId: user.id },
+        completed: true,
+      }
+    })
+
+    openProposals = await prisma.proposal.count({ where: { freelancerId: user.id, status: "DRAFT" } })
+  } catch (error) {
+    console.error("Dashboard database fetch error:", error)
+    // Fallback if DB schema is out of sync or connection fails
+  }
+
+  const serializedJobs = availableJobs.map((job: any) => ({
     id: job.id,
     title: job.title,
     budget: job.salary || "$0",
-    skills: job.skills,
+    skills: job.skills || [],
   }))
 
-  const activeJobs = await prisma.activeJob.findMany({
-    where: { freelancerId: user.id },
-    include: { client: true },
-    orderBy: { updatedAt: "desc" },
-    take: 4,
-  })
-
-  const serializedActiveJobs = activeJobs.map(job => ({
+  const serializedActiveJobs = activeJobs.map((job: any) => ({
     id: job.id,
     title: job.title,
     client: job.client ? { name: job.client.name } : null,
@@ -39,20 +58,13 @@ export default async function DashboardPage() {
     progress: job.progress,
   }))
 
-  const milestones = await prisma.milestone.findMany({
-    where: {
-      job: { freelancerId: user.id },
-      completed: true,
-    }
-  })
-
   const totalEarnings = milestones.reduce((sum, m) => sum + (m.amount || 0), 0)
   const formattedEarnings = `$${totalEarnings.toLocaleString()}`
 
   const stats = {
     activeJobs: activeJobs.length,
     earnings: formattedEarnings,
-    openProposals: await prisma.proposal.count({ where: { freelancerId: user.id, status: "DRAFT" } })
+    openProposals: openProposals
   }
 
   return (

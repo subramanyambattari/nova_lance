@@ -11,6 +11,8 @@ model User {
   id             Int           @id @default(autoincrement())
   email          String        @unique
   name           String?
+  profile        UserProfile?
+  settings       UserSettings?
   posts          Post[]
   jobs           Job[]
   proposals      Proposal[]    @relation("FreelancerProposals")
@@ -44,6 +46,7 @@ model Job {
   skills         String[]
   type           String
   experience     String
+  status         String     @default("Active")
   location       String     @default("Remote")
   remote         Boolean    @default(true)
   verifiedClient Boolean    @default(false)
@@ -355,4 +358,49 @@ enum NotificationType {
   MESSAGE
   MENTION
   FILE
+}
+
+model UserProfile {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @unique
+  phone              String?
+  location           String?
+  timezone           String?
+  languages          String?
+  title              String?
+  bio                String?
+  experienceLevel    String?
+  hourlyRate         Float?
+  availability       String?
+  portfolioWebsite   String?
+  github             String?
+  linkedin           String?
+  preferredJobType   String?
+  budgetRange        String?
+  weeklyAvailability String?
+  remoteOnly         Boolean  @default(true)
+  openToContract     Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserSettings {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @unique
+  displayName        String?
+  workspaceName      String?
+  emailNotifications Boolean  @default(true)
+  inAppNotifications Boolean  @default(true)
+  marketingDigest    Boolean  @default(false)
+  proposalAlerts     Boolean  @default(true)
+  messageAlerts      Boolean  @default(true)
+  paymentAlerts      Boolean  @default(true)
+  twoFactor          Boolean  @default(false)
+  loginAlerts        Boolean  @default(true)
+  publicProfile      Boolean  @default(true)
+  dataSharing        Boolean  @default(false)
+  autoSaveDrafts     Boolean  @default(true)
+  weeklySummary      Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

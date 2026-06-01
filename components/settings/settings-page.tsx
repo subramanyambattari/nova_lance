@@ -24,7 +24,8 @@ import {
   WalletCards,
 } from "lucide-react"
 import type { ElementType } from "react"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useTransition, useEffect } from "react"
+import { updateSettings } from "@/app/actions/user"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -128,9 +129,15 @@ function SettingToggle({
   )
 }
 
-export function SettingsPage() {
-  const [settings, setSettings] = useState(defaultSettings)
-  const [savedSettings, setSavedSettings] = useState(defaultSettings)
+export function SettingsPage({ initialData }: { initialData?: any }) {
+  const [isPending, startTransition] = useTransition()
+  
+  const [settings, setSettings] = useState<SettingsState>(
+    initialData ? { ...defaultSettings, ...initialData } : defaultSettings
+  )
+  const [savedSettings, setSavedSettings] = useState<SettingsState>(
+    initialData ? { ...defaultSettings, ...initialData } : defaultSettings
+  )
   const [toast, setToast] = useState<string | null>(null)
 
   const isDirty = useMemo(
@@ -148,8 +155,13 @@ export function SettingsPage() {
   }
 
   function saveChanges() {
-    setSavedSettings(settings)
-    showToast("Settings saved.")
+    startTransition(async () => {
+      const res = await updateSettings(settings)
+      if (res.success) {
+        setSavedSettings(settings)
+        showToast("Settings saved to database.")
+      }
+    })
   }
 
   function resetChanges() {
@@ -189,11 +201,11 @@ export function SettingsPage() {
             <Button
               type="button"
               onClick={saveChanges}
-              disabled={!isDirty}
+              disabled={!isDirty || isPending}
               className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-sky-100"
             >
               <Save className="size-4" />
-              Save
+              {isPending ? "Saving..." : "Save"}
             </Button>
           </div>
         </motion.header>
@@ -583,11 +595,11 @@ export function SettingsPage() {
               <Button
                 type="button"
                 onClick={saveChanges}
-                disabled={!isDirty}
+                disabled={!isDirty || isPending}
                 className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-sky-100"
               >
                 <Save className="size-4" />
-                Save Changes
+                {isPending ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </div>

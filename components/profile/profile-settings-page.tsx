@@ -3,8 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AnimatePresence, motion } from "framer-motion"
 import { Check, Loader2, Save } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
+import { updateProfile } from "@/app/actions/user"
 
 import { AnalyticsCard } from "@/components/profile/analytics-card"
 import { PersonalInfoForm } from "@/components/profile/personal-info-form"
@@ -24,54 +25,38 @@ import { Button } from "@/components/ui/button"
 
 const draftKey = "nova-lance-profile-draft"
 
-export function ProfileSettingsPage() {
-  const [isSaving, setIsSaving] = useState(false)
+export function ProfileSettingsPage({ initialData }: { initialData?: ProfileFormValues }) {
+  const [isPending, startTransition] = useTransition()
   const [toast, setToast] = useState<string | null>(null)
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     mode: "onChange",
-    defaultValues: defaultProfileValues,
+    defaultValues: initialData || defaultProfileValues,
   })
 
   const { control, formState, handleSubmit, register, reset, watch } = form
 
-  useEffect(() => {
-    const rawDraft = window.localStorage.getItem(draftKey)
-    if (!rawDraft) return
+  // We don't use localStorage drafts since we have a real backend now
 
-    try {
-      reset({ ...defaultProfileValues, ...JSON.parse(rawDraft) })
-    } catch {
-      window.localStorage.removeItem(draftKey)
-    }
-  }, [reset])
-
-  useEffect(() => {
-    const subscription = watch((value) => {
-      window.localStorage.setItem(draftKey, JSON.stringify(value))
-    })
-
-    return () => subscription.unsubscribe()
-  }, [watch])
 
   function showToast(message: string) {
     setToast(message)
     window.setTimeout(() => setToast(null), 2400)
   }
 
-  async function onSubmit(values: ProfileFormValues) {
-    setIsSaving(true)
-    await new Promise((resolve) => window.setTimeout(resolve, 650))
-    window.localStorage.setItem(draftKey, JSON.stringify(values))
-    setIsSaving(false)
-    showToast("Profile changes saved.")
+  function onSubmit(values: ProfileFormValues) {
+    startTransition(async () => {
+      const res = await updateProfile(values)
+      if (res.success) {
+        showToast("Profile changes saved to database.")
+      }
+    })
   }
 
   function onCancel() {
-    reset(defaultProfileValues)
-    window.localStorage.removeItem(draftKey)
-    showToast("Draft changes discarded.")
+    reset(initialData || defaultProfileValues)
+    showToast("Changes discarded.")
   }
 
   return (
@@ -84,7 +69,7 @@ export function ProfileSettingsPage() {
         onSubmit={handleSubmit(onSubmit)}
         className="relative z-0 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
       >
-        <ProfileHeader isSaving={isSaving} onCancel={onCancel} />
+        <ProfileHeader isSaving={isPending} onCancel={onCancel} />
         <ProfileHero />
         <AnalyticsCard />
         <div className="grid gap-4 xl:grid-cols-[1.35fr_0.85fr]">
@@ -108,10 +93,10 @@ export function ProfileSettingsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-medium text-zinc-950 dark:text-zinc-100">
-                {formState.isDirty ? "Unsaved profile changes" : "Profile draft autosaved"}
+                {formState.isDirty ? "Unsaved profile changes" : "Profile synced"}
               </p>
               <p className="text-xs text-zinc-500">
-                Validation runs as you edit. Draft changes are stored locally.
+                Validation runs as you edit.
               </p>
             </div>
             <div className="flex gap-2">
@@ -125,10 +110,10 @@ export function ProfileSettingsPage() {
               </Button>
               <Button
                 type="submit"
-                disabled={isSaving}
+                disabled={isPending}
                 className="rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100"
               >
-                {isSaving ? (
+                {isPending ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
                   <Save className="size-4" />

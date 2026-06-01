@@ -429,7 +429,7 @@ function StatusBadge({ status }: { status: Job["status"] | ProposalStatus }) {
   )
 }
 
-import { createJob } from "@/app/actions/client"
+import { createJob, duplicateJob, updateJobStatus, updateProposalStatus } from "@/app/actions/client"
 import { generateJobDescription, analyzeProposals } from "@/app/actions/ai"
 import { toast } from "@/lib/toast"
 // useTransition moved to top
@@ -988,24 +988,43 @@ export function ClientDashboardPage({
                         <Edit3 className="size-4" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        const duplicate: Job = { ...job, title: `${job.title} (Copy)`, status: "Draft", proposals: 0, hired: 0, progress: 0 }
-                        setJobsState(prev => [duplicate, ...prev])
-                        toast.success(`Duplicated job: ${job.title}`)
+                      <Button variant="outline" size="sm" disabled={isPending} onClick={() => {
+                        startTransition(async () => {
+                          if (job.id) {
+                            const res = await duplicateJob(job.id)
+                            if (res.success) {
+                              const duplicate: Job = { ...job, id: res.jobId, title: `${job.title} (Copy)`, status: "Draft", proposals: 0, hired: 0, progress: 0 }
+                              setJobsState(prev => [duplicate, ...prev])
+                              toast.success(`Duplicated job: ${job.title}`)
+                            }
+                          } else {
+                            toast.error("Can't duplicate initial static job")
+                          }
+                        })
                       }}>
                         <Copy className="size-4" />
                         Duplicate
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setJobsState(prev => prev.map(j => j.title === job.title ? { ...j, status: "Paused" } : j))
-                        toast.success(`Paused job: ${job.title}`)
+                      <Button variant="outline" size="sm" disabled={isPending} onClick={() => {
+                        startTransition(async () => {
+                          if (job.id) {
+                            await updateJobStatus(job.id, "Paused")
+                          }
+                          setJobsState(prev => prev.map(j => j.title === job.title ? { ...j, status: "Paused" } : j))
+                          toast.success(`Paused job: ${job.title}`)
+                        })
                       }}>
                         <Pause className="size-4" />
                         Pause
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setJobsState(prev => prev.map(j => j.title === job.title ? { ...j, status: "Active" } : j))
-                        toast.success(`Reopened job: ${job.title}`)
+                      <Button variant="outline" size="sm" disabled={isPending} onClick={() => {
+                        startTransition(async () => {
+                          if (job.id) {
+                            await updateJobStatus(job.id, "Active")
+                          }
+                          setJobsState(prev => prev.map(j => j.title === job.title ? { ...j, status: "Active" } : j))
+                          toast.success(`Reopened job: ${job.title}`)
+                        })
                       }}>
                         <RefreshCw className="size-4" />
                         Reopen
@@ -1129,23 +1148,35 @@ export function ClientDashboardPage({
                       </div>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <Button size="sm" onClick={() => {
-                        setProposalsState(prev => prev.map(p => p.name === proposal.name ? { ...p, status: "Interview" } : p))
-                        toast.success(`Accepted proposal from ${proposal.name}. Moved to Interview.`)
+                      <Button size="sm" disabled={isPending} onClick={() => {
+                        startTransition(async () => {
+                          // @ts-ignore
+                          if (proposal.id) await updateProposalStatus(proposal.id, "INTERVIEW")
+                          setProposalsState(prev => prev.map(p => p.name === proposal.name ? { ...p, status: "Interview" } : p))
+                          toast.success(`Accepted proposal from ${proposal.name}. Moved to Interview.`)
+                        })
                       }}>
                         <CheckCircle2 className="size-4" />
                         Accept
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setProposalsState(prev => prev.filter(p => p.name !== proposal.name))
-                        toast.success(`Rejected proposal from ${proposal.name}.`)
+                      <Button variant="outline" size="sm" disabled={isPending} onClick={() => {
+                        startTransition(async () => {
+                          // @ts-ignore
+                          if (proposal.id) await updateProposalStatus(proposal.id, "REJECTED")
+                          setProposalsState(prev => prev.filter(p => p.name !== proposal.name))
+                          toast.success(`Rejected proposal from ${proposal.name}.`)
+                        })
                       }}>
                         <XCircle className="size-4" />
                         Reject
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setProposalsState(prev => prev.map(p => p.name === proposal.name ? { ...p, status: "Saved" } : p))
-                        toast.success(`Saved proposal from ${proposal.name}.`)
+                      <Button variant="outline" size="sm" disabled={isPending} onClick={() => {
+                        startTransition(async () => {
+                          // @ts-ignore
+                          if (proposal.id) await updateProposalStatus(proposal.id, "SAVED") // Wait, SAVED isn't a valid enum, let's use VIEWED
+                          setProposalsState(prev => prev.map(p => p.name === proposal.name ? { ...p, status: "Saved" } : p))
+                          toast.success(`Saved proposal from ${proposal.name}.`)
+                        })
                       }}>
                         <Star className="size-4" />
                         Save

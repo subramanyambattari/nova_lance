@@ -49,3 +49,45 @@ export async function updateProposalStatus(proposalId: string, status: string) {
   revalidatePath("/client-dashboard")
   return { success: true, proposal }
 }
+
+export async function updateJobStatus(jobId: string, status: string) {
+  const user = await requireUser()
+  
+  const job = await prisma.job.update({
+    where: { id: jobId },
+    data: { status },
+  })
+  
+  revalidatePath("/client-dashboard")
+  return { success: true, job }
+}
+
+export async function duplicateJob(jobId: string) {
+  const user = await requireUser()
+  
+  const originalJob = await prisma.job.findUnique({
+    where: { id: jobId }
+  })
+
+  if (!originalJob) {
+    throw new Error("Job not found")
+  }
+  
+  const newJob = await prisma.job.create({
+    data: {
+      title: `${originalJob.title} (Copy)`,
+      description: originalJob.description,
+      company: originalJob.company,
+      salary: originalJob.salary,
+      skills: originalJob.skills,
+      type: originalJob.type,
+      experience: originalJob.experience,
+      clientId: user.id,
+      status: "Draft",
+    },
+  })
+  
+  revalidatePath("/client-dashboard")
+  return { success: true, jobId: newJob.id }
+}
+
