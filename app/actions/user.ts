@@ -50,14 +50,23 @@ export async function updateProfile(data: any) {
     }
   })
 
-  // Also update User name and email if needed
-  if (data.fullName || data.email) {
+  // Also update User name, email, and username if needed
+  if (data.fullName || data.email || data.username) {
     await prisma.user.update({
       where: { id: user.id },
       data: {
         ...(data.fullName && { name: data.fullName }),
         ...(data.email && { email: data.email }),
+        ...(data.username && { username: data.username }),
       }
+    })
+  }
+
+  if (typeof data.twoFactor === "boolean") {
+    await prisma.userSettings.upsert({
+      where: { userId: user.id },
+      update: { twoFactor: data.twoFactor },
+      create: { userId: user.id, twoFactor: data.twoFactor },
     })
   }
 
@@ -102,6 +111,30 @@ export async function updateSettings(data: any) {
       dataSharing: data.dataSharing,
       autoSaveDrafts: data.autoSaveDrafts,
       weeklySummary: data.weeklySummary,
+    }
+  })
+
+  if (data.email) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { email: data.email }
+    })
+  }
+
+  await prisma.userProfile.upsert({
+    where: { userId: user.id },
+    update: {
+      ...(data.timezone && { timezone: data.timezone }),
+      ...(data.language && { languages: data.language }),
+      ...(data.bio && { bio: data.bio }),
+      ...(data.defaultRate && { hourlyRate: parseFloat(data.defaultRate) }),
+    },
+    create: {
+      userId: user.id,
+      ...(data.timezone && { timezone: data.timezone }),
+      ...(data.language && { languages: data.language }),
+      ...(data.bio && { bio: data.bio }),
+      ...(data.defaultRate && { hourlyRate: parseFloat(data.defaultRate) }),
     }
   })
 

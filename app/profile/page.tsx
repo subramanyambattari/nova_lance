@@ -5,13 +5,14 @@ import { defaultProfileValues } from "@/components/profile/profile-schema"
 
 export default async function ProfilePage() {
   const user = await requireUser()
-  const dbProfile = await prisma.userProfile.findUnique({
-    where: { userId: user.id }
-  })
+  const [dbProfile, dbSettings] = await Promise.all([
+    prisma.userProfile.findUnique({ where: { userId: user.id } }),
+    prisma.userSettings.findUnique({ where: { userId: user.id } })
+  ])
 
   const initialData = dbProfile ? {
     fullName: user.name || defaultProfileValues.fullName,
-    username: defaultProfileValues.username, // Username isn't in schema, fallback to default
+    username: user.username || defaultProfileValues.username,
     email: user.email || defaultProfileValues.email,
     phone: dbProfile.phone || defaultProfileValues.phone,
     location: dbProfile.location || defaultProfileValues.location,
@@ -30,7 +31,7 @@ export default async function ProfilePage() {
     weeklyAvailability: dbProfile.weeklyAvailability || defaultProfileValues.weeklyAvailability,
     remoteOnly: dbProfile.remoteOnly,
     openToContract: dbProfile.openToContract,
-    twoFactor: defaultProfileValues.twoFactor, // Assume settings handles this or fallback
+    twoFactor: dbSettings?.twoFactor ?? defaultProfileValues.twoFactor,
   } : defaultProfileValues
 
   return <ProfileSettingsPage initialData={initialData} />

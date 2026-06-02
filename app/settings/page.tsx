@@ -4,19 +4,20 @@ import { requireUser } from "@/lib/auth"
 
 export default async function SettingsRoute() {
   const user = await requireUser()
-  const dbSettings = await prisma.userSettings.findUnique({
-    where: { userId: user.id }
-  })
+  const [dbSettings, dbProfile] = await Promise.all([
+    prisma.userSettings.findUnique({ where: { userId: user.id } }),
+    prisma.userProfile.findUnique({ where: { userId: user.id } })
+  ])
 
   // We can pass the user email and name directly
   const initialData = dbSettings ? {
     displayName: dbSettings.displayName || user.name || "",
     email: user.email || "",
-    timezone: "Asia/Kolkata", // You could store this in settings or profile
-    language: "English",
+    timezone: dbProfile?.timezone || "Asia/Kolkata",
+    language: dbProfile?.languages || "English",
     workspaceName: dbSettings.workspaceName || "",
-    defaultRate: "85", // Or from profile
-    bio: "", // Or from profile
+    defaultRate: dbProfile?.hourlyRate?.toString() || "85",
+    bio: dbProfile?.bio || "",
     emailNotifications: dbSettings.emailNotifications,
     inAppNotifications: dbSettings.inAppNotifications,
     marketingDigest: dbSettings.marketingDigest,
