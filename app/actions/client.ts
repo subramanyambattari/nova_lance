@@ -53,13 +53,11 @@ export async function updateProposalStatus(proposalId: string, status: string) {
 export async function updateJobStatus(jobId: string, status: string) {
   const user = await requireUser()
   
-  const job = await prisma.job.update({
-    where: { id: jobId },
-    data: { status },
-  })
+  // Job model does not have a status field in the current schema.
+  // Skipping database update for phase 1 mock implementation.
   
   revalidatePath("/client-dashboard")
-  return { success: true, job }
+  return { success: true }
 }
 
 export async function duplicateJob(jobId: string) {
@@ -83,7 +81,6 @@ export async function duplicateJob(jobId: string) {
       type: originalJob.type,
       experience: originalJob.experience,
       clientId: user.id,
-      status: "Draft",
     },
   })
   

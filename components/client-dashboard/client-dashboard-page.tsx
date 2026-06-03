@@ -51,7 +51,9 @@ import { useMemo, useState, useTransition, useEffect } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { AIWorkspace } from "./ai-workspace"
+import { TalentMatches } from "./talent-matches"
 import { cn } from "@/lib/utils"
 
 type ProposalStatus = "New" | "Shortlisted" | "Interview" | "Saved"
@@ -523,8 +525,12 @@ export function ClientDashboardPage({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100 flex">
+
+
+      <main className="flex-1 overflow-auto">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
+
         <header className="grid gap-5 border-b border-zinc-200 pb-6 dark:border-white/10 lg:grid-cols-[1fr_360px]">
           <div className="flex min-w-0 flex-col justify-end">
             <div className="flex flex-wrap items-center gap-2">
@@ -586,37 +592,27 @@ export function ClientDashboardPage({
           </div>
         </header>
 
-        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {overviewStats.map((stat) => (
-            <div key={stat.label} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm text-zinc-500">{stat.label}</p>
-                  <p className="mt-2 text-2xl font-semibold">{stat.value}</p>
+        {activeTab === "overview" && (
+          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {overviewStats.map((stat) => (
+              <div key={stat.label} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm text-zinc-500">{stat.label}</p>
+                    <p className="mt-2 text-2xl font-semibold">{stat.value}</p>
+                  </div>
+                  <span className={cn("grid size-9 place-items-center rounded-md", stat.tone)}>
+                    <stat.icon className="size-5" />
+                  </span>
                 </div>
-                <span className={cn("grid size-9 place-items-center rounded-md", stat.tone)}>
-                  <stat.icon className="size-5" />
-                </span>
+                <p className="mt-3 text-sm text-zinc-500">{stat.trend}</p>
               </div>
-              <p className="mt-3 text-sm text-zinc-500">{stat.trend}</p>
-            </div>
-          ))}
-        </section>
+            ))}
+          </section>
+        )}
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <div className="overflow-x-auto pb-1">
-            <TabsList className="h-auto min-w-max justify-start rounded-lg border-zinc-200 bg-white p-1 text-zinc-600 dark:border-white/10 dark:bg-white/[0.04]">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="ai">AI Workspace</TabsTrigger>
-              <TabsTrigger value="post">Post Job</TabsTrigger>
-              <TabsTrigger value="jobs">My Jobs</TabsTrigger>
-              <TabsTrigger value="talent">Talent Matches</TabsTrigger>
-              <TabsTrigger value="proposals">Proposals</TabsTrigger>
-              <TabsTrigger value="operations">Operations</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
-          </div>
+
 
           <TabsContent value="overview" className="space-y-8">
             <section className="grid gap-6 xl:grid-cols-[1.35fr_0.85fr]">
@@ -697,106 +693,7 @@ export function ClientDashboardPage({
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-8">
-            <section>
-              <SectionHeader
-                eyebrow="Nova AI"
-                title="AI workspace"
-                action={
-                  <Button>
-                    <Sparkles className="size-4" />
-                    Run hiring scan
-                  </Button>
-                }
-              />
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {aiTools.map((tool) => (
-                  <button
-                    key={tool.title}
-                    type="button"
-                    className="rounded-lg border border-zinc-200 bg-white p-4 text-left shadow-sm transition hover:border-zinc-400 dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/30"
-                  >
-                    <span className="grid size-9 place-items-center rounded-md bg-zinc-100 text-zinc-950 dark:bg-white/10 dark:text-white">
-                      <tool.icon className="size-5" />
-                    </span>
-                    <h3 className="mt-4 font-semibold">{tool.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-zinc-500">{tool.text}</p>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-              <div>
-                <SectionHeader eyebrow="Assistant" title="Nova command center" />
-                <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-                  <div className="flex gap-3">
-                    <span className="grid size-10 place-items-center rounded-md bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
-                      <Bot className="size-5" />
-                    </span>
-                    <div>
-                      <p className="font-semibold">What should I do next?</p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-500">
-                        Nova recommends comparing Marco, David, and Ava, then creating two technical milestones
-                        before sending interview invites.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {["Explain proposals", "Suggest budgets", "Summarize meetings", "Generate job content"].map(
-                      (prompt) => (
-                        <Button 
-                          key={prompt} 
-                          variant="outline" 
-                          size="sm"
-                          disabled={isAiLoading}
-                          onClick={async () => {
-                            if (prompt === "Generate job content") {
-                              setIsAiLoading(true)
-                              const res = await generateJobDescription("Create a job post for an AI engineer.")
-                              if (res.success) setAiResponse(res.text)
-                              setIsAiLoading(false)
-                            } else if (prompt === "Explain proposals") {
-                              setIsAiLoading(true)
-                              const res = await analyzeProposals("Analyze recent proposals.")
-                              if (res.success) setAiResponse(res.text)
-                              setIsAiLoading(false)
-                            } else {
-                              setAiResponse(`Feature '${prompt}' is coming soon!`)
-                            }
-                          }}
-                        >
-                          {prompt}
-                        </Button>
-                      )
-                    )}
-                  </div>
-                  {aiResponse && (
-                    <div className="mt-4 rounded-md bg-zinc-100 p-4 text-sm dark:bg-zinc-800">
-                      <div className="flex justify-between items-center mb-2">
-                        <strong className="text-blue-600 dark:text-blue-400">Nova AI Response:</strong>
-                        <Button variant="ghost" size="sm" onClick={() => setAiResponse(null)}>Clear</Button>
-                      </div>
-                      <p className="whitespace-pre-wrap leading-relaxed text-zinc-700 dark:text-zinc-300">
-                        {isAiLoading ? "Thinking..." : aiResponse}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <SectionHeader eyebrow="Risk" title="Trust and safety scan" />
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {trustSafetyFeatures.map((feature) => (
-                    <div key={feature.label} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-                      <feature.icon className="size-5 text-emerald-600 dark:text-emerald-300" />
-                      <h3 className="mt-3 font-semibold">{feature.label}</h3>
-                      <p className="mt-2 text-sm leading-6 text-zinc-500">{feature.text}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
+            <AIWorkspace />
           </TabsContent>
 
           <TabsContent value="post" className="space-y-8">
@@ -1037,56 +934,7 @@ export function ClientDashboardPage({
           </TabsContent>
 
           <TabsContent value="talent" className="space-y-8">
-            <section>
-              <SectionHeader eyebrow="Smart hiring system" title="AI-recommended talent matches" />
-              <div className="grid gap-3 xl:grid-cols-3">
-                {talents.map((talent) => (
-                  <div key={talent.name} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="font-semibold">{talent.name}</h3>
-                        <p className="text-sm text-zinc-500">{talent.title}</p>
-                      </div>
-                      <div className="rounded-md bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
-                        {talent.match}%
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {talent.skills.map((skill) => (
-                        <Badge key={skill} variant="outline" className="rounded-md">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                    <p className="mt-4 text-sm leading-6 text-zinc-500">{talent.portfolio}</p>
-                    <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
-                      <div>
-                        <p className="text-xs text-zinc-500">Rate</p>
-                        <p className="font-medium">{talent.rate}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-zinc-500">Rank</p>
-                        <p className="font-medium">{talent.rank}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-zinc-500">Status</p>
-                        <p className="font-medium">{talent.availability}</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex gap-2">
-                      <Button className="flex-1" onClick={() => toast.success(`Invited ${talent.name} to apply.`)}>
-                        <Send className="size-4" />
-                        Invite
-                      </Button>
-                      <Button variant="outline" className="flex-1" onClick={() => toast.success(`Shortlisted ${talent.name}.`)}>
-                        <Star className="size-4" />
-                        Shortlist
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
+            <TalentMatches />
           </TabsContent>
 
           <TabsContent value="proposals" className="space-y-8">
@@ -1385,7 +1233,8 @@ export function ClientDashboardPage({
             </section>
           </TabsContent>
         </Tabs>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }
