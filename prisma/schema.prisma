@@ -47,7 +47,6 @@ model Job {
   skills         String[]
   type           String
   experience     String
-  status         String     @default("Active")
   location       String     @default("Remote")
   remote         Boolean    @default(true)
   verifiedClient Boolean    @default(false)
