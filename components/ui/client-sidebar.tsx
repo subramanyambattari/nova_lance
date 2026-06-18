@@ -38,42 +38,42 @@ const clientNavItems: {
   },
   {
     title: "AI Workspace",
-    href: "/client-dashboard#ai-workspace",
+    href: "/client-dashboard/ai-workspace",
     icon: Sparkles,
   },
   {
     title: "Post Job",
-    href: "/client-dashboard#post-job",
+    href: "/client-dashboard/post-job",
     icon: Plus,
   },
   {
     title: "My Jobs",
-    href: "/client-dashboard#my-jobs",
+    href: "/client-dashboard/my-jobs",
     icon: BriefcaseBusiness,
   },
   {
     title: "Talent Matches",
-    href: "/client-dashboard#talent-matches",
+    href: "/client-dashboard/talent-matches",
     icon: Users,
   },
   {
     title: "Proposals",
-    href: "/client-dashboard#proposals",
+    href: "/client-dashboard/proposals",
     icon: FileText,
   },
   {
     title: "Operations",
-    href: "/client-dashboard#operations",
+    href: "/client-dashboard/operations",
     icon: ListChecks,
   },
   {
     title: "Analytics",
-    href: "/client-dashboard#analytics",
+    href: "/client-dashboard/analytics",
     icon: BarChart3,
   },
   {
     title: "Settings",
-    href: "/client-dashboard#settings",
+    href: "/client-dashboard/settings",
     icon: Settings,
   },
 ]
@@ -107,23 +107,24 @@ export function ClientSidebar() {
           <SidebarGroupLabel>Client</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {clientNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={
-                      item.href === "/client-dashboard" &&
-                      pathname === "/client-dashboard"
-                    }
-                    tooltip={item.title}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {clientNavItems.map((item) => {
+                const isActive = item.href === pathname || (item.href === "/client-dashboard" && pathname === "/client-dashboard")
+                
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.title}
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

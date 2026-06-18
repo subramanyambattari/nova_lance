@@ -55,7 +55,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { AIWorkspace } from "./ai-workspace"
 import { TalentMatches } from "./talent-matches"
 import { cn } from "@/lib/utils"
-
+import { usePathname } from "next/navigation"
 type ProposalStatus = "New" | "Shortlisted" | "Interview" | "Saved"
 
 type Proposal = {
@@ -458,45 +458,42 @@ export function ClientDashboardPage({
   const [attachments, setAttachments] = useState<string[]>([])
   const [jobDraft, setJobDraft] = useState(initialJobDraft)
 
+  const pathname = usePathname()
+
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace("#", "")
-      const hashToTabMap: Record<string, string> = {
-        "overview": "overview",
-        "ai-workspace": "ai",
-        "post-job": "post",
-        "my-jobs": "jobs",
-        "talent-matches": "talent",
-        "proposals": "proposals",
-        "operations": "operations",
-        "analytics": "analytics",
-        "settings": "settings",
-      }
-      if (hashToTabMap[hash]) {
-        setActiveTab(hashToTabMap[hash])
-      }
-    }
-
-    handleHashChange()
-    window.addEventListener("hashchange", handleHashChange)
-    return () => window.removeEventListener("hashchange", handleHashChange)
-  }, [])
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value)
-    const tabToHashMap: Record<string, string> = {
-      "overview": "overview",
-      "ai": "ai-workspace",
-      "post": "post-job",
-      "jobs": "my-jobs",
-      "talent": "talent-matches",
+    const pathParts = pathname.split('/')
+    const lastPart = pathParts[pathParts.length - 1]
+    const tabToPathMap: Record<string, string> = {
+      "client-dashboard": "overview",
+      "ai-workspace": "ai",
+      "post-job": "post",
+      "my-jobs": "jobs",
+      "talent-matches": "talent",
       "proposals": "proposals",
       "operations": "operations",
       "analytics": "analytics",
       "settings": "settings",
     }
+    if (tabToPathMap[lastPart]) {
+      setActiveTab(tabToPathMap[lastPart])
+    }
+  }, [pathname])
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    const tabToHashMap: Record<string, string> = {
+      "overview": "/client-dashboard",
+      "ai": "/client-dashboard/ai-workspace",
+      "post": "/client-dashboard/post-job",
+      "jobs": "/client-dashboard/my-jobs",
+      "talent": "/client-dashboard/talent-matches",
+      "proposals": "/client-dashboard/proposals",
+      "operations": "/client-dashboard/operations",
+      "analytics": "/client-dashboard/analytics",
+      "settings": "/client-dashboard/settings",
+    }
     if (tabToHashMap[value]) {
-      window.history.pushState(null, "", `#${tabToHashMap[value]}`)
+      window.history.pushState(null, "", tabToHashMap[value])
     }
   }
 
