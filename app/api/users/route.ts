@@ -9,7 +9,11 @@ export async function GET(request: NextRequest) {
   const user = await getOptionalUser()
   if (!user) return Response.json({ users: [] })
 
-  const query = request.nextUrl.searchParams.get("q")?.trim()
+  const searchParams = request.nextUrl.searchParams
+  const query = searchParams.get("q")?.trim()
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10))
+  const limit = Math.max(1, Math.min(50, parseInt(searchParams.get("limit") || "12", 10)))
+  const skip = (page - 1) * limit
 
   try {
     const users = await withTimeout(
@@ -32,18 +36,19 @@ export async function GET(request: NextRequest) {
           presence: true,
         },
         orderBy: [{ name: "asc" }, { email: "asc" }],
-        take: 12,
+        skip,
+        take: limit,
       }),
       2500,
       "Users query"
     )
 
-    return Response.json({ users })
+    return Response.json({ users, page, limit })
   } catch (error) {
     if (!isDatabaseUnavailableError(error)) {
       console.error("Unable to load users.", error)
     }
 
-    return Response.json({ users: [] })
+    return Response.json({ users: [], page: 1, limit: 12 })
   }
 }

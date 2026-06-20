@@ -356,14 +356,16 @@ export function GeminiChatWidget() {
               expanded
                 ? "h-[calc(100vh-2rem)] w-[calc(100vw-2rem)]"
                 : showInbox
-                  ? "h-[min(calc(100vh-5rem),640px)] w-[min(calc(100vw-2rem),760px)] md:grid-cols-[1fr_340px]"
+                  ? mobilePanel === "chat"
+                    ? "h-[min(calc(100vh-5rem),640px)] w-[min(calc(100vw-2rem),760px)] md:grid-cols-[1fr_340px]"
+                    : "h-[min(calc(100vh-5rem),640px)] w-[min(calc(100vw-2rem),380px)] grid-cols-1"
                   : "h-[min(calc(100vh-5rem),600px)] w-[min(calc(100vw-2rem),420px)] grid-cols-1"
             )}
           >
             <section
               className={cn(
                 "min-h-0 flex-col bg-white",
-                mobilePanel === "chat" ? "flex" : "hidden md:flex"
+                mobilePanel === "chat" ? "flex" : "hidden"
               )}
             >
               <div className="flex h-[60px] shrink-0 items-center gap-3 bg-violet-600 px-4 text-white">
@@ -445,7 +447,13 @@ export function GeminiChatWidget() {
                   size="icon-sm"
                   className="text-white hover:bg-white/15"
                   title="Close chat"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    if (showInbox) {
+                      setMobilePanel("inbox")
+                    } else {
+                      setOpen(false)
+                    }
+                  }}
                 >
                   <X className="size-4" />
                 </Button>
