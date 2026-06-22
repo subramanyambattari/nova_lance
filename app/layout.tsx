@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppShell } from "@/components/ui/app-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 import { WebSocketProvider } from "@/components/websocket-provider";
 import { Toaster } from "sonner";
@@ -44,7 +43,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WebSocketProvider userId={currentUserId}>
-            <AppShell>{children}</AppShell>
+            {children}
             <Toaster position="top-right" />
             <NotificationsListener />
           </WebSocketProvider>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 
-export default function LoginPage() {
+export default function SignupPage() {
   return (
     <div className="flex min-h-screen bg-white text-zinc-900">
       {/* Left Column - Form */}
@@ -16,7 +16,7 @@ export default function LoginPage() {
               </svg>
               <span className="text-2xl font-bold tracking-tight text-zinc-900">NovaLance</span>
             </Link>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Welcome back</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Sign up</h1>
           </div>
 
           <div className="space-y-4">
@@ -67,9 +67,21 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-4">
+            <div className="flex gap-4">
+              <input 
+                type="text" 
+                placeholder="First Name" 
+                className="w-1/2 h-12 px-4 rounded-md border-2 border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:ring-0 transition-colors" 
+              />
+              <input 
+                type="text" 
+                placeholder="Last Name" 
+                className="w-1/2 h-12 px-4 rounded-md border-2 border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:ring-0 transition-colors" 
+              />
+            </div>
             <input 
-              type="text" 
-              placeholder="Email or Username" 
+              type="email" 
+              placeholder="Email" 
               className="w-full h-12 px-4 rounded-md border-2 border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:ring-0 transition-colors" 
             />
             <input 
@@ -78,30 +90,25 @@ export default function LoginPage() {
               className="w-full h-12 px-4 rounded-md border-2 border-zinc-200 bg-white text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:ring-0 transition-colors" 
             />
             
-            <div className="flex items-center justify-between text-sm py-2">
-              <label className="flex items-center gap-2 text-zinc-600 font-medium cursor-pointer">
-                <input type="checkbox" className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500 w-4 h-4" /> Remember me
+            <div className="flex items-start text-sm pt-2">
+              <label className="flex items-start gap-2 text-zinc-600 font-medium cursor-pointer">
+                <input type="checkbox" className="mt-1 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 w-4 h-4" /> 
+                <span>I agree to the NovaLance <Link href="#" className="text-blue-600 hover:text-blue-700 hover:underline transition-all">User Agreement</Link> and <Link href="#" className="text-blue-600 hover:text-blue-700 hover:underline transition-all">Privacy Policy</Link>.</span>
               </label>
-              <Link href="#" className="text-blue-600 font-medium hover:text-blue-700 hover:underline transition-all">Forgot Password?</Link>
             </div>
 
             <Button className="w-full h-12 mt-2 bg-blue-600 text-white text-base font-bold rounded-md hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
-              Log in
+              Join NovaLance
             </Button>
           </div>
 
           <p className="mt-8 text-center text-sm text-zinc-600 font-medium">
-            Don't have an account? <Link href="/signup" className="text-blue-600 hover:text-blue-700 hover:underline">Sign up</Link>
+            Already have an account? <Link href="/login" className="text-blue-600 hover:text-blue-700 hover:underline transition-all">Log in</Link>
           </p>
-
-          <div className="mt-8 flex justify-center gap-4 opacity-75">
-            <div className="h-10 w-32 bg-zinc-100 rounded border border-zinc-200 flex items-center justify-center font-semibold text-xs text-zinc-400">App Store</div>
-            <div className="h-10 w-32 bg-zinc-100 rounded border border-zinc-200 flex items-center justify-center font-semibold text-xs text-zinc-400">Google Play</div>
-          </div>
         </div>
       </div>
 
-      {/* Right Column - Generated Image graphic */}
+      {/* Right Column - Image graphic */}
       <div className="hidden lg:block lg:w-1/2 relative bg-zinc-950 overflow-hidden">
         <Image 
           src="/auth-bg.png" 
