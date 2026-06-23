@@ -41,19 +41,8 @@ export default function SignupPage() {
       password: data.password,
     })
     
-    if (result.success) {
-      const loginRes = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      })
-      
-      setIsLoading(false)
-      if (loginRes?.error) {
-        alert("Registered successfully, but failed to log in automatically.")
-      } else {
-        window.location.href = "/" // or onboarding
-      }
+    if (result.success && result.requireOtp) {
+      window.location.href = `/verify-email?email=${encodeURIComponent(data.email)}`
     } else {
       setIsLoading(false)
       alert(result.error || "Something went wrong during registration")
