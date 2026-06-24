@@ -6,6 +6,8 @@ import { WebSocketProvider } from "@/components/websocket-provider";
 import { Toaster } from "sonner";
 import { NotificationsListener } from "@/components/notifications-listener";
 
+import { SessionProvider } from "@/components/session-provider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,18 +38,20 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <WebSocketProvider userId={currentUserId}>
-            {children}
-            <Toaster position="top-right" />
-            <NotificationsListener />
-          </WebSocketProvider>
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <WebSocketProvider userId={currentUserId}>
+              {children}
+              <Toaster position="top-right" />
+              <NotificationsListener />
+            </WebSocketProvider>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

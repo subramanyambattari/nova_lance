@@ -386,6 +386,7 @@ model UserProfile {
   weeklyAvailability String?
   remoteOnly         Boolean  @default(true)
   openToContract     Boolean  @default(true)
+  skills             String[] @default([])
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

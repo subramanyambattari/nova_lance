@@ -35,11 +35,11 @@ export const authConfig = {
       }
       return true
     },
-    session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id
+    session({ session, token }) {
+      if (session.user && token) {
+        session.user.id = token.id as string
         // @ts-ignore
-        session.user.role = user.role
+        session.user.role = token.role as string | undefined
       }
       return session
     },
