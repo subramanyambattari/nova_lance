@@ -7,6 +7,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { ModeToggle } from "@/components/mode-toggle"
 import { checkUsernameAvailability, generateUsernameSuggestions, completeOnboarding } from "@/app/actions/onboarding"
+import { generateCloudinarySignature } from "@/app/actions/upload"
+import { useRef } from "react"
 
 const CATEGORIES = [
   "Websites, IT & Software",
@@ -93,63 +95,100 @@ export default function OnboardingPage() {
   const [skillSearchQuery, setSkillSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("Websites, IT & Software")
 
+  // Step 5 State
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [step5Attempted, setStep5Attempted] = useState(false)
+
+  // Step 6 State
+  const [title, setTitle] = useState("")
+  const [bio, setBio] = useState("")
+  const [bioError, setBioError] = useState("")
+
+  // Step 7 State
+  const [languages, setLanguages] = useState<string[]>([])
+  const [languageInput, setLanguageInput] = useState("")
+  const [dateOfBirth, setDateOfBirth] = useState("")
+
+  // Profile Image Upload State
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [profileImage, setProfileImage] = useState<string | null>(null)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      setIsUploadingImage(true)
+      const { timestamp, signature, apiKey, cloudName } = await generateCloudinarySignature()
+      
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("api_key", apiKey || "")
+      formData.append("timestamp", timestamp.toString())
+      formData.append("signature", signature)
+
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await response.json()
+      if (data.secure_url) {
+        setProfileImage(data.secure_url)
+      } else {
+        alert("Image upload failed: " + (data.error?.message || "Unknown error"))
+      }
+    } catch (error) {
+      console.error(error)
+      alert("Error uploading image")
+    } finally {
+      setIsUploadingImage(false)
+    }
+  }
+
   useEffect(() => {
     if (session?.user?.name && step === 2 && suggestions.length === 0) {
       generateUsernameSuggestions(session.user.name).then(res => {
         setSuggestions(res.suggestions)
       })
     }
-  }, [session, step])
+  }, [session, step, suggestions.length])
 
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>
   }
 
   if (status === "unauthenticated") {
-    // Should be handled by middleware/layout, but just in case
     window.location.href = "/login"
     return null
   }
 
-  const handleNextStep1 = () => {
-    if (agreed) setStep(2)
-  }
-
+  const handleNextStep1 = () => { if (agreed) setStep(2) }
   const handleNextStep2 = async () => {
     if (!username || username.length < 3) {
       setUsernameError("Username must be at least 3 characters")
       return
     }
-
     setIsCheckingUsername(true)
     setUsernameError("")
     const res = await checkUsernameAvailability(username)
     setIsCheckingUsername(false)
-
-    if (res.available) {
-      setStep(3)
-    } else {
-      setUsernameError(res.error || "Username is not available")
-    }
+    if (res.available) setStep(3)
+    else setUsernameError(res.error || "Username is not available")
   }
 
   const handleComplete = async (selectedRole: "CLIENT" | "FREELANCER") => {
     setRole(selectedRole)
-    
     if (selectedRole === "FREELANCER") {
       setStep(4)
       return
     }
-
     setIsSubmitting(true)
     const res = await completeOnboarding({ username, role: selectedRole })
-    
-    if (res.success) {
-      window.location.href = "/"
-    } else {
-      setIsSubmitting(false)
-      alert(res.error || "Something went wrong")
-    }
+    if (res.success) window.location.href = "/"
+    else { setIsSubmitting(false); alert(res.error || "Something went wrong") }
   }
 
   const handleFinalComplete = async () => {
@@ -159,15 +198,18 @@ export default function OnboardingPage() {
     const res = await completeOnboarding({ 
       username, 
       role,
-      skills: selectedSkills 
+      skills: selectedSkills,
+      firstName,
+      lastName,
+      title,
+      bio,
+      languages,
+      dateOfBirth,
+      imageUrl: profileImage || undefined
     })
     
-    if (res.success) {
-      window.location.href = "/"
-    } else {
-      setIsSubmitting(false)
-      alert(res.error || "Something went wrong")
-    }
+    if (res.success) window.location.href = "/"
+    else { setIsSubmitting(false); alert(res.error || "Something went wrong") }
   }
 
   return (
@@ -435,11 +477,220 @@ export default function OnboardingPage() {
 
               <div className="w-full max-w-5xl flex justify-end mt-8">
                 <Button 
-                  onClick={handleFinalComplete}
-                  disabled={selectedSkills.length === 0 || isSubmitting}
-                  className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50"
+                  onClick={() => setStep(5)}
+                  disabled={selectedSkills.length === 0}
+                  className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? "Saving..." : "Next"}
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {step === 5 && (
+            <div className="w-full flex flex-col items-center">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold mb-2">Profile details</h1>
+              </div>
+
+              <div className="w-full max-w-xl text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-8 shadow-sm">
+                <h2 className="text-xl font-bold mb-2">Profile photo</h2>
+                <p className="text-sm text-zinc-500 mb-6">Uploading a quality photo to your profile will help you make the right impression and build trust with potential clients.</p>
+                
+                <div className="flex justify-center mb-10">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    ref={fileInputRef} 
+                    onChange={handleImageUpload} 
+                  />
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`relative w-40 h-40 cursor-pointer group`}
+                  >
+                    <div className={`w-full h-full border-2 ${isUploadingImage ? 'opacity-50' : ''} border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800/80 transition-colors overflow-hidden`}>
+                      {profileImage ? (
+                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <svg className="w-12 h-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                      )}
+                      {isUploadingImage && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <span className="text-white text-sm font-medium">Uploading...</span>
+                        </div>
+                      )}
+                    </div>
+                    <button type="button" className="absolute -bottom-4 -right-4 w-10 h-10 bg-white dark:bg-zinc-800 border shadow rounded-full flex items-center justify-center text-blue-600 hover:text-blue-700 z-10">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-bold mb-2">What is your name?</h2>
+                <p className="text-sm text-zinc-500 mb-6">Please use your real name as this will be required for identity verification.</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">First name <span className="text-red-500">*</span></label>
+                    <input 
+                      type="text" 
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className={`w-full h-12 px-4 rounded-md border ${step5Attempted && firstName === "" ? "border-red-500" : "border-zinc-300 dark:border-zinc-700"} bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600`}
+                    />
+                    {step5Attempted && firstName === "" && <p className="text-red-500 text-xs mt-1">First name is required</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Last name <span className="text-red-500">*</span></label>
+                    <input 
+                      type="text" 
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className={`w-full h-12 px-4 rounded-md border ${step5Attempted && lastName === "" ? "border-red-500" : "border-zinc-300 dark:border-zinc-700"} bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600`}
+                    />
+                    {step5Attempted && lastName === "" && <p className="text-red-500 text-xs mt-1">Last name is required</p>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full max-w-xl flex justify-between mt-8">
+                <Button onClick={() => setStep(4)} variant="outline" className="px-8 py-2 rounded-md font-medium text-lg">Back</Button>
+                <Button 
+                  onClick={() => {
+                    setStep5Attempted(true);
+                    if (firstName !== "" && lastName !== "" && !isUploadingImage) {
+                      setStep(6);
+                    }
+                  }} 
+                  disabled={isUploadingImage} 
+                  className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {step === 6 && (
+            <div className="w-full flex flex-col items-center">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold mb-2">Profile details</h1>
+              </div>
+
+              <div className="w-full max-w-xl text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-8 shadow-sm">
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center text-blue-600">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-bold mb-2">Tell us a bit about yourself</h2>
+                <p className="text-sm text-zinc-500 mb-6">Fill out your profile for clients to better understand your services.</p>
+                
+                <h2 className="text-lg font-bold mb-2">What do you do?</h2>
+                <p className="text-sm text-zinc-500 mb-2">Write a one line description about yourself.</p>
+                <input 
+                  type="text" 
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Full Stack Developer | AI Enthusiast"
+                  className="w-full h-12 px-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 mb-6"
+                />
+
+                <h2 className="text-lg font-bold mb-2">Describe yourself</h2>
+                <textarea 
+                  value={bio}
+                  onChange={(e) => {
+                    setBio(e.target.value);
+                    if (e.target.value.length >= 100) setBioError("");
+                  }}
+                  rows={6}
+                  className={`w-full p-4 rounded-md border ${bio.length > 0 && bio.length < 100 ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'} bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 resize-none`}
+                  placeholder="Tell clients about your experience, skills and what makes you a great candidate..."
+                />
+                <div className="flex justify-between items-center mt-2">
+                  {bio.length > 0 && bio.length < 100 ? (
+                    <span className="text-red-500 text-sm">Please enter at least 100 characters.</span>
+                  ) : (
+                    <span></span>
+                  )}
+                  <span className="text-zinc-400 text-sm">{bio.length} characters</span>
+                </div>
+              </div>
+
+              <div className="w-full max-w-xl flex justify-between mt-8">
+                <Button onClick={() => setStep(5)} variant="outline" className="px-8 py-2 rounded-md font-medium text-lg">Back</Button>
+                <Button onClick={() => setStep(7)} disabled={!title || bio.length < 100} className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed">Next</Button>
+              </div>
+            </div>
+          )}
+
+          {step === 7 && (
+            <div className="w-full flex flex-col items-center">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold mb-2">Profile details</h1>
+              </div>
+
+              <div className="w-full max-w-xl text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-8 shadow-sm">
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center text-blue-600">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-bold mb-2">What languages do you speak?</h2>
+                <p className="text-sm text-zinc-500 mb-4">We will use this to help match you with clients who are fluent in these languages.</p>
+                
+                <div className="relative mb-8">
+                  <input 
+                    type="text" 
+                    value={languageInput}
+                    onChange={(e) => setLanguageInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && languageInput) {
+                        e.preventDefault();
+                        if (!languages.includes(languageInput)) {
+                          setLanguages([...languages, languageInput]);
+                        }
+                        setLanguageInput("");
+                      }
+                    }}
+                    placeholder="e.g. English, Hindi, Deutsch (press Enter to add)"
+                    className="w-full h-12 px-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 mb-2"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {languages.map(lang => (
+                      <span key={lang} className="inline-flex items-center gap-1 px-3 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-sm">
+                        {lang}
+                        <button onClick={() => setLanguages(languages.filter(l => l !== lang))} className="text-zinc-500 hover:text-red-500">&times;</button>
+                      </span>
+                    ))}
+                  </div>
+                  <button 
+                    onClick={() => { if (languageInput && !languages.includes(languageInput)) { setLanguages([...languages, languageInput]); setLanguageInput("") } }}
+                    disabled={!languageInput}
+                    className="mt-2 text-sm text-blue-600 disabled:opacity-50 hover:underline"
+                  >
+                    + Add language
+                  </button>
+                </div>
+
+                <h2 className="text-xl font-bold mb-2">When were you born?</h2>
+                <p className="text-sm text-zinc-500 mb-4">You need to be at least 16 years old to use NovaLance. This information will be used for verification and will be kept confidential.</p>
+                
+                <input 
+                  type="date" 
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  className="w-1/2 h-12 px-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600"
+                />
+              </div>
+
+              <div className="w-full max-w-xl flex justify-between mt-8">
+                <Button onClick={() => setStep(6)} variant="outline" className="px-8 py-2 rounded-md font-medium text-lg">Back</Button>
+                <Button onClick={handleFinalComplete} disabled={languages.length === 0 || !dateOfBirth || isSubmitting} className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed">
+                  {isSubmitting ? "Saving..." : "Join NovaLance"}
                 </Button>
               </div>
             </div>

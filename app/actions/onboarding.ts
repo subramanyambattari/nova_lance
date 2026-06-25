@@ -27,7 +27,18 @@ export async function generateUsernameSuggestions(baseName: string) {
   return { suggestions }
 }
 
-export async function completeOnboarding(data: { username: string; role: "CLIENT" | "FREELANCER"; skills?: string[] }) {
+export async function completeOnboarding(data: { 
+  username: string; 
+  role: "CLIENT" | "FREELANCER"; 
+  skills?: string[];
+  firstName?: string;
+  lastName?: string;
+  title?: string;
+  bio?: string;
+  languages?: string[];
+  dateOfBirth?: string;
+  imageUrl?: string;
+}) {
   try {
     const session = await auth()
     if (!session?.user?.email) {
@@ -39,21 +50,35 @@ export async function completeOnboarding(data: { username: string; role: "CLIENT
       return { success: false, error: "Username is already taken" }
     }
 
+    const name = data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : undefined;
+
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email },
       data: {
         username: data.username,
         role: data.role,
+        ...(name ? { name } : {}),
+        ...(data.imageUrl ? { image: data.imageUrl } : {})
       },
     })
 
-    if (data.skills && data.skills.length > 0) {
+    if (data.role === "FREELANCER") {
+      const profileData = {
+        skills: data.skills || [],
+        firstName: data.firstName || null,
+        lastName: data.lastName || null,
+        title: data.title || null,
+        bio: data.bio || null,
+        languages: data.languages || [],
+        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      };
+
       await prisma.userProfile.upsert({
         where: { userId: updatedUser.id },
-        update: { skills: data.skills },
+        update: profileData,
         create: {
           userId: updatedUser.id,
-          skills: data.skills,
+          ...profileData
         }
       })
     }
