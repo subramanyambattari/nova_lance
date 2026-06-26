@@ -40,6 +40,7 @@ export async function completeOnboarding(data: {
   imageUrl?: string;
   experiences?: { title: string; company: string; startDate: string; endDate?: string; currentlyWorking: boolean }[];
   referenceEmails?: string[];
+  referenceMessage?: string;
 }) {
   try {
     const session = await auth()
@@ -88,7 +89,8 @@ export async function completeOnboarding(data: {
               }))
             }
           } : {}),
-          referenceEmails: data.referenceEmails || []
+          referenceEmails: data.referenceEmails || [],
+          referenceMessage: data.referenceMessage
         },
         create: {
           userId: updatedUser.id,
@@ -110,7 +112,8 @@ export async function completeOnboarding(data: {
               }))
             }
           } : {}),
-          referenceEmails: data.referenceEmails || []
+          referenceEmails: data.referenceEmails || [],
+          referenceMessage: data.referenceMessage
         }
       })
     }

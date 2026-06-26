@@ -391,6 +391,7 @@ model UserProfile {
   openToContract     Boolean  @default(true)
   skills             String[] @default([])
   referenceEmails    String[] @default([])
+  referenceMessage   String?
   experiences        Experience[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
