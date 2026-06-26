@@ -390,8 +390,21 @@ model UserProfile {
   remoteOnly         Boolean  @default(true)
   openToContract     Boolean  @default(true)
   skills             String[] @default([])
+  referenceEmails    String[] @default([])
+  experiences        Experience[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Experience {
+  id               Int         @id @default(autoincrement())
+  title            String
+  company          String
+  startDate        DateTime
+  endDate          DateTime?
+  currentlyWorking Boolean     @default(false)
+  userProfileId    Int
+  userProfile      UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
 }
 
 model UserSettings {

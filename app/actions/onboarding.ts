@@ -38,6 +38,8 @@ export async function completeOnboarding(data: {
   languages?: string[];
   dateOfBirth?: string;
   imageUrl?: string;
+  experiences?: { title: string; company: string; startDate: string; endDate?: string; currentlyWorking: boolean }[];
+  referenceEmails?: string[];
 }) {
   try {
     const session = await auth()
@@ -62,23 +64,53 @@ export async function completeOnboarding(data: {
       },
     })
 
-    if (data.role === "FREELANCER") {
-      const profileData = {
-        skills: data.skills || [],
-        firstName: data.firstName || null,
-        lastName: data.lastName || null,
-        title: data.title || null,
-        bio: data.bio || null,
-        languages: data.languages || [],
-        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
-      };
+    const dobDate = data.dateOfBirth ? new Date(data.dateOfBirth) : null;
 
+    if (data.role === "FREELANCER") {
       await prisma.userProfile.upsert({
         where: { userId: updatedUser.id },
-        update: profileData,
+        update: {
+          skills: data.skills || [],
+          firstName: data.firstName,
+          lastName: data.lastName,
+          title: data.title,
+          bio: data.bio,
+          languages: data.languages || [],
+          dateOfBirth: dobDate,
+          ...(data.experiences && data.experiences.length > 0 ? {
+            experiences: {
+              create: data.experiences.map(exp => ({
+                title: exp.title,
+                company: exp.company,
+                startDate: new Date(exp.startDate),
+                endDate: exp.endDate ? new Date(exp.endDate) : null,
+                currentlyWorking: exp.currentlyWorking
+              }))
+            }
+          } : {}),
+          referenceEmails: data.referenceEmails || []
+        },
         create: {
           userId: updatedUser.id,
-          ...profileData
+          skills: data.skills || [],
+          firstName: data.firstName,
+          lastName: data.lastName,
+          title: data.title,
+          bio: data.bio,
+          languages: data.languages || [],
+          dateOfBirth: dobDate,
+          ...(data.experiences && data.experiences.length > 0 ? {
+            experiences: {
+              create: data.experiences.map(exp => ({
+                title: exp.title,
+                company: exp.company,
+                startDate: new Date(exp.startDate),
+                endDate: exp.endDate ? new Date(exp.endDate) : null,
+                currentlyWorking: exp.currentlyWorking
+              }))
+            }
+          } : {}),
+          referenceEmails: data.referenceEmails || []
         }
       })
     }
