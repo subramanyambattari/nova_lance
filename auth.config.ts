@@ -8,7 +8,7 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
-      const isOnDashboard = nextUrl.pathname.startsWith("/client-dashboard") || nextUrl.pathname.startsWith("/freelancer-dashboard")
+      const isOnDashboard = nextUrl.pathname.startsWith("/client-dashboard") || nextUrl.pathname.startsWith("/user-dashboard")
       const isOnOnboarding = nextUrl.pathname.startsWith("/onboarding")
       // @ts-ignore
       const role = auth?.user?.role as string | undefined
@@ -18,19 +18,19 @@ export const authConfig = {
         if (!role) return Response.redirect(new URL("/onboarding", nextUrl))
         
         if (nextUrl.pathname.startsWith("/client-dashboard") && role !== "CLIENT") {
-           return Response.redirect(new URL("/freelancer-dashboard", nextUrl))
+           return Response.redirect(new URL("/user-dashboard", nextUrl))
         }
-        if (nextUrl.pathname.startsWith("/freelancer-dashboard") && role !== "FREELANCER") {
+        if (nextUrl.pathname.startsWith("/user-dashboard") && role !== "FREELANCER") {
            return Response.redirect(new URL("/client-dashboard", nextUrl))
         }
         return true
       } else if (isLoggedIn) {
         if (isOnOnboarding && role) {
-           return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/freelancer-dashboard", nextUrl))
+           return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))
         }
         if (nextUrl.pathname === "/login" || nextUrl.pathname === "/") {
            if (!role) return Response.redirect(new URL("/onboarding", nextUrl))
-           return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/freelancer-dashboard", nextUrl))
+           return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))
         }
       }
       return true
