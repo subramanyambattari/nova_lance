@@ -120,7 +120,8 @@ export default function OnboardingPage() {
   const setStep = (newStep: number) => {
     if (newStep === step) return;
     _setStep(newStep)
-    router.push(`/onboarding/${getStepString(newStep)}`)
+    // Shallow route update to prevent Next.js from fetching a new RSC payload, which causes a 1-second delay
+    window.history.pushState(null, '', `/onboarding/${getStepString(newStep)}`);
   }
   
   // Step 1 State
