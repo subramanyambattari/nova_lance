@@ -118,6 +118,7 @@ export default function OnboardingPage() {
   const [step, _setStep] = useState(1)
 
   const setStep = (newStep: number) => {
+    if (newStep === step) return;
     _setStep(newStep)
     router.push(`/onboarding/${getStepString(newStep)}`)
   }
@@ -279,12 +280,14 @@ export default function OnboardingPage() {
   }
 
   const handleComplete = async (selectedRole: "CLIENT" | "FREELANCER") => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     setRole(selectedRole)
     if (selectedRole === "FREELANCER") {
       setStep(4)
+      setTimeout(() => setIsSubmitting(false), 500); // Re-enable for subsequent actions
       return
     }
-    setIsSubmitting(true)
     const res = await completeOnboarding({ username, role: selectedRole })
     if (res.success) window.location.href = "/"
     else { setIsSubmitting(false); alert(res.error || "Something went wrong") }
@@ -1034,7 +1037,7 @@ export default function OnboardingPage() {
                   Invite your past employers to write a message about working with you. References will be displayed on your profile to build trust with potential clients.
                 </p>
 
-                <div className="w-full min-h-[3rem] px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus-within:ring-1 focus-within:ring-blue-600 focus-within:border-blue-600 mb-8 flex flex-wrap gap-2 items-center transition-all">
+                <div className="relative w-full min-h-[3rem] px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus-within:ring-1 focus-within:ring-blue-600 focus-within:border-blue-600 mb-8 flex flex-wrap gap-2 items-center transition-all">
                   {referenceEmailsList.map((email, i) => (
                     <span key={i} className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 text-sm px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-700 transition-all hover:bg-zinc-200 dark:hover:bg-zinc-700">
                       <svg className="w-3.5 h-3.5 text-zinc-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
@@ -1044,36 +1047,59 @@ export default function OnboardingPage() {
                       </button>
                     </span>
                   ))}
-                  <input 
-                    type="email" 
-                    value={currentEmailInput}
-                    onChange={(e) => setCurrentEmailInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
-                        e.preventDefault();
-                        const val = currentEmailInput.trim().replace(/,/g, '');
-                        if (val && !referenceEmailsList.includes(val)) {
-                          setReferenceEmailsList([...referenceEmailsList, val]);
-                          setCurrentEmailInput("");
+                  <div className="flex-1 min-w-[180px] relative">
+                    <input 
+                      type="email" 
+                      value={currentEmailInput}
+                      onChange={(e) => setCurrentEmailInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+                          e.preventDefault();
+                          const val = currentEmailInput.trim().replace(/,/g, '');
+                          if (val && !referenceEmailsList.includes(val)) {
+                            setReferenceEmailsList([...referenceEmailsList, val]);
+                            setCurrentEmailInput("");
+                          }
+                        } else if (e.key === 'Backspace' && currentEmailInput === '' && referenceEmailsList.length > 0) {
+                          setReferenceEmailsList(referenceEmailsList.slice(0, -1));
                         }
-                      } else if (e.key === 'Backspace' && currentEmailInput === '' && referenceEmailsList.length > 0) {
-                        setReferenceEmailsList(referenceEmailsList.slice(0, -1));
-                      }
-                    }}
-                    placeholder={referenceEmailsList.length === 0 ? "Enter email addresses" : ""}
-                    className="flex-1 min-w-[180px] bg-transparent outline-none border-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-sm h-8"
-                  />
+                      }}
+                      placeholder={referenceEmailsList.length === 0 ? "Enter email addresses" : ""}
+                      className="w-full bg-transparent outline-none border-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-sm h-8"
+                    />
+                  </div>
+                  
+                  {currentEmailInput.trim() !== "" && (
+                    <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md shadow-lg z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                      <button
+                        onClick={() => {
+                          const val = currentEmailInput.trim().replace(/,/g, '');
+                          if (val && !referenceEmailsList.includes(val)) {
+                            setReferenceEmailsList([...referenceEmailsList, val]);
+                            setCurrentEmailInput("");
+                          }
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center"
+                      >
+                        Adding '{currentEmailInput}'
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                <h2 className="text-lg font-bold mb-2">Include a personal message (optional)</h2>
-                <textarea
-                  value={referenceMessage}
-                  onChange={(e) => setReferenceMessage(e.target.value)}
-                  className="w-full h-32 p-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 mb-8 resize-none text-zinc-900 dark:text-zinc-100 transition-colors"
-                  placeholder="Hi! I'm applying for jobs on NovaLance and I was hoping you could provide a reference based on our time working together. It would help me a lot to have you as a reference."
-                />
+                {referenceEmailsList.length > 0 && (
+                  <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                    <h2 className="text-lg font-bold mb-2">Include a personal message (optional)</h2>
+                    <textarea
+                      value={referenceMessage}
+                      onChange={(e) => setReferenceMessage(e.target.value)}
+                      className="w-full h-32 p-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 mb-8 resize-none text-zinc-900 dark:text-zinc-100 transition-colors"
+                      placeholder="Hi! I'm applying for jobs on NovaLance and I was hoping you could provide a reference based on our time working together. It would help me a lot to have you as a reference."
+                    />
+                  </div>
+                )}
 
-                <div className="flex justify-between items-center w-full">
+                <div className="flex justify-between items-center w-full mt-4">
                   <Button onClick={() => setStep(8)} variant="outline" className="px-8 py-2 rounded-md font-medium text-lg border-zinc-300">Back</Button>
                   <Button 
                     onClick={handleFinalComplete} 
