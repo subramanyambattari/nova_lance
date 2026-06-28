@@ -81,7 +81,7 @@ const MOCK_SKILLS: Record<string, { name: string; count: number }[]> = {
 };
 
 export default function OnboardingPage() {
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
   const router = useRouter()
   const params = useParams()
   
@@ -167,6 +167,7 @@ export default function OnboardingPage() {
   const [referenceEmailsList, setReferenceEmailsList] = useState<string[]>([])
   const [currentEmailInput, setCurrentEmailInput] = useState("")
   const [referenceMessage, setReferenceMessage] = useState("")
+  const [isSent, setIsSent] = useState(false)
 
   // Profile Image Upload State
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -233,6 +234,7 @@ export default function OnboardingPage() {
           if (parsed.experiences) setExperiences(parsed.experiences);
           if (parsed.referenceEmailsList) setReferenceEmailsList(parsed.referenceEmailsList);
           if (parsed.referenceMessage) setReferenceMessage(parsed.referenceMessage);
+          if (parsed.isSent) setIsSent(parsed.isSent);
           if (parsed.profileImage) setProfileImage(parsed.profileImage);
         } catch (e) {}
       }
@@ -243,11 +245,11 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const state = {
-        agreed, username, role, selectedSkills, firstName, lastName, title, bio, languages, dateOfBirth, experiences, referenceEmailsList, referenceMessage, profileImage
+        agreed, username, role, selectedSkills, firstName, lastName, title, bio, languages, dateOfBirth, experiences, referenceEmailsList, referenceMessage, isSent, profileImage
       };
       localStorage.setItem("onboarding_state", JSON.stringify(state));
     }
-  }, [agreed, username, role, selectedSkills, firstName, lastName, title, bio, languages, dateOfBirth, experiences, referenceEmailsList, referenceMessage, profileImage]);
+  }, [agreed, username, role, selectedSkills, firstName, lastName, title, bio, languages, dateOfBirth, experiences, referenceEmailsList, referenceMessage, isSent, profileImage]);
 
   useEffect(() => {
     if (session?.user?.name && step === 2 && suggestions.length === 0) {
@@ -290,7 +292,10 @@ export default function OnboardingPage() {
       return
     }
     const res = await completeOnboarding({ username, role: selectedRole })
-    if (res.success) window.location.href = "/"
+    if (res.success) {
+      await update({ role: selectedRole, username });
+      window.location.href = selectedRole === "CLIENT" ? "/client-dashboard" : "/user-dashboard";
+    }
     else { setIsSubmitting(false); alert(res.error || "Something went wrong") }
   }
 
@@ -343,8 +348,9 @@ export default function OnboardingPage() {
     })
     
     if (res.success) {
+      await update({ role, username });
       localStorage.removeItem("onboarding_state");
-      window.location.href = "/";
+      window.location.href = role === "CLIENT" ? "/client-dashboard" : "/user-dashboard";
     }
     else { setIsSubmitting(false); alert(res.error || "Something went wrong") }
   }
@@ -1038,17 +1044,85 @@ export default function OnboardingPage() {
                   Invite your past employers to write a message about working with you. References will be displayed on your profile to build trust with potential clients.
                 </p>
 
-                <div className="relative w-full min-h-[3rem] px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus-within:ring-1 focus-within:ring-blue-600 focus-within:border-blue-600 mb-8 flex flex-wrap gap-2 items-center transition-all">
-                  {referenceEmailsList.map((email, i) => (
-                    <span key={i} className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 text-sm px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-700 transition-all hover:bg-zinc-200 dark:hover:bg-zinc-700">
-                      <svg className="w-3.5 h-3.5 text-zinc-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
-                      {email}
-                      <button onClick={() => setReferenceEmailsList(referenceEmailsList.filter((_, idx) => idx !== i))} className="ml-1 text-zinc-400 hover:text-red-500 transition-colors focus:outline-none">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                      </button>
-                    </span>
-                  ))}
-                  <div className="flex-1 min-w-[180px] relative">
+                {!isSent ? (
+                  <>
+                    <div className="relative w-full min-h-[3rem] px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus-within:ring-1 focus-within:ring-blue-600 focus-within:border-blue-600 mb-8 flex flex-wrap gap-2 items-center transition-all">
+                      {referenceEmailsList.map((email, i) => (
+                        <span key={i} className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 text-sm px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-700 transition-all hover:bg-zinc-200 dark:hover:bg-zinc-700">
+                          <svg className="w-3.5 h-3.5 text-zinc-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
+                          {email}
+                          <button onClick={() => setReferenceEmailsList(referenceEmailsList.filter((_, idx) => idx !== i))} className="ml-1 text-zinc-400 hover:text-red-500 transition-colors focus:outline-none">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </span>
+                      ))}
+                      <div className="flex-1 min-w-[180px] relative">
+                        <input 
+                          type="email" 
+                          value={currentEmailInput}
+                          onChange={(e) => setCurrentEmailInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+                              e.preventDefault();
+                              const val = currentEmailInput.trim().replace(/,/g, '');
+                              if (val && !referenceEmailsList.includes(val)) {
+                                setReferenceEmailsList([...referenceEmailsList, val]);
+                                setCurrentEmailInput("");
+                              }
+                            } else if (e.key === 'Backspace' && currentEmailInput === '' && referenceEmailsList.length > 0) {
+                              setReferenceEmailsList(referenceEmailsList.slice(0, -1));
+                            }
+                          }}
+                          placeholder={referenceEmailsList.length === 0 ? "Enter email addresses" : ""}
+                          className="w-full bg-transparent outline-none border-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-sm h-8"
+                        />
+                      </div>
+                      
+                      {currentEmailInput.trim() !== "" && (
+                        <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md shadow-lg z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                          <button
+                            onClick={() => {
+                              const val = currentEmailInput.trim().replace(/,/g, '');
+                              if (val && !referenceEmailsList.includes(val)) {
+                                setReferenceEmailsList([...referenceEmailsList, val]);
+                                setCurrentEmailInput("");
+                              }
+                            }}
+                            className="w-full px-4 py-3 text-left text-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center"
+                          >
+                            Adding '{currentEmailInput}'
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {referenceEmailsList.length > 0 && (
+                      <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                        <h2 className="text-lg font-bold mb-2">Include a personal message (optional)</h2>
+                        <textarea
+                          value={referenceMessage}
+                          onChange={(e) => setReferenceMessage(e.target.value)}
+                          className="w-full h-32 p-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 mb-8 resize-none text-zinc-900 dark:text-zinc-100 transition-colors"
+                          placeholder="Hi! I'm applying for jobs on NovaLance and I was hoping you could provide a reference based on our time working together. It would help me a lot to have you as a reference."
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center w-full mt-4">
+                      <Button onClick={() => setStep(8)} variant="outline" className="px-8 py-2 rounded-md font-medium text-lg border-zinc-300">Back</Button>
+                      <Button 
+                        onClick={() => {
+                          if (referenceEmailsList.length > 0) setIsSent(true);
+                        }} 
+                        disabled={referenceEmailsList.length === 0}
+                        className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50"
+                      >
+                        Send
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                     <input 
                       type="email" 
                       value={currentEmailInput}
@@ -1061,55 +1135,48 @@ export default function OnboardingPage() {
                             setReferenceEmailsList([...referenceEmailsList, val]);
                             setCurrentEmailInput("");
                           }
-                        } else if (e.key === 'Backspace' && currentEmailInput === '' && referenceEmailsList.length > 0) {
-                          setReferenceEmailsList(referenceEmailsList.slice(0, -1));
                         }
                       }}
-                      placeholder={referenceEmailsList.length === 0 ? "Enter email addresses" : ""}
-                      className="w-full bg-transparent outline-none border-none focus:ring-0 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-sm h-8"
+                      placeholder="Enter email addresses"
+                      className="w-full h-12 px-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 mb-8 text-zinc-900 dark:text-zinc-100"
                     />
-                  </div>
-                  
-                  {currentEmailInput.trim() !== "" && (
-                    <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md shadow-lg z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                      <button
-                        onClick={() => {
-                          const val = currentEmailInput.trim().replace(/,/g, '');
-                          if (val && !referenceEmailsList.includes(val)) {
-                            setReferenceEmailsList([...referenceEmailsList, val]);
-                            setCurrentEmailInput("");
-                          }
-                        }}
-                        className="w-full px-4 py-3 text-left text-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center"
-                      >
-                        Adding '{currentEmailInput}'
-                      </button>
-                    </div>
-                  )}
-                </div>
 
-                {referenceEmailsList.length > 0 && (
-                  <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                    <h2 className="text-lg font-bold mb-2">Include a personal message (optional)</h2>
-                    <textarea
-                      value={referenceMessage}
-                      onChange={(e) => setReferenceMessage(e.target.value)}
-                      className="w-full h-32 p-4 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:ring-blue-600 focus:border-blue-600 mb-8 resize-none text-zinc-900 dark:text-zinc-100 transition-colors"
-                      placeholder="Hi! I'm applying for jobs on NovaLance and I was hoping you could provide a reference based on our time working together. It would help me a lot to have you as a reference."
-                    />
+                    <h2 className="text-lg font-bold mb-4">Invited users</h2>
+                    <div className="space-y-4 mb-8">
+                      {referenceEmailsList.map((email, i) => (
+                        <div key={i} className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-900 p-3 rounded-md border border-zinc-200 dark:border-zinc-800">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-500 overflow-hidden">
+                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+                            </div>
+                            <span className="font-medium text-sm text-zinc-900 dark:text-zinc-100">{email}</span>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              const newList = referenceEmailsList.filter((_, idx) => idx !== i);
+                              setReferenceEmailsList(newList);
+                              if (newList.length === 0) setIsSent(false);
+                            }}
+                            className="text-blue-600 hover:text-blue-700 text-sm font-semibold mr-2"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-between items-center w-full mt-4">
+                      <Button onClick={() => setIsSent(false)} variant="outline" className="px-8 py-2 rounded-md font-medium text-lg border-zinc-300">Back</Button>
+                      <Button 
+                        onClick={handleFinalComplete} 
+                        disabled={isSubmitting} 
+                        className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50"
+                      >
+                        {isSubmitting ? "Finishing..." : "Finish"}
+                      </Button>
+                    </div>
                   </div>
                 )}
-
-                <div className="flex justify-between items-center w-full mt-4">
-                  <Button onClick={() => setStep(8)} variant="outline" className="px-8 py-2 rounded-md font-medium text-lg border-zinc-300">Back</Button>
-                  <Button 
-                    onClick={handleFinalComplete} 
-                    disabled={isSubmitting} 
-                    className="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-md transition-all shadow-md disabled:opacity-50"
-                  >
-                    {isSubmitting ? "Sending..." : "Send"}
-                  </Button>
-                </div>
               </div>
             </div>
           )}

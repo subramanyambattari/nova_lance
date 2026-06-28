@@ -21,5 +21,5 @@ export async function setRole(formData: FormData) {
   })
 
   // Redirect to correct dashboard
-  redirect(role === "CLIENT" ? "/client-dashboard" : "/freelancer-dashboard")
+  redirect(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard")
 }
