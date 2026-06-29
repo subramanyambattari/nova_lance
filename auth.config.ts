@@ -32,6 +32,8 @@ export const authConfig = {
            if (!role) return Response.redirect(new URL("/onboarding", nextUrl))
            return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))
         }
+      } else {
+        // Allow public access to root "/"
       }
       return true
     },
