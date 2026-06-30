@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Sparkles, UploadCloud } from "lucide-react";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
 export default function PostProjectPage() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState(1);
   const [description, setDescription] = useState("");
   
@@ -46,6 +47,14 @@ export default function PostProjectPage() {
     setFeatures(prev => 
       prev.includes(feat) ? prev.filter(f => f !== feat) : [...prev, feat]
     );
+  };
+
+  const handleAIImprovement = () => {
+    if (description.trim().length > 0) {
+      setDescription(prev => prev + "\n\nKey Requirements:\n- High quality and responsive design\n- Modern technology stack\n- Fast delivery");
+    } else {
+      setDescription("I am looking for a talented professional to help me build a modern, high-quality solution for my business.");
+    }
   };
 
   return (
@@ -231,20 +240,28 @@ export default function PostProjectPage() {
                 <Textarea 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[200px] p-4 text-lg border-zinc-300 dark:border-zinc-800 focus-visible:ring-pink-600 shadow-sm"
+                  className={`min-h-[200px] p-4 text-lg focus-visible:ring-pink-600 shadow-sm ${
+                    description.length < 30 ? "border-red-500 focus-visible:ring-red-500" : "border-zinc-300 dark:border-zinc-800"
+                  }`}
                 />
-                <p className="text-xs text-red-500 font-semibold flex items-center gap-1">
-                  <span className="rounded-full bg-red-100 text-red-500 size-4 flex items-center justify-center font-bold text-[10px]">!</span>
-                  Please enter at least 30 characters
-                </p>
+                {description.length < 30 && (
+                  <p className="text-xs text-red-500 font-semibold flex items-center gap-1">
+                    <span className="rounded-full bg-red-100 text-red-500 size-4 flex items-center justify-center font-bold text-[10px]">!</span>
+                    Please enter at least 30 characters
+                  </p>
+                )}
               </div>
 
-              <div className="border-2 border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group">
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group"
+              >
                 <UploadCloud className="size-10 text-zinc-400 group-hover:text-blue-500 transition-colors mb-3" />
                 <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Drag & drop or <span className="text-blue-600 hover:underline">click to upload</span> any images or documents that might be helpful in explaining your brief.
                 </p>
                 <p className="text-xs text-zinc-500 mt-2">(Max 25 MB)</p>
+                <input type="file" ref={fileInputRef} className="hidden" multiple />
               </div>
 
               <div className="flex items-center gap-6 pt-4">
@@ -254,8 +271,11 @@ export default function PostProjectPage() {
                 >
                   <Link href="/login">Post Project</Link>
                 </Button>
-                <button className="text-zinc-600 dark:text-zinc-400 font-bold hover:underline flex items-center gap-2">
-                  <Sparkles className="size-4" /> I want AI assistance
+                <button 
+                  onClick={handleAIImprovement}
+                  className="text-zinc-600 dark:text-zinc-400 font-bold hover:text-pink-500 transition-colors flex items-center gap-2 group"
+                >
+                  <Sparkles className="size-4 group-hover:animate-pulse" /> I want AI assistance
                 </button>
               </div>
             </div>
