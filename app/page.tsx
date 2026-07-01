@@ -11,17 +11,17 @@ export default function LandingPage() {
       
       <main>
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-12 pb-32 lg:pt-16 lg:pb-40">
+        <section className="relative overflow-hidden pt-0 pb-6 lg:pt-0 lg:pb-8 mt-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black -z-10" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start pt-8 lg:pt-12">
               <div className="max-w-2xl">
-                <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-4 leading-tight">
                   Hire the best freelancers for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-500">any job, online.</span>
                 </h1>
                 
-                <ul className="space-y-4 mb-10 text-lg text-zinc-300">
+                <ul className="space-y-4 mb-8 text-lg text-zinc-300">
                   <li className="flex items-center gap-3">
                     <CheckCircle2 className="text-violet-500 size-6" />
                     <span>World's largest freelance marketplace</span>

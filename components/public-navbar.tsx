@@ -10,8 +10,8 @@ export function PublicNavbar() {
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-5">
-            <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center gap-2 mr-4">
               <span className="flex size-8 items-center justify-center rounded-md bg-blue-600 text-white">
                 <Sparkles className="size-4" />
               </span>
@@ -19,7 +19,7 @@ export function PublicNavbar() {
                 Nova Lance
               </span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-300">
+            <nav className="hidden md:flex items-center gap-4 text-sm font-medium text-zinc-300">
               
               {/* Hire freelancers Dropdown */}
               <div className="relative group py-4">
