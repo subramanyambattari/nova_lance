@@ -24,10 +24,6 @@ export default function PostProjectPage() {
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDescription(e.target.value);
-    if (e.target.value.length > 5 && phase === 1) {
-      // Small delay before moving to phase 2 to let user finish their thought
-      setTimeout(() => setPhase(2), 1500);
-    }
   };
 
   const handleNextPhase1 = () => setPhase(2);
@@ -47,6 +43,19 @@ export default function PostProjectPage() {
     setFeatures(prev => 
       prev.includes(feat) ? prev.filter(f => f !== feat) : [...prev, feat]
     );
+  };
+
+  const getFeaturesList = () => {
+    switch (projectPurpose) {
+      case "Informational":
+        return ["Contact form", "Blog/News section", "Newsletter signup", "SEO optimization", "Social media integration"];
+      case "Portfolio/Showcase":
+        return ["Image gallery", "Project case studies", "Client testimonials", "Resume download", "Contact form"];
+      case "E-commerce":
+        return ["Product catalog", "Shopping cart", "Payment gateway integration", "User authentication", "Order tracking"];
+      default:
+        return ["User authentication", "Database integration", "API development", "Admin dashboard", "Payment gateway integration"];
+    }
   };
 
   const handleAIImprovement = () => {
@@ -77,7 +86,7 @@ export default function PostProjectPage() {
         {/* Content Area */}
         <div className="max-w-xl w-full mx-auto flex-1">
           <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-            Tell us what you <br /> need <span className="text-pink-600">done.</span>
+            Tell us what you <br /> need <span className="text-violet-600">done.</span>
           </h1>
 
           {phase === 1 && (
@@ -87,34 +96,41 @@ export default function PostProjectPage() {
               </p>
               <Textarea 
                 placeholder="Enter a few bullet points or a full description."
-                className="min-h-[200px] text-lg p-6 bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 rounded-xl mb-6 shadow-sm focus-visible:ring-pink-600"
+                className="min-h-[200px] text-lg p-6 bg-white dark:bg-zinc-950 border-zinc-300 dark:border-zinc-800 rounded-xl mb-6 shadow-sm focus-visible:ring-violet-600"
                 value={description}
                 onChange={handleDescriptionChange}
               />
               <div className="flex items-center gap-4">
                 <Button 
                   onClick={handleNextPhase1} 
-                  className="bg-pink-600 hover:bg-pink-700 text-white px-10 py-6 text-lg font-bold rounded-xl"
+                  disabled={description.trim().length < 10}
+                  className="bg-violet-600 hover:bg-violet-700 text-white px-10 py-6 text-lg font-bold rounded-xl disabled:opacity-50"
                 >
                   Next
                 </Button>
                 <span className="text-zinc-500 text-sm font-semibold">Press CTRL + ENTER</span>
               </div>
+              {description.trim().length > 0 && description.trim().length < 10 && (
+                 <p className="text-xs text-red-500 font-semibold mt-2 flex items-center gap-1">
+                   <span className="rounded-full bg-red-100 text-red-500 size-4 flex items-center justify-center font-bold text-[10px]">!</span>
+                   Please enter at least 10 characters to proceed
+                 </p>
+              )}
               
               {/* Trust badges / stats */}
               <div className="mt-16 space-y-4 text-zinc-600 dark:text-zinc-400 font-medium">
                 <p className="text-black dark:text-white font-semibold">Nova Lance connects over 89 million professionals globally</p>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-3">
-                    <div className="size-5 rounded-full bg-pink-600 flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="size-5 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs">✓</div>
                     From $10 tasks to $100k projects, we've got you covered
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="size-5 rounded-full bg-pink-600 flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="size-5 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs">✓</div>
                     Connect with skilled freelancers in seconds
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="size-5 rounded-full bg-pink-600 flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="size-5 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs">✓</div>
                     Only pay freelancers once you are happy with their work
                   </li>
                 </ul>
@@ -185,7 +201,7 @@ export default function PostProjectPage() {
                   <span className="text-xs text-zinc-500">3 of 3</span>
                 </div>
                 <div className="flex flex-col gap-3">
-                  {["Product catalog", "Shopping cart", "Payment gateway integration", "User authentication"].map(opt => (
+                  {getFeaturesList().map(opt => (
                     <button 
                       key={opt}
                       onClick={() => toggleFeature(opt)}
@@ -203,7 +219,7 @@ export default function PostProjectPage() {
               <div className="flex items-center gap-6 pt-4">
                 <Button 
                   onClick={handleNextPhase2} 
-                  className="bg-pink-600 hover:bg-pink-700 text-white px-10 py-6 text-lg font-bold rounded-xl"
+                  className="bg-violet-600 hover:bg-violet-700 text-white px-10 py-6 text-lg font-bold rounded-xl"
                 >
                   Next
                 </Button>
@@ -240,7 +256,7 @@ export default function PostProjectPage() {
                 <Textarea 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className={`min-h-[200px] p-4 text-lg focus-visible:ring-pink-600 shadow-sm ${
+                  className={`min-h-[200px] p-4 text-lg focus-visible:ring-violet-600 shadow-sm ${
                     description.length < 30 ? "border-red-500 focus-visible:ring-red-500" : "border-zinc-300 dark:border-zinc-800"
                   }`}
                 />
@@ -267,13 +283,13 @@ export default function PostProjectPage() {
               <div className="flex items-center gap-6 pt-4">
                 <Button 
                   asChild
-                  className="bg-pink-600 hover:bg-pink-700 text-white px-10 py-6 text-lg font-bold rounded-xl"
+                  className="bg-violet-600 hover:bg-violet-700 text-white px-10 py-6 text-lg font-bold rounded-xl"
                 >
                   <Link href="/login">Post Project</Link>
                 </Button>
                 <button 
                   onClick={handleAIImprovement}
-                  className="text-zinc-600 dark:text-zinc-400 font-bold hover:text-pink-500 transition-colors flex items-center gap-2 group"
+                  className="text-zinc-600 dark:text-zinc-400 font-bold hover:text-violet-500 transition-colors flex items-center gap-2 group"
                 >
                   <Sparkles className="size-4 group-hover:animate-pulse" /> I want AI assistance
                 </button>
@@ -298,9 +314,9 @@ export default function PostProjectPage() {
         {/* Dynamic Overlay */}
         {phase > 1 && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm">
-            <div className="animate-in zoom-in-95 fade-in duration-500 rounded-2xl border border-white/20 bg-black/40 backdrop-blur-xl p-8 shadow-2xl shadow-pink-500/20">
+            <div className="animate-in zoom-in-95 fade-in duration-500 rounded-2xl border border-white/20 bg-black/40 backdrop-blur-xl p-8 shadow-2xl shadow-violet-500/20">
               <div className="flex items-center gap-3 mb-4">
-                <Sparkles className="text-pink-500 size-6" />
+                <Sparkles className="text-violet-500 size-6" />
                 <h3 className="text-xl font-bold text-white">Let's add some details</h3>
               </div>
               <p className="text-zinc-200 text-sm leading-relaxed">

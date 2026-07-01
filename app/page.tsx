@@ -6,42 +6,42 @@ import { CheckCircle2 } from "lucide-react";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-pink-500/30">
+    <div className="min-h-screen bg-black text-white selection:bg-violet-500/30">
       <PublicNavbar />
       
       <main>
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-20 pb-32 lg:pt-32 lg:pb-40">
+        <section className="relative overflow-hidden pt-12 pb-32 lg:pt-16 lg:pb-40">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black -z-10" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
               <div className="max-w-2xl">
                 <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
-                  Hire the best freelancers for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-500">any job, online.</span>
+                  Hire the best freelancers for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-500">any job, online.</span>
                 </h1>
                 
                 <ul className="space-y-4 mb-10 text-lg text-zinc-300">
                   <li className="flex items-center gap-3">
-                    <CheckCircle2 className="text-pink-500 size-6" />
+                    <CheckCircle2 className="text-violet-500 size-6" />
                     <span>World's largest freelance marketplace</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <CheckCircle2 className="text-pink-500 size-6" />
+                    <CheckCircle2 className="text-violet-500 size-6" />
                     <span>Any job you can possibly think of</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <CheckCircle2 className="text-pink-500 size-6" />
+                    <CheckCircle2 className="text-violet-500 size-6" />
                     <span>Save up to 90% & get quotes for free</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <CheckCircle2 className="text-pink-500 size-6" />
+                    <CheckCircle2 className="text-violet-500 size-6" />
                     <span>Pay only when you're 100% happy</span>
                   </li>
                 </ul>
                 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button asChild size="lg" className="h-14 px-8 text-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold">
+                  <Button asChild size="lg" className="h-14 px-8 text-lg bg-violet-600 hover:bg-violet-700 text-white font-semibold">
                     <Link href="/onboarding">Hire a Freelancer</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="h-14 px-8 text-lg border-zinc-700 text-zinc-100 hover:bg-zinc-900 font-semibold bg-transparent">
@@ -83,7 +83,7 @@ export default function LandingPage() {
               <div className="order-1 lg:order-2">
                 <div className="mb-12">
                   <h2 className="text-4xl lg:text-5xl font-bold mb-4">Make your dreams a reality.</h2>
-                  <Link href="/onboarding" className="text-pink-500 font-semibold text-lg hover:text-pink-400 transition-colors flex items-center gap-2">
+                  <Link href="/onboarding" className="text-violet-500 font-semibold text-lg hover:text-violet-400 transition-colors flex items-center gap-2">
                     Get started now <span aria-hidden="true">&rarr;</span>
                   </Link>
                 </div>
