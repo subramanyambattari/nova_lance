@@ -1,8 +1,16 @@
+"use client";
+
 import { PublicNavbar } from "@/components/public-navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+
+const FADE_UP_ANIMATION_VARIANTS = {
+  hidden: { opacity: 0, y: 20, filter: "blur(20px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } },
+};
 
 export default function LandingPage() {
   return (
@@ -12,43 +20,55 @@ export default function LandingPage() {
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden pt-0 pb-6 lg:pt-0 lg:pb-8 mt-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black -z-10" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-violet-600/20 rounded-full blur-[120px] -z-10 animate-pulse" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-background to-background -z-20" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start pt-8 lg:pt-12">
+            <motion.div 
+              initial="hidden"
+              animate="show"
+              viewport={{ once: true }}
+              variants={{
+                hidden: {},
+                show: {
+                  transition: { staggerChildren: 0.15 },
+                },
+              }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start pt-8 lg:pt-12"
+            >
               <div className="max-w-2xl">
-                <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-4 leading-tight">
+                <motion.h1 variants={FADE_UP_ANIMATION_VARIANTS} className="text-5xl lg:text-7xl font-bold tracking-tight mb-4 leading-tight">
                   Hire the best freelancers for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-500">any job, online.</span>
-                </h1>
+                </motion.h1>
                 
-                <div className="bg-foreground/5 border border-border p-2 rounded-2xl flex items-center mb-6 shadow-2xl backdrop-blur-sm max-w-xl">
+                <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="bg-background/40 border border-border/50 p-2 rounded-2xl flex items-center mb-6 shadow-2xl backdrop-blur-xl max-w-xl">
                   <div className="flex-1 px-4 text-muted-foreground flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     What service are you looking for today?
                   </div>
                   <Button className="bg-violet-600 hover:bg-violet-700 text-foreground rounded-xl px-6 h-12">Search</Button>
-                </div>
+                </motion.div>
                 
-                <div className="flex flex-wrap items-center gap-3 mb-10 text-sm">
+                <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="flex flex-wrap items-center gap-3 mb-10 text-sm">
                   <span className="text-zinc-500 font-medium">Popular:</span>
                   {["Website Design", "WordPress", "Logo Design", "AI Services"].map(tag => (
                     <span key={tag} className="px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:bg-foreground/5 cursor-pointer transition-colors">
                       {tag}
                     </span>
                   ))}
-                </div>
+                </motion.div>
                 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="flex flex-col sm:flex-row gap-4">
                   <Button asChild size="lg" className="h-14 px-8 text-lg bg-violet-600 hover:bg-violet-700 text-foreground font-semibold">
                     <Link href="/onboarding">Hire a Freelancer</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="h-14 px-8 text-lg border-zinc-700 text-foreground/80 hover:bg-zinc-900 font-semibold bg-transparent">
                     <Link href="/onboarding">Earn Money Freelancing</Link>
                   </Button>
-                </div>
+                </motion.div>
               </div>
               
-              <div className="relative mx-auto w-full max-w-lg lg:max-w-none flex justify-center lg:justify-end">
+              <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="relative mx-auto w-full max-w-lg lg:max-w-none flex justify-center lg:justify-end">
                 <div className="relative w-full aspect-[4/5] sm:aspect-square lg:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/20 border border-border">
                   <Image 
                     src="/images/hero_app_mockup.png" 
@@ -59,8 +79,8 @@ export default function LandingPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
@@ -136,13 +156,13 @@ export default function LandingPage() {
               ].map((testimonial, i) => (
                 <div key={i} className="bg-background/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl relative">
                   <svg className="w-10 h-10 text-violet-500/20 absolute top-6 left-6" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true"><path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" /></svg>
-                  <p className="text-lg text-zinc-300 relative z-10 mb-8 pt-6 leading-relaxed">"{testimonial.quote}"</p>
+                  <p className="text-lg text-foreground/80 relative z-10 mb-8 pt-6 leading-relaxed">"{testimonial.quote}"</p>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center font-bold text-foreground">
                       {testimonial.author.charAt(0)}
                     </div>
                     <div>
-                      <h4 className="font-bold text-white">{testimonial.author}</h4>
+                      <h4 className="font-bold text-foreground">{testimonial.author}</h4>
                       <p className="text-sm text-zinc-500">{testimonial.title}</p>
                     </div>
                   </div>
@@ -151,11 +171,11 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-        <section className="relative py-24 bg-zinc-950 border-t border-white/5">
+        <section className="relative py-24 bg-muted/20 border-t border-border/50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               
-              <div className="order-2 lg:order-1 relative w-full aspect-square md:aspect-video lg:aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+              <div className="order-2 lg:order-1 relative w-full aspect-square md:aspect-video lg:aspect-square rounded-3xl overflow-hidden shadow-2xl border border-border">
                 <Image 
                   src="/images/vibrant_features_art.png" 
                   alt="Vibrant Features" 
@@ -174,26 +194,26 @@ export default function LandingPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
                   <div>
-                    <h3 className="text-2xl font-bold mb-3 text-white">The best talent</h3>
-                    <p className="text-zinc-400 leading-relaxed">
+                    <h3 className="text-2xl font-bold mb-3 text-foreground">The best talent</h3>
+                    <p className="text-muted-foreground leading-relaxed">
                       Discover reliable professionals by exploring their portfolios and immersing yourself in the feedback shared on their profiles.
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold mb-3 text-white">Fast bids</h3>
-                    <p className="text-zinc-400 leading-relaxed">
+                    <h3 className="text-2xl font-bold mb-3 text-foreground">Fast bids</h3>
+                    <p className="text-muted-foreground leading-relaxed">
                       Get quick, no-obligation quotes from skilled freelancers. 80% of jobs receive bids within 60 seconds. Your idea is just moments from reality.
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold mb-3 text-white">Quality work</h3>
-                    <p className="text-zinc-400 leading-relaxed">
+                    <h3 className="text-2xl font-bold mb-3 text-foreground">Quality work</h3>
+                    <p className="text-muted-foreground leading-relaxed">
                       With Nova Lance's talent pool of top-tier professionals at your fingertips, you'll find quality talent to get what you need done.
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold mb-3 text-white">Be in control</h3>
-                    <p className="text-zinc-400 leading-relaxed">
+                    <h3 className="text-2xl font-bold mb-3 text-foreground">Be in control</h3>
+                    <p className="text-muted-foreground leading-relaxed">
                       Stay in the loop while on the move. Chat with your freelancers and get real time updates with our platform. Anytime, anywhere.
                     </p>
                   </div>
@@ -203,11 +223,114 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+        {/* How it Works Section */}
+        <section className="py-24 bg-background relative border-t border-border/50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">How it works</h2>
+              <p className="text-muted-foreground text-lg">A simple, secure, and streamlined process for both clients and freelancers.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { step: "1", title: "Post a job or browse", desc: "Share your project requirements, or search through profiles to find the perfect talent." },
+                { step: "2", title: "Hire the best fit", desc: "Compare proposals, review portfolios, and interview your favorites before hiring." },
+                { step: "3", title: "Pay safely", desc: "Funds are held in escrow. Release payment only when the work meets your expectations." }
+              ].map(item => (
+                <div key={item.step} className="flex flex-col items-center text-center p-6">
+                  <div className="w-16 h-16 rounded-2xl bg-violet-600/10 text-violet-500 flex items-center justify-center text-2xl font-bold mb-6">
+                    {item.step}
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Why Choose Nova Lance */}
+        <section className="py-24 bg-muted/30 border-y border-border/50">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div>
+                <h2 className="text-4xl font-bold mb-6">Why choose Nova Lance?</h2>
+                <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+                  We've built the most reliable platform to connect ambitious companies with elite talent. No more endless searching or risky payments.
+                </p>
+                <ul className="space-y-6">
+                  {[
+                    { title: "Payment Protection", desc: "Escrow system ensures you only pay for completed, approved work." },
+                    { title: "Verified Talent", desc: "Every freelancer goes through an identity verification process." },
+                    { title: "24/7 Support", desc: "Our global support team is ready to help you at any hour." }
+                  ].map(feature => (
+                    <li key={feature.title} className="flex gap-4">
+                      <div className="mt-1 w-8 h-8 rounded-full bg-violet-600/20 text-violet-500 flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-lg">{feature.title}</h4>
+                        <p className="text-muted-foreground">{feature.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border border-border">
+                <div className="absolute inset-0 bg-gradient-to-tr from-violet-600/20 to-blue-500/20" />
+                <Image src="/images/vibrant_features_art.png" alt="Value Proposition" fill className="object-cover opacity-80" />
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
-      <footer className="bg-black py-12 border-t border-white/10 text-center text-zinc-500 text-sm">
+      <footer className="bg-background py-16 border-t border-border">
         <div className="container mx-auto px-4">
-          <p>&copy; {new Date().getFullYear()} Nova Lance. All rights reserved.</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12 border-b border-border/50 pb-12">
+            <div className="col-span-2 lg:col-span-2">
+              <Link href="/" className="flex items-center gap-2 mb-6">
+                <span className="flex size-8 items-center justify-center rounded-md bg-blue-600 text-white">
+                  <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                </span>
+                <span className="text-xl font-bold tracking-tight text-foreground">Nova Lance</span>
+              </Link>
+              <p className="text-muted-foreground mb-6 max-w-sm">The world's most vibrant platform connecting elite talent with forward-thinking teams.</p>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">For Clients</h4>
+              <ul className="space-y-3 text-muted-foreground text-sm">
+                <li><Link href="#" className="hover:text-foreground">How to Hire</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Talent Marketplace</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Project Catalog</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Enterprise</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">For Freelancers</h4>
+              <ul className="space-y-3 text-muted-foreground text-sm">
+                <li><Link href="#" className="hover:text-foreground">How to Find Work</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Direct Contracts</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Win Work Safely</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Resources</h4>
+              <ul className="space-y-3 text-muted-foreground text-sm">
+                <li><Link href="#" className="hover:text-foreground">Help & Support</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Success Stories</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Blog</Link></li>
+                <li><Link href="#" className="hover:text-foreground">Community</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} Nova Lance Global Inc.</p>
+            <div className="flex gap-6">
+              <Link href="#" className="hover:text-foreground">Terms of Service</Link>
+              <Link href="#" className="hover:text-foreground">Privacy Policy</Link>
+              <Link href="#" className="hover:text-foreground">Accessibility</Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
