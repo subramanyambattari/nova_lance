@@ -432,6 +432,7 @@ model UserSettings {
 enum Role {
   CLIENT
   FREELANCER
+  ADMIN
 }
 
 model Account {
@@ -467,4 +468,14 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+
+model PlatformSettings {
+  id               Int      @id @default(1)
+  platformName     String   @default("Nova Lance")
+  supportEmail     String   @default("support@novalance.dev")
+  maintenanceMode  Boolean  @default(false)
+  allowNewSignups  Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
 }

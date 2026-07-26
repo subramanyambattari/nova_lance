@@ -41,8 +41,12 @@ export default function SignupPage() {
       password: data.password,
     })
     
-    if (result.success && result.requireOtp) {
-      window.location.href = `/verify-email?email=${encodeURIComponent(data.email)}`
+    if (result.success) {
+      if (result.requireOtp) {
+        window.location.href = `/verify-email?email=${encodeURIComponent(data.email)}`
+      } else {
+        window.location.href = `/login?registered=true`
+      }
     } else {
       setIsLoading(false)
       alert(result.error || "Something went wrong during registration")

@@ -5,9 +5,10 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { WebSocketProvider } from "@/components/websocket-provider";
 import { Toaster } from "sonner";
 import { NotificationsListener } from "@/components/notifications-listener";
-
 import { SessionProvider } from "@/components/session-provider";
-
+import { auth } from "@/auth";
+import { getPlatformSettings } from "@/app/actions/settings";
+import { MaintenanceScreen } from "@/app/_components/maintenance-screen";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,13 +24,31 @@ export const metadata: Metadata = {
   description: "Next-gen freelance platform",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth()
+  const settings = await getPlatformSettings()
+  
+  // @ts-ignore
+  const role = session?.user?.role
+  const isSuperAdmin = session?.user?.email === "b.subburoyal@gmail.com"
+  const isAdmin = role === "ADMIN" || isSuperAdmin
+  
   // Hardcoding userId for demo purposes. In a real app this comes from auth context.
   const currentUserId = 1;
+
+  if (settings.maintenanceMode && !isAdmin) {
+    return (
+      <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+        <body className="min-h-full flex flex-col">
+          <MaintenanceScreen />
+        </body>
+      </html>
+    )
+  }
 
   return (
     <html

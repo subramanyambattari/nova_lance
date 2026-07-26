@@ -12,11 +12,23 @@ export const authConfig = {
       const isOnOnboarding = nextUrl.pathname.startsWith("/onboarding")
       // @ts-ignore
       const role = auth?.user?.role as string | undefined
+      const userEmail = auth?.user?.email
+
+      const isOnAdmin = nextUrl.pathname.startsWith("/admin")
+      const isSuperAdmin = userEmail === "b.subburoyal@gmail.com"
+
+      if (isOnAdmin) {
+        if (!isLoggedIn) return false // Redirect to login
+        if (role !== "ADMIN" && !isSuperAdmin) return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))
+        return true
+      }
 
       if (isOnDashboard) {
         if (!isLoggedIn) return false // Redirect to login
-        if (!role) return Response.redirect(new URL("/onboarding", nextUrl))
+        if (!role && !isSuperAdmin) return Response.redirect(new URL("/onboarding", nextUrl))
         
+        if (role === "ADMIN" || isSuperAdmin) return Response.redirect(new URL("/admin", nextUrl))
+
         if (nextUrl.pathname.startsWith("/client-dashboard") && role !== "CLIENT") {
            return Response.redirect(new URL("/user-dashboard", nextUrl))
         }
@@ -25,15 +37,20 @@ export const authConfig = {
         }
         return true
       } else if (isLoggedIn) {
-        if (isOnOnboarding && role) {
+        if (isOnOnboarding && (role || isSuperAdmin)) {
+           if (role === "ADMIN" || isSuperAdmin) return Response.redirect(new URL("/admin", nextUrl))
            return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))
         }
         if (nextUrl.pathname === "/login" || nextUrl.pathname === "/") {
-           if (!role) return Response.redirect(new URL("/onboarding", nextUrl))
+           if (!role && !isSuperAdmin) return Response.redirect(new URL("/onboarding", nextUrl))
+           if (role === "ADMIN" || isSuperAdmin) return Response.redirect(new URL("/admin", nextUrl))
            return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))
         }
       } else {
-        // Allow public access to root "/"
+        // Not logged in
+        if (isOnOnboarding) {
+          return Response.redirect(new URL("/login", nextUrl))
+        }
       }
       return true
     },
