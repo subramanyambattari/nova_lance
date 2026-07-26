@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Sparkles, Users, Briefcase, Settings, LayoutDashboard, LogOut } from "lucide-react"
 import { ModeToggle } from "@/components/mode-toggle"
-import { Button } from "@/components/ui/button"
+import { AdminLogoutButton } from "./admin-logout-button"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -39,12 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         
         <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-           <Button variant="outline" className="w-full flex items-center justify-start gap-3" asChild>
-             <Link href="/">
-               <LogOut className="size-4" />
-               Exit Admin
-             </Link>
-           </Button>
+           <AdminLogoutButton />
         </div>
       </aside>
 

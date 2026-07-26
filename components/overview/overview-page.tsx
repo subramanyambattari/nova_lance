@@ -190,13 +190,48 @@ const tooltipStyle = {
   color: "#fafafa",
 }
 
-export function OverviewPage() {
+export function OverviewPage({ stats }: { stats?: any }) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setMounted(true), 0)
     return () => window.clearTimeout(timer)
   }, [])
+
+  // Merge dynamic stats with command stats if available
+  const dynamicCommandStats = [
+    {
+      label: "Today focus",
+      value: "7",
+      detail: "Actions need attention",
+      icon: Radar,
+      tone: "text-sky-300",
+    },
+    {
+      label: "Pipeline value",
+      value: stats ? `$${(stats.pipeline.reduce((acc: number, curr: any) => acc + curr.value, 0) / 1000).toFixed(1)}k` : "$42.8k",
+      detail: "Across proposals and leads",
+      icon: Target,
+      tone: "text-violet-300",
+    },
+    {
+      label: "Active work",
+      value: stats ? stats.activeWorkCount.toString() : "5",
+      detail: "Currently active contracts",
+      icon: BriefcaseBusiness,
+      tone: "text-amber-300",
+    },
+    {
+      label: "Available balance",
+      value: stats ? `$${(stats.availableBalance / 1000).toFixed(1)}k` : "$8.2k",
+      detail: "Ready to withdraw",
+      icon: Wallet,
+      tone: "text-emerald-300",
+    },
+  ]
+
+  const displayPipeline = stats ? stats.pipeline : pipeline;
+  const displayActiveWork = stats ? stats.activeWork : activeWork;
 
   return (
     <div className="min-h-screen overflow-hidden bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
@@ -267,7 +302,7 @@ export function OverviewPage() {
         </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {commandStats.map((stat, index) => (
+          {dynamicCommandStats.map((stat, index) => (
             <div key={stat.label}>
               <Card className="h-full rounded-2xl border-zinc-200 bg-white shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-2xl dark:shadow-black/20">
                 <CardContent className="p-5">
@@ -331,7 +366,7 @@ export function OverviewPage() {
             <CardContent className="h-96 min-h-0 min-w-0 pt-2">
               {mounted ? (
                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                  <BarChart data={pipeline} margin={{ left: -16, right: 8, top: 10 }}>
+                  <BarChart data={displayPipeline} margin={{ left: -16, right: 8, top: 10 }}>
                     <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
                     <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
                     <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
@@ -371,24 +406,30 @@ export function OverviewPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {activeWork.map((project) => (
-                    <TableRow key={project.project} className="border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
-                      <TableCell className="font-medium text-zinc-950 dark:text-zinc-100">{project.project}</TableCell>
-                      <TableCell className="hidden text-zinc-600 dark:text-zinc-400 sm:table-cell">{project.client}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="border-sky-400/20 bg-sky-500/10 text-sky-200">
-                          {project.state}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden text-zinc-600 dark:text-zinc-400 md:table-cell">{project.due}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Progress value={project.progress} />
-                          <span className="w-9 text-right text-xs text-zinc-500">{project.progress}%</span>
-                        </div>
-                      </TableCell>
+                  {displayActiveWork.length > 0 ? (
+                    displayActiveWork.map((project: any) => (
+                      <TableRow key={project.project} className="border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/[0.03]">
+                        <TableCell className="font-medium text-zinc-950 dark:text-zinc-100">{project.project}</TableCell>
+                        <TableCell className="hidden text-zinc-600 dark:text-zinc-400 sm:table-cell">{project.client}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="border-sky-400/20 bg-sky-500/10 text-sky-200">
+                            {project.state}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden text-zinc-600 dark:text-zinc-400 md:table-cell">{project.due}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Progress value={project.progress} />
+                            <span className="w-9 text-right text-xs text-zinc-500">{project.progress}%</span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-zinc-500 h-24">No active delivery contracts found.</TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

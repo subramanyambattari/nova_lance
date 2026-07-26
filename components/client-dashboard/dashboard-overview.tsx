@@ -1,11 +1,43 @@
-import { ArrowUpRight, Sparkles } from "lucide-react"
+import { ArrowUpRight, Sparkles, Briefcase, FileText, CheckCircle, CreditCard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ProgressBar, SectionHeader, StatusBadge } from "./ui-components"
-import { overviewStats, activity, deadlines } from "./data"
+import { activity, deadlines } from "./data"
 import type { Job } from "./types"
 
-export function DashboardOverview({ jobsState }: { jobsState: Job[] }) {
+export function DashboardOverview({ jobsState, stats = { totalJobsPosted: 0, activeContractsCount: 0, totalSpent: 0, interviewsHeld: 0 }, activeContracts = [] }: { jobsState: Job[], stats?: any, activeContracts?: any[] }) {
+  
+  const overviewStats = [
+    {
+      label: "Total jobs posted",
+      value: stats.totalJobsPosted.toString(),
+      trend: "Across all time",
+      icon: Briefcase,
+      tone: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
+    },
+    {
+      label: "Active contracts",
+      value: stats.activeContractsCount.toString(),
+      trend: "In progress right now",
+      icon: FileText,
+      tone: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
+    },
+    {
+      label: "Total spent",
+      value: `$${stats.totalSpent.toLocaleString()}`,
+      trend: "All completed milestones",
+      icon: CreditCard,
+      tone: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
+    },
+    {
+      label: "Interviews held",
+      value: stats.interviewsHeld.toString(),
+      trend: "Total candidates interviewed",
+      icon: CheckCircle,
+      tone: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
+    },
+  ]
+
   return (
     <div className="space-y-8">
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -27,19 +59,19 @@ export function DashboardOverview({ jobsState }: { jobsState: Job[] }) {
 
       <section className="grid gap-6 xl:grid-cols-[1.35fr_0.85fr]">
         <div>
-          <SectionHeader eyebrow="Project health" title="Progress overview" />
+          <SectionHeader eyebrow="Project health" title="Active Contracts" />
           <div className="space-y-3">
-            {jobsState.length > 0 ? (
-              jobsState.map((job) => (
-                <div key={job.id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+            {activeContracts.length > 0 ? (
+              activeContracts.map((contract, i) => (
+                <div key={i} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold">{job.title}</h3>
-                        <StatusBadge status={job.status} />
+                        <h3 className="font-semibold">{contract.project}</h3>
+                        <StatusBadge status={contract.state} />
                       </div>
                       <p className="mt-1 text-sm text-zinc-500">
-                        {job.proposals} proposals, {job.hired} hired, {job.budget}
+                        {contract.client} • Due {contract.due}
                       </p>
                     </div>
                     <Button variant="outline" size="sm">
@@ -48,13 +80,13 @@ export function DashboardOverview({ jobsState }: { jobsState: Job[] }) {
                     </Button>
                   </div>
                   <div className="mt-4 flex items-center gap-3">
-                    <ProgressBar value={job.progress} className="flex-1" />
-                    <span className="w-10 text-right text-sm text-zinc-500">{job.progress}%</span>
+                    <ProgressBar value={contract.progress} className="flex-1" />
+                    <span className="w-10 text-right text-sm text-zinc-500">{contract.progress}%</span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-zinc-500">No active jobs found. Post a job to get started!</p>
+              <p className="text-sm text-zinc-500">No active contracts found. Hire a freelancer to get started!</p>
             )}
           </div>
         </div>

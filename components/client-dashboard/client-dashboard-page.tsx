@@ -51,9 +51,15 @@ import type { Job, Proposal, ProposalStatus } from "./types"
 export function ClientDashboardPage({
   initialJobs = [],
   initialProposals = [],
+  stats,
+  activeContracts = [],
+  talentMatches = [],
 }: {
   initialJobs?: any[]
   initialProposals?: any[]
+  stats?: any
+  activeContracts?: any[]
+  talentMatches?: any[]
 }) {
   const [isPending, startTransition] = useTransition()
 
@@ -143,7 +149,7 @@ export function ClientDashboardPage({
 
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             <TabsContent value="overview" className="space-y-8">
-              <DashboardOverview jobsState={jobsState} />
+              <DashboardOverview jobsState={jobsState} stats={stats} activeContracts={activeContracts} />
             </TabsContent>
 
             <TabsContent value="ai" className="space-y-8">
@@ -285,7 +291,7 @@ export function ClientDashboardPage({
             </TabsContent>
 
             <TabsContent value="talent" className="space-y-8">
-              <TalentMatches />
+              <TalentMatches matches={talentMatches} />
             </TabsContent>
 
             <TabsContent value="proposals" className="space-y-8">

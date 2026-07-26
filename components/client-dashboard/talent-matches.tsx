@@ -53,7 +53,9 @@ const talents = [
   },
 ]
 
-export function TalentMatches() {
+export function TalentMatches({ matches = [] }: { matches?: any[] }) {
+  const displayTalents = matches.length > 0 ? matches : talents;
+
   return (
     <div className="space-y-8">
       {/* Top Widgets */}
@@ -110,7 +112,7 @@ export function TalentMatches() {
           </div>
         </div>
         <div className="grid gap-4">
-          {talents.map((talent) => (
+          {displayTalents.map((talent) => (
             <div key={talent.name} className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
               <div className="grid gap-4 lg:grid-cols-[1fr_200px_200px]">
                 {/* Left Col */}
@@ -129,7 +131,7 @@ export function TalentMatches() {
                        </span>
                     </div>
                   </div>
-                  <p className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{talent.portfolio}</p>
+                  <p className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{talent.bio || talent.portfolio}</p>
                   
                   <div className="mt-4 flex flex-wrap items-center gap-2">
                     <span className="text-xs font-semibold text-zinc-500 mr-2">Matched Skills:</span>
@@ -138,10 +140,10 @@ export function TalentMatches() {
                         {skill}
                       </Badge>
                     ))}
-                    {talent.missingSkills.length > 0 && (
+                    {talent.missingSkills && talent.missingSkills.length > 0 && (
                       <>
                         <span className="text-xs font-semibold text-zinc-500 ml-2 mr-2">Missing:</span>
-                        {talent.missingSkills.map((skill) => (
+                        {talent.missingSkills.map((skill: string) => (
                           <Badge key={skill} variant="outline" className="rounded-md border-amber-200 bg-amber-50/50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
                             {skill}
                           </Badge>
@@ -167,8 +169,8 @@ export function TalentMatches() {
                        <p className="font-medium">{talent.rate}</p>
                      </div>
                      <div>
-                       <p className="text-xs text-zinc-500">Rank</p>
-                       <p className="font-medium">{talent.rank}</p>
+                       <p className="text-xs text-zinc-500">Earned</p>
+                       <p className="font-medium">{talent.earned || talent.rank}</p>
                      </div>
                    </div>
                 </div>

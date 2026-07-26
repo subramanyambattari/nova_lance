@@ -7,7 +7,13 @@ if (!globalAny.mockPlatformSettings) {
     platformName: "Nova Lance",
     supportEmail: "support@novalance.dev",
     maintenanceMode: false,
-    allowNewSignups: true
+    allowNewSignups: true,
+    platformFeePercent: 10.0,
+    minimumWithdrawal: 50.0,
+    require2FA: false,
+    sessionTimeoutMinutes: 60,
+    emailAlertsEnabled: true,
+    systemAnnouncements: true,
   }
 }
 import { prisma } from "@/lib/prisma"
@@ -33,7 +39,13 @@ export async function getPlatformSettings() {
           platformName: "Nova Lance",
           supportEmail: "support@novalance.dev",
           maintenanceMode: false,
-          allowNewSignups: true
+          allowNewSignups: true,
+          platformFeePercent: 10.0,
+          minimumWithdrawal: 50.0,
+          require2FA: false,
+          sessionTimeoutMinutes: 60,
+          emailAlertsEnabled: true,
+          systemAnnouncements: true,
         }
       })
     }
@@ -50,6 +62,12 @@ export async function updatePlatformSettings(data: {
   supportEmail?: string
   maintenanceMode?: boolean
   allowNewSignups?: boolean
+  platformFeePercent?: number
+  minimumWithdrawal?: number
+  require2FA?: boolean
+  sessionTimeoutMinutes?: number
+  emailAlertsEnabled?: boolean
+  systemAnnouncements?: boolean
 }) {
   try {
     if (!prisma.platformSettings) {
@@ -64,7 +82,13 @@ export async function updatePlatformSettings(data: {
         platformName: data.platformName || "Nova Lance",
         supportEmail: data.supportEmail || "support@novalance.dev",
         maintenanceMode: data.maintenanceMode ?? false,
-        allowNewSignups: data.allowNewSignups ?? true
+        allowNewSignups: data.allowNewSignups ?? true,
+        platformFeePercent: data.platformFeePercent ?? 10.0,
+        minimumWithdrawal: data.minimumWithdrawal ?? 50.0,
+        require2FA: data.require2FA ?? false,
+        sessionTimeoutMinutes: data.sessionTimeoutMinutes ?? 60,
+        emailAlertsEnabled: data.emailAlertsEnabled ?? true,
+        systemAnnouncements: data.systemAnnouncements ?? true,
       }
     })
 

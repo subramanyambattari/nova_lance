@@ -8,7 +8,7 @@ import { NotificationsListener } from "@/components/notifications-listener";
 import { SessionProvider } from "@/components/session-provider";
 import { auth } from "@/auth";
 import { getPlatformSettings } from "@/app/actions/settings";
-import { MaintenanceScreen } from "@/app/_components/maintenance-screen";
+import { MaintenanceWrapper } from "@/components/maintenance-wrapper";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -44,7 +44,19 @@ export default async function RootLayout({
     return (
       <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
         <body className="min-h-full flex flex-col">
-          <MaintenanceScreen />
+          <SessionProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <MaintenanceWrapper>
+                {children}
+              </MaintenanceWrapper>
+              <Toaster position="top-right" />
+            </ThemeProvider>
+          </SessionProvider>
         </body>
       </html>
     )

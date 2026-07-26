@@ -57,6 +57,79 @@ export default async function ClientDashboardRoute() {
     jobId: p.jobId,
   }))
 
-  return <ClientDashboardPage initialJobs={serializedJobs} initialProposals={serializedProposals} />
+  const dbActiveContracts = await prisma.activeJob.findMany({
+    where: { clientId: user.id },
+    include: { freelancer: true },
+    orderBy: { updatedAt: "desc" }
+  })
+
+  const activeContracts = dbActiveContracts.map(c => ({
+    project: c.title,
+    client: c.freelancer.name || "Freelancer",
+    state: c.status,
+    due: c.deadline ? c.deadline.toLocaleDateString() : "TBD",
+    progress: c.progress
+  }))
+
+  const stats = {
+    totalJobsPosted: dbJobs.length,
+    activeContractsCount: activeContracts.length,
+    totalSpent: dbActiveContracts.reduce((sum, c) => sum + (c.budget || 0), 0),
+    interviewsHeld: serializedProposals.filter(p => p.status === "INTERVIEW").length
+  }
+
+  // Collect all skills the client is looking for
+  const requiredSkills = new Set<string>()
+  dbJobs.forEach(job => {
+    job.skills.forEach(skill => requiredSkills.add(skill))
+  })
+
+  // Find freelancers that have at least one matching skill
+  const dbTalentMatches = await prisma.user.findMany({
+    where: { 
+      role: "FREELANCER",
+      profile: {
+        skills: {
+          hasSome: Array.from(requiredSkills)
+        }
+      }
+    },
+    include: {
+      profile: true
+    },
+    take: 6
+  })
+
+  const talentMatches = dbTalentMatches.map(freelancer => {
+    const profile = freelancer.profile
+    const freelancerSkills = profile?.skills || []
+    
+    // Calculate match percentage simply based on skill overlap
+    const overlap = freelancerSkills.filter(s => requiredSkills.has(s)).length
+    const requiredCount = requiredSkills.size || 1
+    const matchPercent = Math.min(Math.round((overlap / requiredCount) * 100) + 40, 99) // Boost baseline so it looks good
+
+    return {
+      name: freelancer.name || "Freelancer",
+      initials: (freelancer.name || "FL").substring(0, 2).toUpperCase(),
+      role: profile?.title || "Freelancer",
+      match: matchPercent,
+      rate: profile?.hourlyRate ? `$${profile.hourlyRate}/hr` : "$50/hr",
+      earned: "$10k+", // Placeholder for now
+      skills: freelancerSkills.slice(0, 4),
+      status: profile?.availability || "Available",
+      bio: profile?.bio || "Experienced freelancer ready for new opportunities.",
+    }
+  })
+
+  return (
+    <ClientDashboardPage 
+      initialJobs={serializedJobs} 
+      initialProposals={serializedProposals} 
+      stats={stats}
+      activeContracts={activeContracts}
+      talentMatches={talentMatches}
+    />
+  )
 }
 

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 
 export function PublicNavbar() {
   return (
@@ -15,7 +16,7 @@ export function PublicNavbar() {
               <span className="flex size-8 items-center justify-center rounded-md bg-blue-600 text-foreground">
                 <Sparkles className="size-4" />
               </span>
-              <span className="text-xl font-bold tracking-tight text-foreground">
+              <span className="text-xl font-bold tracking-tight text-foreground hidden sm:inline-block">
                 Nova Lance
               </span>
             </Link>
@@ -96,23 +97,68 @@ export function PublicNavbar() {
 
             </nav>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <ModeToggle />
+            
+            {/* Desktop Auth Links */}
             <Link
               href="/login"
-              className="hidden sm:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Log In
             </Link>
             <Link
               href="/onboarding"
-              className="hidden sm:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Sign Up
             </Link>
-            <Button asChild className="bg-violet-600 hover:bg-violet-700 text-foreground border-0">
+            
+            <Button asChild className="hidden sm:inline-flex bg-violet-600 hover:bg-violet-700 text-foreground border-0">
               <Link href="/post-project">Post a Project</Link>
             </Button>
+
+            {/* Mobile Menu */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="shrink-0 bg-transparent">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                  <nav className="flex flex-col gap-6 mt-8">
+                    <Link href="/" className="flex items-center gap-2 mb-4">
+                      <span className="flex size-8 items-center justify-center rounded-md bg-blue-600 text-foreground">
+                        <Sparkles className="size-4" />
+                      </span>
+                      <span className="text-xl font-bold tracking-tight">Nova Lance</span>
+                    </Link>
+                    
+                    <div className="flex flex-col gap-3">
+                      <div className="font-semibold text-lg pb-2 border-b">Explore</div>
+                      <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Hire freelancers</Link>
+                      <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Find work</Link>
+                      <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">Solutions</Link>
+                    </div>
+
+                    <div className="flex flex-col gap-3 mt-4">
+                      <div className="font-semibold text-lg pb-2 border-b">Account</div>
+                      <Link href="/login" className="text-muted-foreground hover:text-foreground transition-colors">Log In</Link>
+                      <Link href="/onboarding" className="text-muted-foreground hover:text-foreground transition-colors">Sign Up</Link>
+                    </div>
+
+                    <div className="mt-6">
+                      <Button asChild className="w-full bg-violet-600 hover:bg-violet-700 text-foreground border-0">
+                        <Link href="/post-project">Post a Project</Link>
+                      </Button>
+                    </div>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </div>

@@ -473,9 +473,22 @@ model VerificationToken {
 
 model PlatformSettings {
   id               Int      @id @default(1)
-  platformName     String   @default("Nova Lance")
-  supportEmail     String   @default("support@novalance.dev")
-  maintenanceMode  Boolean  @default(false)
-  allowNewSignups  Boolean  @default(true)
-  updatedAt        DateTime @updatedAt
+  platformName          String   @default("Nova Lance")
+  supportEmail          String   @default("support@novalance.dev")
+  maintenanceMode       Boolean  @default(false)
+  allowNewSignups       Boolean  @default(true)
+  
+  // Fees & Payments
+  platformFeePercent    Float    @default(10.0)
+  minimumWithdrawal     Float    @default(50.0)
+  
+  // Security
+  require2FA            Boolean  @default(false)
+  sessionTimeoutMinutes Int      @default(60)
+  
+  // Notifications
+  emailAlertsEnabled    Boolean  @default(true)
+  systemAnnouncements   Boolean  @default(true)
+
+  updatedAt             DateTime @updatedAt
 }
