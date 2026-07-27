@@ -16,7 +16,7 @@ export function ProposalsStats({ stats }: { stats: ProposalStats }) {
   ]
 
   return (
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {cards.map((card, index) => {
         const Icon = card.icon
 
@@ -26,20 +26,24 @@ export function ProposalsStats({ stats }: { stats: ProposalStats }) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
-            whileHover={{ y: -4, scale: 1.01 }}
-            className="rounded-[18px] bg-gradient-to-br from-blue-400/30 via-zinc-200 to-violet-500/30 p-px shadow-sm dark:from-blue-400/35 dark:via-white/10 dark:to-violet-500/30 dark:shadow-xl dark:shadow-black/20"
+            className="group relative"
           >
-            <div className="h-full rounded-[17px] border border-zinc-200 bg-white p-4 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/80">
-              <div className="flex items-start justify-between gap-3">
-                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-2 text-blue-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-blue-200">
-                  <Icon className="size-5" />
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/20 via-zinc-200 to-violet-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-blue-400/20 dark:via-white/5 dark:to-violet-500/20 blur-sm" />
+            <div className="relative h-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-white/70 p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/40">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-white/5" />
+              
+              <div className="relative z-10">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="inline-flex rounded-2xl border border-zinc-200/60 bg-zinc-50 p-3 text-blue-600 shadow-sm dark:border-white/5 dark:bg-white/[0.03] dark:text-blue-400">
+                    <Icon className="size-5.5" />
+                  </div>
+                  <span className="rounded-xl border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+                    {card.trend}
+                  </span>
                 </div>
-                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200">
-                  {card.trend}
-                </span>
+                <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{card.label}</p>
+                <p className="mt-1.5 text-3xl font-bold text-zinc-950 dark:text-white">{card.value}</p>
               </div>
-              <p className="mt-5 text-sm text-zinc-500">{card.label}</p>
-              <p className="mt-2 text-2xl font-semibold text-zinc-950 dark:text-white">{card.value}</p>
             </div>
           </motion.div>
         )

@@ -58,6 +58,37 @@ export function JobsGrid({
     if (firstPage) onMetaChange({ total: firstPage.total, updatedAt: firstPage.updatedAt })
   }, [onMetaChange, query.data])
 
+  // Simulate Real-time Feed Updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simulate receiving a new job every 30 seconds
+      if (jobs.length > 0) {
+        queryClient.setQueriesData<{ pages: JobsResponse[] }>(
+          { queryKey: ["jobs"] },
+          (old) => {
+            if (!old) return old
+            const newJob: Job = {
+              ...jobs[Math.floor(Math.random() * jobs.length)],
+              id: `live-${Date.now()}`,
+              title: `[Live] ${jobs[Math.floor(Math.random() * jobs.length)].title.replace(/\[Live\]\s*/g, "")}`,
+              postedAt: new Date().toISOString(),
+              match: Math.floor(Math.random() * 30) + 70, // Random match 70-99
+            }
+            return {
+              ...old,
+              pages: old.pages.map((page, index) => 
+                index === 0 ? { ...page, jobs: [newJob, ...page.jobs] } : page
+              )
+            }
+          }
+        )
+        import("@/lib/toast").then(({ toast }) => toast.success("New job posted in real-time feed!"))
+      }
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [jobs, queryClient])
+
   useEffect(() => {
     const element = loadMoreRef.current
     if (!element) return

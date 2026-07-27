@@ -40,19 +40,20 @@ export function PostJobTab({
     <section className="grid gap-6 xl:grid-cols-[1fr_390px]">
       <div>
         <SectionHeader eyebrow="Smart job creation" title="Post a job" />
-        <div className="space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium">Job title</span>
+        <div className="space-y-5">
+          <label className="block group">
+            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">Job title</span>
             <input
               value={jobDraft.title}
               onChange={(event) => setJobDraft((draft) => ({ ...draft, title: event.target.value }))}
-              className="mt-2 h-10 w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-zinc-950/20 dark:border-white/10 dark:bg-white/[0.04]"
+              className="mt-2 h-11 w-full rounded-xl border border-zinc-200/80 bg-white px-4 text-sm font-medium outline-none transition-all focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 dark:border-white/10 dark:bg-zinc-900/50 dark:focus:border-violet-400 dark:focus:ring-violet-400/10 shadow-sm"
+              placeholder="e.g. Senior Frontend Developer for AI Dashboard"
             />
           </label>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
             {jobFieldOptions.map((field) => (
-              <label key={field.key} className="block">
-                <span className="text-sm font-medium">{field.label}</span>
+              <label key={field.key} className="block group">
+                <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 transition-colors group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400">{field.label}</span>
                 <select
                   value={jobDraft[field.key as keyof typeof initialJobDraft]}
                   onChange={(event) =>
@@ -61,7 +62,7 @@ export function PostJobTab({
                       [field.key]: event.target.value,
                     }))
                   }
-                  className="mt-2 h-10 w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-zinc-950/20 dark:border-white/10 dark:bg-zinc-900"
+                  className="mt-2 h-11 w-full rounded-xl border border-zinc-200/80 bg-white px-4 text-sm font-medium outline-none transition-all focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 dark:border-white/10 dark:bg-zinc-900/50 dark:focus:border-violet-400 dark:focus:ring-violet-400/10 shadow-sm appearance-none"
                 >
                   {field.options.map((option) => (
                     <option key={option}>{option}</option>
@@ -72,21 +73,21 @@ export function PostJobTab({
           </div>
 
           <div>
-            <span className="text-sm font-medium">Skill tags</span>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Skill tags</span>
+            <div className="mt-3 flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <button
                   key={skill}
                   type="button"
-                  className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-white/[0.04]"
+                  className="group flex items-center gap-1.5 rounded-full border border-violet-200/60 bg-violet-50/50 px-3 py-1.5 text-sm font-medium text-violet-800 transition-all hover:bg-violet-100 hover:border-violet-300 dark:border-violet-900/30 dark:bg-violet-900/20 dark:text-violet-300 dark:hover:bg-violet-900/40"
                   onClick={() => setSkills((items) => items.filter((item) => item !== skill))}
                 >
                   {skill}
-                  <XCircle className="size-3.5" />
+                  <XCircle className="size-4 opacity-50 transition-opacity group-hover:opacity-100" />
                 </button>
               ))}
             </div>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-4 flex gap-2">
               <input
                 value={skillDraft}
                 onChange={(event) => setSkillDraft(event.target.value)}
@@ -96,19 +97,22 @@ export function PostJobTab({
                     addSkill()
                   }
                 }}
-                placeholder="Add a skill"
-                className="h-9 min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-zinc-950/20 dark:border-white/10 dark:bg-white/[0.04]"
+                placeholder="Add a required skill..."
+                className="h-11 min-w-0 flex-1 rounded-xl border border-zinc-200/80 bg-white px-4 text-sm outline-none transition-all focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 dark:border-white/10 dark:bg-zinc-900/50 dark:focus:border-violet-400 dark:focus:ring-violet-400/10 shadow-sm"
               />
-              <Button type="button" variant="outline" onClick={addSkill}>
-                <Plus className="size-4" />
+              <Button type="button" variant="outline" onClick={addSkill} className="h-11 rounded-xl px-5 border-zinc-200/80 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-200 dark:border-white/10 dark:hover:bg-violet-900/30 dark:hover:text-violet-400 dark:hover:border-violet-800/50">
+                <Plus className="size-4 mr-1.5" />
                 Add
               </Button>
             </div>
           </div>
 
-          <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-white p-4 text-center text-sm text-zinc-500 dark:border-white/15 dark:bg-white/[0.04]">
-            <Upload className="mb-2 size-5" />
-            Upload briefs, brand files, specs, or screenshots
+          <label className="group mt-4 flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200/80 bg-zinc-50/50 p-6 text-center text-sm font-medium text-zinc-500 transition-all hover:border-violet-300 hover:bg-violet-50/50 hover:text-violet-600 dark:border-white/10 dark:bg-zinc-900/30 dark:hover:border-violet-500/50 dark:hover:bg-violet-900/20 dark:hover:text-violet-400">
+            <div className="rounded-full bg-white p-3 shadow-sm mb-3 group-hover:bg-violet-100 group-hover:shadow-md transition-all dark:bg-zinc-800 dark:group-hover:bg-violet-900/50">
+              <Upload className="size-5" />
+            </div>
+            <span className="font-semibold text-zinc-700 dark:text-zinc-300 group-hover:text-violet-700 dark:group-hover:text-violet-300">Click to upload</span> or drag and drop files
+            <span className="text-xs font-normal text-zinc-400 mt-1">Briefs, brand files, specs, or screenshots</span>
             <input
               type="file"
               multiple
@@ -121,7 +125,7 @@ export function PostJobTab({
           {attachments.length ? (
             <div className="flex flex-wrap gap-2">
               {attachments.map((name) => (
-                <Badge key={name} variant="outline" className="rounded-md">
+                <Badge key={name} variant="outline" className="rounded-md bg-white dark:bg-zinc-900">
                   {name}
                 </Badge>
               ))}
@@ -132,29 +136,33 @@ export function PostJobTab({
 
       <aside>
         <SectionHeader eyebrow="Preview" title="AI-generated details" />
-        <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-          <h3 className="text-lg font-semibold">{jobDraft.title}</h3>
-          <p className="mt-3 text-sm leading-6 text-zinc-500">
+        <div className="relative overflow-hidden rounded-2xl border border-violet-200/60 bg-gradient-to-br from-violet-50/80 via-white to-white p-6 shadow-sm dark:border-violet-900/30 dark:from-violet-950/40 dark:via-zinc-900/60 dark:to-zinc-900/40">
+          <div className="absolute top-0 right-0 h-full w-1.5 bg-gradient-to-b from-violet-500 to-indigo-500 opacity-80" />
+          
+          <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">{jobDraft.title || "Untitled Job Post"}</h3>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
             We need an experienced freelancer to build a production-ready AI chatbot with secure
             authentication, analytics, admin controls, and documented deployment.
           </p>
-          <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+          
+          <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
             {[
               ["Budget", jobDraft.budget],
               ["Timeline", jobDraft.timeline],
               ["Priority", jobDraft.priority],
               ["Experience", jobDraft.experience],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-md border border-zinc-200 p-3 dark:border-white/10">
-                <p className="text-xs text-zinc-500">{label}</p>
-                <p className="mt-1 font-medium">{value}</p>
+              <div key={label} className="rounded-xl border border-zinc-200/60 bg-white/60 p-3.5 dark:border-white/5 dark:bg-zinc-950/40 shadow-sm">
+                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</p>
+                <p className="mt-1 font-semibold text-zinc-900 dark:text-white">{value}</p>
               </div>
             ))}
           </div>
-          <div className="mt-6 flex justify-end gap-3">
-            <Button variant="outline">Save as draft</Button>
+          <div className="mt-8 flex justify-end gap-3">
+            <Button variant="outline" className="rounded-xl h-11 px-6 shadow-sm">Save as draft</Button>
             <Button
               disabled={isPending}
+              className="rounded-xl h-11 px-6 bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20 transition-all"
               onClick={() => {
                 startTransition(async () => {
                   await createJob({
@@ -184,7 +192,7 @@ export function PostJobTab({
               }}
             >
               {isPending ? "Posting..." : "Post job"}
-              <ArrowUpRight className="size-4" />
+              <ArrowUpRight className="size-4 ml-1.5" />
             </Button>
           </div>
         </div>

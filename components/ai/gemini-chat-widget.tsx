@@ -202,6 +202,15 @@ export function GeminiChatWidget() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
   }, [activeConversation?.messages, sending, open])
 
+  useEffect(() => {
+    const handleOpen = () => {
+      setOpen(true)
+      setMobilePanel("inbox")
+    }
+    window.addEventListener('open-chat-widget', handleOpen)
+    return () => window.removeEventListener('open-chat-widget', handleOpen)
+  }, [])
+
   function updateConversationMessages(
     conversationId: string,
     updater: (messages: ChatMessage[]) => ChatMessage[]
@@ -354,12 +363,8 @@ export function GeminiChatWidget() {
             className={cn(
               "grid overflow-hidden rounded-2xl border border-zinc-200/50 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl shadow-2xl shadow-zinc-950/20 dark:shadow-black/40 transition-all duration-300 ease-in-out",
               expanded
-                ? "h-[calc(100vh-2rem)] w-[calc(100vw-2rem)]"
-                : showInbox
-                  ? mobilePanel === "chat"
-                    ? "h-[min(calc(100vh-5rem),640px)] w-[min(calc(100vw-2rem),760px)] md:grid-cols-[1fr_340px]"
-                    : "h-[min(calc(100vh-5rem),640px)] w-[min(calc(100vw-2rem),380px)] grid-cols-1"
-                  : "h-[min(calc(100vh-5rem),600px)] w-[min(calc(100vw-2rem),420px)] grid-cols-1"
+                ? "h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] grid-cols-1"
+                : "h-[min(calc(100vh-5rem),560px)] w-[min(calc(100vw-2rem),380px)] grid-cols-1"
             )}
           >
             <section
@@ -368,8 +373,8 @@ export function GeminiChatWidget() {
                 mobilePanel === "chat" ? "flex" : "hidden"
               )}
             >
-              <div className="relative flex h-[72px] shrink-0 items-center gap-3 bg-gradient-to-r from-violet-600 via-violet-700 to-indigo-800 px-5 text-white overflow-hidden shadow-sm">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+              <div className="relative flex h-[72px] shrink-0 items-center gap-3 bg-gradient-to-r from-violet-600 via-violet-700 to-indigo-800 px-5 text-white shadow-sm">
+                <div className="absolute inset-0 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
                 <div className="relative z-10 grid size-10 place-items-center rounded-xl bg-white/20 backdrop-blur-sm shadow-inner border border-white/20">
                   {activeConversation.ai ? <Sparkles className="size-5" /> : <Bot className="size-5" />}
                 </div>
@@ -416,48 +421,43 @@ export function GeminiChatWidget() {
                     </div>
                   ) : null}
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className={cn(
-                    "text-white hover:bg-white/15",
-                    showInbox && "bg-white/15"
-                  )}
-                  title={showInbox ? "Hide Chat History" : "Show Chat History"}
-                  onClick={() => {
-                    setShowInbox(!showInbox)
-                    setMobilePanel(showInbox ? "chat" : "inbox")
-                  }}
-                >
-                  <History className="size-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-white hover:bg-white/15"
-                  title={expanded ? "Exit expanded view" : "Expand"}
-                  onClick={() => setExpanded((value) => !value)}
-                >
-                  <Maximize2 className="size-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-white hover:bg-white/15"
-                  title="Close chat"
-                  onClick={() => {
-                    if (showInbox) {
-                      setMobilePanel("inbox")
-                    } else {
-                      setOpen(false)
-                    }
-                  }}
-                >
-                  <X className="size-4" />
-                </Button>
+                <div className="relative z-10 flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className={cn(
+                      "text-white hover:bg-white/15",
+                      mobilePanel === "inbox" && "bg-white/15"
+                    )}
+                    title={mobilePanel === "inbox" ? "Hide Chat History" : "Show Chat History"}
+                    onClick={() => {
+                      setMobilePanel(mobilePanel === "chat" ? "inbox" : "chat")
+                    }}
+                  >
+                    <History className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-white hover:bg-white/15"
+                    title={expanded ? "Exit expanded view" : "Expand"}
+                    onClick={() => setExpanded((value) => !value)}
+                  >
+                    <Maximize2 className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-white hover:bg-white/15"
+                    title="Close chat"
+                    onClick={() => setOpen(false)}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </div>
               </div>
 
               <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto bg-zinc-50/50 dark:bg-zinc-900/30 px-5 py-6">
@@ -568,17 +568,17 @@ export function GeminiChatWidget() {
 
             <aside
               className={cn(
-                "min-h-0 flex-col bg-zinc-50/50 text-zinc-950 border-l border-zinc-100/80 transition-all",
-                mobilePanel === "inbox" ? "flex" : (showInbox ? "hidden md:flex" : "hidden")
+                "min-h-0 flex-col bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-950 dark:text-zinc-100 border-l border-zinc-200/50 dark:border-white/10 transition-all",
+                mobilePanel === "inbox" ? "flex" : "hidden"
               )}
             >
-              <div className="flex h-[60px] shrink-0 items-center gap-3 bg-zinc-950 px-5 text-white">
-                <h2 className="text-lg font-semibold">Messages</h2>
+              <div className="flex h-[72px] shrink-0 items-center gap-3 border-b border-zinc-200/50 dark:border-white/10 bg-white/50 dark:bg-zinc-950/50 px-5 backdrop-blur-md">
+                <h2 className="text-lg font-semibold tracking-wide">Messages</h2>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className={cn("ml-auto text-white hover:bg-white/10", unreadCount && "text-blue-200")}
+                  className={cn("ml-auto text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800", unreadCount && "text-violet-600 dark:text-violet-400")}
                   title="Unread messages"
                   onClick={() => setUnreadOnly((value) => !value)}
                 >
@@ -588,7 +588,7 @@ export function GeminiChatWidget() {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="text-white hover:bg-white/10"
+                  className="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   title="Collapse"
                   onClick={() => setOpen(false)}
                 >
@@ -597,21 +597,21 @@ export function GeminiChatWidget() {
               </div>
 
               <div className="shrink-0 space-y-4 p-5">
-                <label className="flex h-14 items-center gap-3 rounded-full border border-zinc-300 px-4 text-zinc-500">
-                  <Search className="size-6 text-zinc-900" />
+                <label className="flex h-12 items-center gap-3 rounded-full border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-950/50 px-4 text-zinc-500 shadow-sm focus-within:border-violet-500/50 focus-within:ring-2 focus-within:ring-violet-500/20 transition-all">
+                  <Search className="size-5 text-zinc-400" />
                   <input
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search"
-                    className="min-w-0 flex-1 bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-500"
+                    placeholder="Search messages..."
+                    className="min-w-0 flex-1 bg-transparent text-sm text-zinc-900 dark:text-zinc-100 outline-none placeholder:text-zinc-500"
                   />
                   <button
                     type="button"
-                    className={cn("grid size-8 place-items-center rounded-full", unreadOnly && "bg-blue-100 text-blue-700")}
+                    className={cn("grid size-7 place-items-center rounded-full transition-colors", unreadOnly ? "bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300" : "hover:bg-zinc-100 dark:hover:bg-zinc-800")}
                     title={unreadOnly ? "Show all messages" : "Show unread only"}
                     onClick={() => setUnreadOnly((value) => !value)}
                   >
-                    <SlidersHorizontal className="size-5" />
+                    <SlidersHorizontal className="size-4" />
                   </button>
                 </label>
 
@@ -621,8 +621,10 @@ export function GeminiChatWidget() {
                       key={tab}
                       type="button"
                       className={cn(
-                        "h-9 rounded-full border border-zinc-300 px-4 text-sm transition-colors hover:bg-zinc-100",
-                        activeTab === tab && "bg-blue-100 font-semibold text-zinc-950"
+                        "h-8 rounded-full border border-zinc-200 dark:border-white/10 px-4 text-xs font-medium transition-all",
+                        activeTab === tab 
+                          ? "bg-violet-600 text-white border-violet-600 shadow-md shadow-violet-500/20" 
+                          : "bg-white dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800"
                       )}
                       onClick={() => {
                         setActiveTab(tab)
@@ -637,49 +639,57 @@ export function GeminiChatWidget() {
 
               <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
                 {filteredConversations.length ? (
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {filteredConversations.map((conversation) => (
                       <button
                         key={conversation.id}
                         type="button"
                         className={cn(
-                          "flex w-full items-center gap-3 rounded-md px-3 py-3 text-left hover:bg-blue-100",
-                          activeId === conversation.id ? "bg-blue-200" : "bg-white"
+                          "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-200",
+                          activeId === conversation.id 
+                            ? "bg-white dark:bg-zinc-800 shadow-sm border border-zinc-200/50 dark:border-white/5" 
+                            : "border border-transparent hover:bg-white/60 dark:hover:bg-zinc-800/50"
                         )}
                         onClick={() => selectConversation(conversation)}
                       >
-                        <div className="relative grid size-12 shrink-0 place-items-center rounded-md bg-white text-blue-600 shadow-sm ring-1 ring-zinc-100">
-                          {conversation.ai ? <Sparkles className="size-7" /> : <Bot className="size-7" />}
-                          <span className="absolute -bottom-1 -right-1 rounded-full bg-white px-1.5 py-0.5 text-[11px] text-zinc-700 shadow-sm">
+                        <div className={cn(
+                          "relative grid size-11 shrink-0 place-items-center rounded-xl shadow-sm ring-1 ring-inset",
+                          conversation.ai 
+                            ? "bg-gradient-to-br from-violet-500 to-indigo-600 text-white ring-violet-500/50" 
+                            : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 ring-zinc-200 dark:ring-white/10"
+                        )}>
+                          {conversation.ai ? <Sparkles className="size-5" /> : <Bot className="size-5" />}
+                          <span className="absolute -bottom-1 -right-1 rounded-full border border-zinc-200/50 dark:border-zinc-800 bg-white dark:bg-zinc-700 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300 shadow-sm">
                             {conversation.badge}
                           </span>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex min-w-0 items-center gap-1">
-                            <p className="truncate text-sm font-semibold">{conversation.name}</p>
-                            <p className="truncate text-sm">{conversation.handle}</p>
+                          <div className="flex min-w-0 items-center justify-between gap-1 mb-0.5">
+                            <p className={cn("truncate text-sm font-semibold", conversation.unread ? "text-zinc-950 dark:text-white" : "text-zinc-800 dark:text-zinc-200")}>{conversation.name}</p>
+                            <span className="shrink-0 text-xs text-zinc-500">{conversation.date}</span>
                           </div>
-                          <p className="truncate text-sm text-zinc-800">{previewFor(conversation)}</p>
+                          <div className="flex items-center gap-2">
+                             <p className={cn("truncate text-xs", conversation.unread ? "font-medium text-zinc-800 dark:text-zinc-200" : "text-zinc-500 dark:text-zinc-400")}>{previewFor(conversation)}</p>
+                          </div>
                         </div>
-                        <div className="flex shrink-0 flex-col items-end gap-2">
-                          <span className="text-sm text-zinc-800">{conversation.date}</span>
-                          {conversation.unread ? <span className="size-2 rounded-full bg-blue-600" /> : null}
-                        </div>
+                        {conversation.unread && (
+                          <div className="shrink-0 size-2.5 rounded-full bg-violet-600 shadow-[0_0_8px_rgba(124,58,237,0.6)]" />
+                        )}
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="grid h-36 place-items-center rounded-md border border-dashed border-zinc-300 text-sm text-zinc-500">
+                  <div className="grid h-36 place-items-center rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 text-sm text-zinc-500">
                     No messages found.
                   </div>
                 )}
               </div>
 
               {activeTab === "Requests" && filteredConversations.length ? (
-                <div className="flex gap-2 border-t border-zinc-200 p-3">
+                <div className="flex gap-2 border-t border-zinc-200/50 dark:border-white/10 p-4 bg-white/50 dark:bg-zinc-950/50">
                   <Button
                     type="button"
-                    className="flex-1"
+                    className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
                     onClick={() => moveConversation(filteredConversations[0].id, "Chats")}
                   >
                     Accept
@@ -687,7 +697,7 @@ export function GeminiChatWidget() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                     onClick={() => moveConversation(filteredConversations[0].id, "Archived")}
                   >
                     Archive
@@ -696,11 +706,11 @@ export function GeminiChatWidget() {
               ) : null}
 
               {activeTab === "Archived" && filteredConversations.length ? (
-                <div className="border-t border-zinc-200 p-3">
+                <div className="border-t border-zinc-200/50 dark:border-white/10 p-4 bg-white/50 dark:bg-zinc-950/50">
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                     onClick={() => moveConversation(filteredConversations[0].id, "Chats")}
                   >
                     Restore selected chat
@@ -709,24 +719,7 @@ export function GeminiChatWidget() {
               ) : null}
             </aside>
 
-            <div className="absolute bottom-3 left-3 flex gap-2 md:hidden">
-              <Button
-                type="button"
-                size="sm"
-                variant={mobilePanel === "chat" ? "default" : "secondary"}
-                onClick={() => setMobilePanel("chat")}
-              >
-                Chat
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={mobilePanel === "inbox" ? "default" : "secondary"}
-                onClick={() => setMobilePanel("inbox")}
-              >
-                Inbox
-              </Button>
-            </div>
+            {/* Removed redundant mobile buttons since it's a single panel now */}
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
