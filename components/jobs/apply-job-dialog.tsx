@@ -1,7 +1,7 @@
 "use client"
 
 import { Bot, Link as LinkIcon, Loader2, Send, X, Clock, DollarSign, FileText } from "lucide-react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
@@ -43,6 +43,19 @@ export function ApplyJobDialog({
 
   const [isGenerating, setIsGenerating] = useState(false)
   const typingIntervalRef = useRef<number | null>(null)
+
+  // Reset state when a new job is selected
+  useEffect(() => {
+    if (job) {
+      setCoverLetter("")
+      setBudget(2500)
+      setTimeline("2 weeks")
+      setPortfolioLinks("https://subburoy.dev")
+      setResumeUrl("")
+      setIsGenerating(false)
+      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current)
+    }
+  }, [job])
 
   if (!open || !job) return null
 

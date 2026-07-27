@@ -45,7 +45,7 @@ export function JobsFilters({
             onChange={(event) => onChange({ ...filters, type: event.target.value })}
             className="h-11 rounded-xl border-zinc-200 bg-zinc-50/50 dark:border-white/10 dark:bg-zinc-950/50 text-zinc-900 dark:text-zinc-100 font-medium focus:ring-2 focus:ring-blue-500/20 transition-all"
           >
-            {["all", "Contract", "Fixed", "Full-time", "Remote"].map((item) => (
+            {["all", "Contract", "Fixed", "Full-time", "Part-time"].map((item) => (
               <option key={item} value={item} className="bg-white dark:bg-zinc-950 font-medium">{item === "all" ? "All types" : item}</option>
             ))}
           </Select>

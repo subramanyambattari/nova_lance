@@ -86,12 +86,16 @@ function postedAfter(posted: string) {
   return null
 }
 
-async function fetchJson(url: string) {
+async function fetchJson(url: string, timeoutMs = 3000) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     const response = await fetch(url, {
       headers: { "User-Agent": "Nova-Lance/1.0" },
       next: { revalidate: 120 },
+      signal: controller.signal
     })
+    clearTimeout(timeoutId);
     if (!response.ok) return null
     return response.json()
   } catch {
@@ -100,7 +104,11 @@ async function fetchJson(url: string) {
 }
 
 async function fetchExternalJobs(query: string): Promise<UnifiedJob[]> {
-  const keyword = encodeURIComponent(query || "react developer")
+  // Use a broad search term for external APIs to ensure they return a healthy pool of jobs.
+  // External APIs often fail or return 0 results on multi-word queries like "React Next.js".
+  // We will rely on our accurate local filtering (below) to refine this broad pool.
+  const broadQuery = query ? query.split(" ")[0] : "software engineer"
+  const keyword = encodeURIComponent(broadQuery)
   const [remotive, remoteOk, arbeitnow, adzuna] = await Promise.all([
     fetchJson(`https://remotive.com/api/remote-jobs?search=${keyword}`),
     fetchJson("https://remoteok.com/api"),
@@ -321,6 +329,40 @@ function fallbackInternalJobs(): UnifiedJob[] {
       source: "internal",
       postedAt: now,
       match: 88,
+    },
+    {
+      id: "demo:on-site-engineer",
+      title: "Senior Backend Engineer (On-site)",
+      company: "DataCorp Inc.",
+      description: "Join our core infrastructure team in New York to build high-throughput data pipelines.",
+      budget: 9500,
+      salary: "$140k - $160k",
+      skills: ["Go", "Python", "Kafka", "AWS"],
+      type: "Full-time",
+      experience: "Senior",
+      location: "New York, NY",
+      remote: false,
+      verifiedClient: true,
+      source: "internal",
+      postedAt: now,
+      match: 75,
+    },
+    {
+      id: "demo:hybrid-designer",
+      title: "UX/UI Designer (Hybrid)",
+      company: "Creative Solutions",
+      description: "Looking for a talented designer to work on our flagship mobile applications in a hybrid setup.",
+      budget: null,
+      salary: "$90k - $110k",
+      skills: ["Figma", "UI/UX", "Prototyping"],
+      type: "Full-time",
+      experience: "Intermediate",
+      location: "London, UK",
+      remote: false,
+      verifiedClient: false,
+      source: "internal",
+      postedAt: now,
+      match: 60,
     },
   ]
 }

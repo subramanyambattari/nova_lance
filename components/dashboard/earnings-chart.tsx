@@ -20,31 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const earningsData = [
-  { month: "Jan", earnings: 6200, target: 5400 },
-  { month: "Feb", earnings: 7600, target: 6600 },
-  { month: "Mar", earnings: 7100, target: 7200 },
-  { month: "Apr", earnings: 9800, target: 8200 },
-  { month: "May", earnings: 11200, target: 9400 },
-  { month: "Jun", earnings: 12400, target: 10200 },
-]
 
-const activityData = [
-  { day: "Mon", hours: 6.5 },
-  { day: "Tue", hours: 8 },
-  { day: "Wed", hours: 5.5 },
-  { day: "Thu", hours: 7.5 },
-  { day: "Fri", hours: 9 },
-  { day: "Sat", hours: 3.5 },
-  { day: "Sun", hours: 2 },
-]
-
-const conversionData = [
-  { stage: "Viewed", value: 42 },
-  { stage: "Shortlisted", value: 26 },
-  { stage: "Interview", value: 14 },
-  { stage: "Won", value: 8 },
-]
 
 function chartCard(title: string, badge: string, children: React.ReactNode) {
   return (
@@ -58,7 +34,46 @@ function chartCard(title: string, badge: string, children: React.ReactNode) {
   )
 }
 
-export function EarningsChart() {
+export function EarningsChart({ initialStats }: { initialStats?: any }) {
+  const earningsData = initialStats?.earningsTrend || [
+    { month: "Jan", earnings: 0, target: 5400 },
+    { month: "Feb", earnings: 0, target: 6600 },
+  ]
+  
+  // Format earnings to match chart expected keys
+  const displayEarningsData = earningsData.map((d: any) => ({
+    month: d.month,
+    earnings: d.paid || d.earnings || 0,
+    target: d.booked || d.target || 0
+  }))
+
+  const activityData = initialStats?.weeklyChart || [
+    { day: "Mon", hours: 0 },
+  ]
+  
+  // Format activity
+  const displayActivityData = activityData.map((d: any) => ({
+    day: d.day,
+    hours: d.value || d.hours || 0
+  }))
+
+  const conversionData = initialStats?.proposalStats || [
+    { stage: "Viewed", value: 0 },
+    { stage: "Shortlisted", value: 0 },
+    { stage: "Interview", value: 0 },
+    { stage: "Won", value: 0 },
+  ]
+
+  // Calculate close rate for badge
+  const won = conversionData.find((d: any) => d.stage === "Won" || d.name === "Won")?.value || 0
+  const viewed = conversionData.find((d: any) => d.stage === "Viewed" || d.name === "Viewed")?.value || 1
+  const closeRate = Math.round((won / (viewed || 1)) * 100)
+
+  // Map "name" to "stage" for the chart if needed
+  const displayConversionData = conversionData.map((d: any) => ({
+    stage: d.name || d.stage,
+    value: d.value
+  }))
   const [mounted, setMounted] = useState(false)
   const tooltipStyle = {
     background: "rgba(9, 9, 11, 0.94)",
@@ -98,7 +113,7 @@ export function EarningsChart() {
           "Earnings overview",
           "+18.7%",
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <AreaChart data={earningsData} margin={{ left: -18, right: 8 }}>
+            <AreaChart data={displayEarningsData} margin={{ left: -18, right: 8 }}>
               <defs>
                 <linearGradient id="earningsFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.45} />
@@ -117,9 +132,9 @@ export function EarningsChart() {
       </div>
       {chartCard(
         "Weekly activity",
-        "128h",
+        `${initialStats?.hoursWorked || 128}h`,
         <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-          <BarChart data={activityData}>
+          <BarChart data={displayActivityData}>
             <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
             <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />
@@ -131,9 +146,9 @@ export function EarningsChart() {
       <div className="xl:col-span-3">
         {chartCard(
           "Proposal conversion",
-          "19% close rate",
+          `${closeRate}% close rate`,
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <LineChart data={conversionData} margin={{ left: -18, right: 12 }}>
+            <LineChart data={displayConversionData} margin={{ left: -18, right: 12 }}>
               <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
               <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 12 }} />

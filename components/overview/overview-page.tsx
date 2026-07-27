@@ -232,6 +232,30 @@ export function OverviewPage({ stats }: { stats?: any }) {
 
   const displayPipeline = stats ? stats.pipeline : pipeline;
   const displayActiveWork = stats ? stats.activeWork : activeWork;
+  const displayEarningsTrend = stats && stats.earningsTrend ? stats.earningsTrend : earningsTrend;
+  const displayPriorityActions = stats && stats.priorityActions ? stats.priorityActions : priorityActions;
+  const displayClientActivity = stats && stats.clientActivity && stats.clientActivity.length > 0 ? stats.clientActivity : messages;
+  const unreadMessagesCount = stats?.unreadMessagesCount ?? 3;
+  const healthScore = stats?.healthScore ?? 86;
+  const nextDeadline = stats?.nextDeadline ?? { value: "Today, 6:00 PM", detail: "Mobile onboarding scope update" };
+  const waitingProposals = stats?.waitingProposals ?? 3;
+  const userName = stats?.userName ? stats.userName.split(" ")[0] : "there";
+
+  const currentDateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const currentHour = new Date().getHours();
+  
+  let greeting = "Good evening";
+  if (currentHour < 12) greeting = "Good morning";
+  else if (currentHour < 17) greeting = "Good afternoon";
+
+  let subHeadline = "See what needs attention, where money is moving, and how your pipeline is converting.";
+  if (unreadMessagesCount > 0) {
+    subHeadline = `You have ${unreadMessagesCount} unread message${unreadMessagesCount > 1 ? 's' : ''} waiting. Let's see what needs attention today.`;
+  } else if (displayPriorityActions.some((a: any) => a.badge === "Today")) {
+    subHeadline = "You have upcoming deadlines. Here is your workspace overview for today.";
+  } else if (displayPriorityActions.some((a: any) => a.badge === "Ready")) {
+    subHeadline = "You have funds ready to withdraw! Here is your workspace overview.";
+  }
 
   return (
     <div className="min-h-screen overflow-hidden bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
@@ -249,14 +273,14 @@ export function OverviewPage({ stats }: { stats?: any }) {
                 Main overview
               </Badge>
               <Badge variant="outline" className="border-zinc-200/80 bg-zinc-50/80 text-zinc-700 dark:border-white/10 dark:bg-zinc-950/50 dark:text-zinc-300 px-3 py-1 text-sm font-semibold shadow-sm">
-                May 21, 2026
+                {currentDateStr}
               </Badge>
             </div>
             <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white sm:text-4xl lg:text-5xl">
-              Command center for your freelance business
+              {greeting}, {userName}
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base font-medium">
-              See what needs attention, where money is moving, which clients are active, and how the pipeline is converting across Nova Lance.
+              {subHeadline}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="h-11 rounded-xl bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 transition-all px-6">
@@ -282,13 +306,13 @@ export function OverviewPage({ stats }: { stats?: any }) {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Workspace health</p>
-                <p className="mt-1 text-3xl font-bold text-zinc-950 dark:text-white">86%</p>
+                <p className="mt-1 text-3xl font-bold text-zinc-950 dark:text-white">{healthScore}%</p>
               </div>
               <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 shadow-sm">
                 <TrendingUp className="size-6" />
               </span>
             </div>
-            <Progress value={86} className="mt-5 h-2.5 bg-zinc-200 dark:bg-zinc-800" />
+            <Progress value={healthScore} className="mt-5 h-2.5 bg-zinc-200 dark:bg-zinc-800" />
             <div className="mt-6 grid grid-cols-3 gap-3 text-sm">
               {[
                 ["Reply", "12m"],
@@ -332,12 +356,12 @@ export function OverviewPage({ stats }: { stats?: any }) {
               </Badge>
             </CardHeader>
             <CardContent className="relative z-10 space-y-4 pt-5">
-              {priorityActions.map((item) => (
+              {displayPriorityActions.map((item: any) => (
                 <div key={item.title} className="group rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 transition-all hover:border-amber-200 hover:shadow-md dark:border-white/10 dark:bg-zinc-950/40 dark:hover:border-amber-500/30 dark:hover:bg-zinc-900/80">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex min-w-0 gap-4">
                       <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white text-zinc-700 shadow-sm dark:bg-white/[0.04] dark:text-zinc-200">
-                        <item.icon className="size-5.5" />
+                        {item.icon ? <item.icon className="size-5.5" /> : <ShieldCheck className="size-5.5" />}
                       </span>
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2.5">
@@ -450,13 +474,13 @@ export function OverviewPage({ stats }: { stats?: any }) {
               <CardTitle className="text-lg font-bold text-zinc-950 dark:text-zinc-100">Client activity</CardTitle>
               <Badge variant="outline" className="gap-1.5 border-zinc-200/80 bg-zinc-50/80 font-semibold text-zinc-700 shadow-sm dark:border-white/10 dark:bg-zinc-950/50 dark:text-zinc-300">
                 <Bell className="size-3.5" />
-                3 unread
+                {unreadMessagesCount} unread
               </Badge>
             </CardHeader>
             <CardContent className="relative z-10 space-y-4 pt-5">
-              {messages.map((item) => (
+              {displayClientActivity.map((item: any) => (
                 <Link
-                  key={item.name}
+                  key={item.name + item.time}
                   href="/messages"
                   className="group flex items-center gap-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 transition-all hover:border-sky-200 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-zinc-950/40 dark:hover:border-sky-500/30 dark:hover:bg-zinc-900/80"
                 >
@@ -488,7 +512,7 @@ export function OverviewPage({ stats }: { stats?: any }) {
             <CardContent className="relative z-10 h-80 min-h-0 min-w-0 pt-5">
               {mounted ? (
                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                  <AreaChart data={earningsTrend} margin={{ left: -16, right: 8 }}>
+                  <AreaChart data={displayEarningsTrend} margin={{ left: -16, right: 8 }}>
                     <defs>
                       <linearGradient id="overviewBooked" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.38} />
@@ -538,8 +562,8 @@ export function OverviewPage({ stats }: { stats?: any }) {
 
         <section className="grid gap-5 md:grid-cols-3">
           {[
-            { title: "Next deadline", value: "Today, 6:00 PM", detail: "Mobile onboarding scope update", icon: CalendarClock },
-            { title: "Proposal response", value: "3 waiting", detail: "Average reply time is 12 minutes", icon: Clock3 },
+            { title: "Next deadline", value: nextDeadline.value, detail: nextDeadline.detail, icon: CalendarClock },
+            { title: "Proposal response", value: `${waitingProposals} waiting`, detail: "Average reply time is 12 minutes", icon: Clock3 },
             { title: "Account readiness", value: "Verified", detail: "Profile, payout, and billing are active", icon: CheckCircle2 },
           ].map((item) => (
             <Card key={item.title} className="group overflow-hidden rounded-3xl border-zinc-200/80 bg-white shadow-sm backdrop-blur-xl transition-all hover:shadow-md dark:border-white/10 dark:bg-zinc-900/40">

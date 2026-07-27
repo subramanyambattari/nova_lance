@@ -2,7 +2,7 @@
 
 import { Dialog as DialogPrimitive } from "radix-ui"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Paperclip, Save, Send, Sparkles, X } from "lucide-react"
+import { Check, Loader2, Paperclip, Save, Send, Sparkles, X, AlertCircle } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -83,6 +83,14 @@ export function CreateProposalDialog({
 }) {
   const [attachments, setAttachments] = useState<ProposalAttachmentItem[]>([])
   const [aiLoading, setAiLoading] = useState(false)
+  
+  // Real-time features state
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [jobDetails, setJobDetails] = useState<{ title: string; budget: number } | null>(null)
+  const [jobLoading, setJobLoading] = useState(false)
+  const [jobError, setJobError] = useState(false)
+
   const isEditing = Boolean(proposal)
 
   const defaults = useMemo<ProposalForm>(() => {
@@ -112,25 +120,87 @@ export function CreateProposalDialog({
     resolver: zodResolver(draftSchema),
     defaultValues: defaults,
   })
-  const coverLetter = form.watch("coverLetter") ?? ""
 
+  const coverLetter = form.watch("coverLetter") ?? ""
+  const watchedJobId = form.watch("jobId")
+  const watchedBudget = form.watch("budget")
+
+  // Character count & Progress bar logic
+  const charCount = coverLetter.length
+  const minSubmitChars = 80
+  const progressPercent = Math.min((charCount / minSubmitChars) * 100, 100)
+  const progressColor = charCount >= minSubmitChars ? "bg-emerald-400" : charCount >= 20 ? "bg-blue-400" : "bg-zinc-600"
+
+  // 1. Initial Load & Hydrate
   useEffect(() => {
     if (!open) return
-
     const localDraft = !proposal ? localStorage.getItem(draftKey) : null
     form.reset(localDraft ? JSON.parse(localDraft) : defaults)
     setAttachments(proposal?.attachments ?? [])
   }, [defaults, form, open, proposal])
 
+  // 2. Real-Time Saving Indicator
   useEffect(() => {
     if (!open || proposal) return
+    setIsSaving(true)
+    const timer = setTimeout(() => {
+      const values = form.getValues()
+      localStorage.setItem(draftKey, JSON.stringify(values))
+      setLastSaved(new Date())
+      setIsSaving(false)
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [coverLetter, watchedBudget, watchedJobId, form.watch("timeline"), open, proposal]) // watch key fields
 
-    const subscription = form.watch((value) => {
-      localStorage.setItem(draftKey, JSON.stringify(value))
-    })
+  // 3. Smart Timeline Suggestion
+  useEffect(() => {
+    if (watchedBudget && !Number.isNaN(watchedBudget)) {
+      let suggestedTimeline = "2 weeks"
+      if (watchedBudget < 1000) suggestedTimeline = "1 week"
+      else if (watchedBudget > 5000) suggestedTimeline = "1 month"
+      
+      const currentTimeline = form.getValues("timeline")
+      if (currentTimeline !== suggestedTimeline) {
+        form.setValue("timeline", suggestedTimeline, { shouldValidate: true })
+      }
+    }
+  }, [watchedBudget, form])
 
-    return () => subscription.unsubscribe()
-  }, [form, open, proposal])
+  // 4. Live Job Details Fetching
+  useEffect(() => {
+    if (!watchedJobId || watchedJobId.length < 5) {
+      setJobDetails(null)
+      setJobError(false)
+      return
+    }
+
+    const fetchJob = async () => {
+      setJobLoading(true)
+      setJobError(false)
+      try {
+        const res = await fetch(`/api/jobs/${watchedJobId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setJobDetails(data)
+          if (data.budget && !form.getValues("budget")) {
+            form.setValue("budget", data.budget, { shouldValidate: true })
+          }
+        } else {
+          setJobDetails(null)
+          setJobError(true)
+        }
+      } catch (err) {
+        setJobDetails(null)
+        setJobError(true)
+      } finally {
+        setJobLoading(false)
+      }
+    }
+
+    const timer = setTimeout(fetchJob, 1000)
+    return () => clearTimeout(timer)
+  }, [watchedJobId, form])
+
 
   function applyValidationErrors(error: z.ZodError<ProposalForm>) {
     const firstIssue = error.issues[0]
@@ -233,9 +303,28 @@ export function CreateProposalDialog({
         <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 grid max-h-[90vh] w-[calc(100vw-2rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950 p-5 text-zinc-100 shadow-2xl shadow-black/60 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <DialogPrimitive.Title className="text-xl font-semibold text-white">
-                {isEditing ? "Edit proposal" : "Create proposal"}
-              </DialogPrimitive.Title>
+              <div className="flex items-center gap-3">
+                <DialogPrimitive.Title className="text-xl font-semibold text-white">
+                  {isEditing ? "Edit proposal" : "Create proposal"}
+                </DialogPrimitive.Title>
+                
+                {/* Real-time Draft Saving Indicator */}
+                {!isEditing && (
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="size-3 animate-spin text-blue-400" />
+                        Saving draft...
+                      </>
+                    ) : lastSaved ? (
+                      <>
+                        <Check className="size-3 text-emerald-400" />
+                        Draft saved
+                      </>
+                    ) : null}
+                  </div>
+                )}
+              </div>
               <DialogPrimitive.Description className="mt-1 text-sm text-zinc-500">
                 Save as a draft or submit when the proposal is ready for the client.
               </DialogPrimitive.Description>
@@ -247,12 +336,27 @@ export function CreateProposalDialog({
             </DialogPrimitive.Close>
           </div>
 
-          <form className="grid gap-4" onSubmit={(event) => event.preventDefault()}>
+          <form className="grid gap-4 pb-16" onSubmit={(event) => event.preventDefault()}>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Job ID or reference</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Job ID or reference</Label>
+                  {jobLoading && <Loader2 className="size-3.5 animate-spin text-zinc-400" />}
+                </div>
                 <Input {...form.register("jobId")} className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-100" />
-                {form.formState.errors.jobId ? <p className="text-xs text-rose-300">{form.formState.errors.jobId.message}</p> : null}
+                {form.formState.errors.jobId && <p className="text-xs text-rose-300">{form.formState.errors.jobId.message}</p>}
+                
+                {/* Real-time Job Lookup Result */}
+                {jobDetails && (
+                  <p className="flex items-center gap-1.5 text-xs text-emerald-400">
+                    <Check className="size-3.5" /> Found: {jobDetails.title} (${jobDetails.budget})
+                  </p>
+                )}
+                {jobError && (
+                  <p className="flex items-center gap-1.5 text-xs text-rose-400">
+                    <AlertCircle className="size-3.5" /> Job not found in database.
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>External job URL</Label>
@@ -269,19 +373,33 @@ export function CreateProposalDialog({
                   {aiLoading ? "Thinking..." : "AI improve"}
                 </Button>
               </div>
-              <Textarea
-                {...form.register("coverLetter")}
-                aria-invalid={Boolean(form.formState.errors.coverLetter)}
-                className="min-h-44 rounded-xl border-white/10 bg-white/[0.04] text-zinc-100 placeholder:text-zinc-600"
-                placeholder="Describe your relevant experience, delivery plan, communication cadence, and outcomes..."
-              />
+              <div className="relative">
+                <Textarea
+                  {...form.register("coverLetter")}
+                  aria-invalid={Boolean(form.formState.errors.coverLetter)}
+                  className="min-h-44 rounded-xl border-white/10 bg-white/[0.04] text-zinc-100 placeholder:text-zinc-600 pb-8"
+                  placeholder="Describe your relevant experience, delivery plan, communication cadence, and outcomes..."
+                />
+                
+                {/* Live Character Count Progress Bar */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                    <div 
+                      className={`h-full transition-all duration-300 ease-out ${progressColor}`} 
+                      style={{ width: `${progressPercent}%` }} 
+                    />
+                  </div>
+                  <span className={`ml-3 text-xs ${charCount >= minSubmitChars ? "text-emerald-400" : "text-zinc-500"}`}>
+                    {charCount}/{minSubmitChars}
+                  </span>
+                </div>
+              </div>
               {form.formState.errors.coverLetter ? <p className="text-xs text-rose-300">{form.formState.errors.coverLetter.message}</p> : null}
-              <p className="text-xs text-zinc-500">Drafts allow 20+ characters. Submitted proposals require 80+ characters.</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Budget</Label>
+                <Label>Budget (auto-adjusts timeline)</Label>
                 <Input type="number" {...form.register("budget", { valueAsNumber: true })} className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-100" />
                 {form.formState.errors.budget ? <p className="text-xs text-rose-300">{form.formState.errors.budget.message}</p> : null}
               </div>
@@ -313,7 +431,7 @@ export function CreateProposalDialog({
                 <Label>Attachment URL</Label>
                 <div className="flex gap-2">
                   <Input {...form.register("attachmentUrl")} placeholder="https://..." className="rounded-xl border-white/10 bg-white/[0.04] text-zinc-100 placeholder:text-zinc-600" />
-                  <Button type="button" variant="outline" onClick={addAttachment} className="rounded-xl">
+                  <Button type="button" variant="outline" onClick={addAttachment} className="rounded-xl border-white/10">
                     <Paperclip className="size-4" />
                   </Button>
                 </div>
@@ -336,11 +454,11 @@ export function CreateProposalDialog({
           </form>
 
           <div className="sticky bottom-0 -mx-5 -mb-5 flex flex-col-reverse gap-3 border-t border-white/10 bg-zinc-950/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" disabled={loading} onClick={() => submitProposal(false)} className="rounded-xl">
+            <Button type="button" variant="outline" disabled={loading} onClick={() => submitProposal(false)} className="rounded-xl border-white/10 hover:bg-white/5">
               {loading ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
               Save draft
             </Button>
-            <Button type="button" disabled={loading || coverLetter.trim().length < 80} onClick={() => submitProposal(true)} className="rounded-xl bg-white text-zinc-950 hover:bg-blue-100">
+            <Button type="button" disabled={loading || charCount < minSubmitChars} onClick={() => submitProposal(true)} className="rounded-xl bg-white text-zinc-950 hover:bg-blue-100 disabled:opacity-50">
               {loading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
               Submit proposal
             </Button>

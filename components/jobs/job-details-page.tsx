@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"
 
 import { ApplyJobDialog, type ProposalPayload } from "@/components/jobs/apply-job-dialog"
 import { JobsQueryProvider } from "@/components/jobs/query-provider"
-import type { Job } from "@/components/jobs/types"
+import type { Job, JobsResponse } from "@/components/jobs/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,7 +32,47 @@ async function fetchJob(id: string) {
 function DetailsContent({ id }: { id: string }) {
   const [applyOpen, setApplyOpen] = useState(false)
   const queryClient = useQueryClient()
-  const query = useQuery({ queryKey: ["job", id], queryFn: () => fetchJob(id) })
+  
+  const query = useQuery({ 
+    queryKey: ["job", id], 
+    queryFn: async () => {
+      if (id.startsWith("live-")) {
+        const jobsData = queryClient.getQueryData<{ pages: JobsResponse[] }>(["jobs", { q: "", remoteOnly: true, experience: "all", type: "all", minBudget: 0, skills: "", posted: "any", verified: false }]) || queryClient.getQueryData<{ pages: JobsResponse[] }>(["jobs"]);
+        
+        // Search across all "jobs" queries in the cache to find the live job
+        const queries = queryClient.getQueriesData<{ pages: JobsResponse[] }>({ queryKey: ["jobs"] });
+        let cachedJob = null;
+        for (const [_, data] of queries) {
+          const found = data?.pages?.flatMap(p => p.jobs).find(j => j.id === id);
+          if (found) {
+            cachedJob = found;
+            break;
+          }
+        }
+
+        if (cachedJob) return cachedJob as JobDetail;
+        
+        return {
+          id,
+          title: "Real-time Simulated Role",
+          company: "Confidential Client",
+          description: "This is a real-time generated job. Full description is unavailable because this is a simulated feed item.",
+          budget: null,
+          salary: "Competitive",
+          skills: ["Remote Work", "Communication"],
+          type: "Full-time",
+          experience: "Any",
+          location: "Remote",
+          remote: true,
+          verifiedClient: true,
+          source: "internal",
+          postedAt: new Date().toISOString(),
+          match: 95
+        } as JobDetail;
+      }
+      return fetchJob(id)
+    }
+  })
   
   useEffect(() => {
     const handleProposalUpdate = (e: Event) => {

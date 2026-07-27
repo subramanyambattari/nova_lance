@@ -25,15 +25,16 @@ const initialFilters: JobFilters = {
 
 function FindJobsContent() {
   const [filters, setFilters] = useState(initialFilters)
+  const [debouncedFilters, setDebouncedFilters] = useState(initialFilters)
   const [search, setSearch] = useState(initialFilters.q)
   const [meta, setMeta] = useState<{ total: number; updatedAt?: string }>({ total: 0 })
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      setFilters((current) => ({ ...current, q: search }))
-    }, 350)
+      setDebouncedFilters((current) => ({ ...current, ...filters, q: search }))
+    }, 400)
     return () => window.clearTimeout(timeout)
-  }, [search])
+  }, [search, filters])
 
   const handleMetaChange = useCallback((nextMeta: { total: number; updatedAt?: string }) => {
     setMeta(nextMeta)
@@ -51,7 +52,7 @@ function FindJobsContent() {
         <JobsFilters filters={filters} onChange={setFilters} />
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
           <div>
-            <JobsGrid filters={filters} onMetaChange={handleMetaChange} />
+            <JobsGrid filters={debouncedFilters} onMetaChange={handleMetaChange} />
           </div>
           <aside className="space-y-4">
             <RecommendedJobs />
