@@ -2,8 +2,9 @@ import { Download, Plus, Sparkles } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
-export function DashboardHeader() {
+export function DashboardHeader({ onTabChange }: { onTabChange?: (tab: string) => void }) {
   return (
     <header className="grid gap-5 border-b border-zinc-200 pb-6 dark:border-white/10 lg:grid-cols-[1fr_360px]">
       <div className="flex min-w-0 flex-col justify-end">
@@ -26,15 +27,18 @@ export function DashboardHeader() {
           tracking spend, and getting real-time AI hiring guidance.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button>
+          <Button onClick={() => onTabChange?.("post")}>
             <Plus className="size-4" />
             Post job
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => onTabChange?.("ai")}>
             <Sparkles className="size-4" />
             Ask Nova
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => {
+            toast.success("Downloading Monthly Report...")
+            onTabChange?.("analytics")
+          }}>
             <Download className="size-4" />
             Monthly report
           </Button>

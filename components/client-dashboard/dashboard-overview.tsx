@@ -1,5 +1,6 @@
-import { ArrowUpRight, Sparkles, Briefcase, FileText, CheckCircle, CreditCard } from "lucide-react"
+import { ArrowUpRight, Sparkles, Briefcase, FileText, CheckCircle, CreditCard, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { ProgressBar, SectionHeader, StatusBadge } from "./ui-components"
 import { activity, deadlines } from "./data"
@@ -74,7 +75,12 @@ export function DashboardOverview({ jobsState, stats = { totalJobsPosted: 0, act
                         {contract.client} • Due {contract.due}
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        // Normally this would navigate to the contract details or operations tab
+                        toast.success(`Opened contract: ${contract.project}`)
+                      }
+                    }}>
                       <ArrowUpRight className="size-4" />
                       Open
                     </Button>
@@ -86,7 +92,18 @@ export function DashboardOverview({ jobsState, stats = { totalJobsPosted: 0, act
                 </div>
               ))
             ) : (
-              <p className="text-sm text-zinc-500">No active contracts found. Hire a freelancer to get started!</p>
+              <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center bg-zinc-50/50 dark:bg-zinc-900/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mb-4">
+                  <Search className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">No active contracts</h3>
+                <p className="mt-2 text-sm text-zinc-500 max-w-sm mb-6">
+                  You don't have any ongoing projects right now. Post a new job or browse talent to get started!
+                </p>
+                <Button onClick={() => window.location.href = '/post-project'} className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Post a Project
+                </Button>
+              </div>
             )}
           </div>
         </div>

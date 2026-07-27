@@ -14,6 +14,7 @@ import {
   Zap,
   CheckCircle2,
   XCircle,
+  Trash2,
 } from "lucide-react"
 import { useMemo, useState, useTransition, useEffect } from "react"
 import { usePathname } from "next/navigation"
@@ -25,7 +26,7 @@ import { AIWorkspace } from "./ai-workspace"
 import { TalentMatches } from "./talent-matches"
 import { toast } from "@/lib/toast"
 
-import { duplicateJob, updateJobStatus, updateProposalStatus } from "@/app/actions/client"
+import { duplicateJob, updateJobStatus, updateProposalStatus, deleteJob } from "@/app/actions/client"
 
 import { DashboardHeader } from "./dashboard-header"
 import { DashboardOverview } from "./dashboard-overview"
@@ -145,7 +146,7 @@ export function ClientDashboardPage({
     <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100 flex">
       <main className="flex-1 overflow-auto">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
-          <DashboardHeader />
+          <DashboardHeader onTabChange={handleTabChange} />
 
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             <TabsContent value="overview" className="space-y-8">
@@ -185,9 +186,9 @@ export function ClientDashboardPage({
                   }
                 />
                 <div className="grid gap-3 lg:grid-cols-2">
-                  {jobsState.map((job) => (
+                  {jobsState.map((job, i) => (
                     <div
-                      key={job.title}
+                      key={job.id ? String(job.id) : `${job.title}-${i}`}
                       className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]"
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -282,6 +283,24 @@ export function ClientDashboardPage({
                         >
                           <RefreshCw className="size-4" />
                           Reopen
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isPending}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          onClick={() => {
+                            startTransition(async () => {
+                              if (job.id) {
+                                await deleteJob(job.id)
+                              }
+                              setJobsState((prev) => prev.filter((j) => j !== job))
+                              toast.success(`Deleted job: ${job.title}`)
+                            })
+                          }}
+                        >
+                          <Trash2 className="size-4" />
+                          Delete
                         </Button>
                       </div>
                     </div>
@@ -638,7 +657,8 @@ export function ClientDashboardPage({
                       <button
                         key={item}
                         type="button"
-                        className="flex w-full items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 text-left text-sm shadow-sm dark:border-white/10 dark:bg-white/[0.04]"
+                        onClick={() => toast.success(`Opened ${item} settings`)}
+                        className="flex w-full items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 text-left text-sm shadow-sm hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] transition-colors"
                       >
                         <Settings className="size-4 text-zinc-500" />
                         {item}

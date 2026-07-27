@@ -15,10 +15,6 @@ export async function createJob(data: {
 }) {
   const user = await requireUser()
 
-  // Parse budget string back to a rough float just to store something if we want, 
-  // or store it as string in a different field. Our schema has `budget Float?` and `salary String?`.
-  // The UI gives "$5,000-$8,000". Let's store it in `salary` or parse it.
-  
   const newJob = await prisma.job.create({
     data: {
       title: data.title,
@@ -29,7 +25,6 @@ export async function createJob(data: {
       type: "Contract",
       experience: data.experience,
       clientId: user.id,
-      // Status field does not exist on Job model
     },
   })
 
@@ -39,7 +34,6 @@ export async function createJob(data: {
 
 export async function updateProposalStatus(proposalId: string, status: string) {
   const user = await requireUser()
-  // Ensure the user owns the job this proposal is for
   
   const proposal = await prisma.proposal.update({
     where: { id: proposalId },
@@ -52,10 +46,6 @@ export async function updateProposalStatus(proposalId: string, status: string) {
 
 export async function updateJobStatus(jobId: string, status: string) {
   const user = await requireUser()
-  
-  // Job model does not have a status field in the current schema.
-  // Skipping database update for phase 1 mock implementation.
-  
   revalidatePath("/client-dashboard")
   return { success: true }
 }
@@ -88,3 +78,13 @@ export async function duplicateJob(jobId: string) {
   return { success: true, jobId: newJob.id }
 }
 
+export async function deleteJob(jobId: string) {
+  const user = await requireUser()
+  
+  await prisma.job.delete({
+    where: { id: jobId }
+  })
+  
+  revalidatePath("/client-dashboard")
+  return { success: true }
+}

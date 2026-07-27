@@ -352,7 +352,7 @@ export function GeminiChatWidget() {
             exit={{ opacity: 0, y: 18, scale: 0.98 }}
             transition={{ duration: 0.18 }}
             className={cn(
-              "grid overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-2xl shadow-zinc-950/20 transition-all duration-300 ease-in-out",
+              "grid overflow-hidden rounded-2xl border border-zinc-200/50 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl shadow-2xl shadow-zinc-950/20 dark:shadow-black/40 transition-all duration-300 ease-in-out",
               expanded
                 ? "h-[calc(100vh-2rem)] w-[calc(100vw-2rem)]"
                 : showInbox
@@ -368,17 +368,18 @@ export function GeminiChatWidget() {
                 mobilePanel === "chat" ? "flex" : "hidden"
               )}
             >
-              <div className="flex h-[60px] shrink-0 items-center gap-3 bg-violet-600 px-4 text-white">
-                <div className="grid size-9 place-items-center rounded-md bg-white/15">
+              <div className="relative flex h-[72px] shrink-0 items-center gap-3 bg-gradient-to-r from-violet-600 via-violet-700 to-indigo-800 px-5 text-white overflow-hidden shadow-sm">
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+                <div className="relative z-10 grid size-10 place-items-center rounded-xl bg-white/20 backdrop-blur-sm shadow-inner border border-white/20">
                   {activeConversation.ai ? <Sparkles className="size-5" /> : <Bot className="size-5" />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">
-                    {activeConversation.name} {activeConversation.handle}
+                  <p className="truncate text-sm font-bold tracking-wide">
+                    {activeConversation.name} <span className="font-medium opacity-80">{activeConversation.handle}</span>
                   </p>
-                  <p className="truncate text-xs text-violet-100">{activeConversation.subtitle}</p>
+                  <p className="truncate text-[11px] uppercase tracking-wider text-violet-100/90 font-semibold">{activeConversation.subtitle}</p>
                 </div>
-                <div className="relative">
+                <div className="relative z-10">
                   <Button
                     type="button"
                     variant="ghost"
@@ -459,8 +460,8 @@ export function GeminiChatWidget() {
                 </Button>
               </div>
 
-              <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto bg-white px-4 py-5">
-                <div className="space-y-4">
+              <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto bg-zinc-50/50 dark:bg-zinc-900/30 px-5 py-6">
+                <div className="space-y-6">
                   {activeConversation.messages.map((message) => {
                     const mine = message.role === "user"
 
@@ -468,14 +469,14 @@ export function GeminiChatWidget() {
                       <div key={message.id} className={cn("flex", mine && "justify-end")}>
                         <div
                           className={cn(
-                            "max-w-[82%] rounded-lg px-3.5 py-2.5 text-sm leading-6 shadow-sm",
+                            "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm transition-all",
                             mine
-                              ? "rounded-br-sm bg-blue-600 text-white"
-                              : "rounded-bl-sm bg-zinc-100 text-zinc-950"
+                              ? "rounded-br-sm bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-violet-500/20"
+                              : "rounded-bl-sm bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-white/5 text-zinc-900 dark:text-zinc-100 shadow-zinc-200/20 dark:shadow-black/20"
                           )}
                         >
                           <p className="whitespace-pre-wrap break-words">{message.content}</p>
-                          <p className={cn("mt-2 text-right text-[11px]", mine ? "text-blue-100" : "text-zinc-600")}>
+                          <p className={cn("mt-2 text-right text-[10px] font-medium tracking-wide", mine ? "text-violet-200" : "text-zinc-400")}>
                             {timeLabel(message.createdAt)}
                           </p>
                         </div>
@@ -483,17 +484,17 @@ export function GeminiChatWidget() {
                     )
                   })}
                   {sending ? (
-                    <div className="flex">
-                      <div className="inline-flex items-center gap-2 rounded-lg rounded-bl-sm bg-zinc-100 px-3.5 py-2.5 text-sm text-zinc-700">
-                        <Loader2 className="size-4 animate-spin" />
-                        Nova is typing
+                      <div className="flex">
+                        <div className="inline-flex items-center gap-3 rounded-2xl rounded-bl-sm bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-white/5 px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300 shadow-sm">
+                          <Loader2 className="size-4 animate-spin text-violet-600" />
+                          <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent font-medium animate-pulse">Nova is thinking...</span>
+                        </div>
                       </div>
-                    </div>
                   ) : null}
                 </div>
               </div>
 
-              <form onSubmit={(event) => void submitMessage(event)} className="shrink-0 border-t border-blue-500 bg-white p-3">
+              <form onSubmit={(event) => void submitMessage(event)} className="shrink-0 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md p-4 border-t border-zinc-100 dark:border-white/10">
                 {attachmentName ? (
                   <div className="mb-2 flex items-center justify-between gap-3 rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-900">
                     <span className="min-w-0 truncate">{attachmentName}</span>
@@ -522,8 +523,8 @@ export function GeminiChatWidget() {
                   <input
                     value={draft}
                     onChange={(event) => setDraft(event.target.value)}
-                    placeholder="Type a message"
-                    className="h-10 min-w-0 flex-1 bg-transparent text-sm text-zinc-950 outline-none placeholder:text-zinc-400"
+                    placeholder="Ask Nova anything..."
+                    className="h-11 min-w-0 flex-1 rounded-full bg-zinc-100 dark:bg-zinc-900 px-4 text-sm text-zinc-950 dark:text-zinc-100 outline-none transition-all placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500/50"
                   />
                   <Button type="button" variant="ghost" size="icon" className="text-zinc-700" title="Voice" onClick={startVoiceInput}>
                     <Mic className="size-5" />
@@ -552,9 +553,13 @@ export function GeminiChatWidget() {
                     {sending ? (
                       <Loader2 className="size-5 animate-spin" />
                     ) : draft.trim() || attachmentName ? (
-                      <Send className="size-5" />
+                      <div className="grid size-8 place-items-center rounded-full bg-violet-600 text-white shadow-md hover:bg-violet-700 transition-colors">
+                        <Send className="size-4" />
+                      </div>
                     ) : (
-                      <ThumbsUp className="size-5" />
+                      <div className="grid size-8 place-items-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+                        <ThumbsUp className="size-4" />
+                      </div>
                     )}
                   </Button>
                 </div>
@@ -727,13 +732,13 @@ export function GeminiChatWidget() {
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
             <Button
               type="button"
-              className="h-14 rounded-full bg-violet-600 px-5 text-white shadow-xl shadow-violet-950/25 hover:bg-violet-500"
+              className="h-14 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-6 text-white shadow-xl shadow-violet-900/25 hover:shadow-violet-900/40 hover:-translate-y-1 transition-all duration-300 font-semibold tracking-wide border-0"
               onClick={() => {
                 setOpen(true)
                 setMobilePanel("chat")
               }}
             >
-              <MessageCircle className="size-5" />
+              <Sparkles className="size-5 mr-2 animate-pulse" />
               Ask Nova
             </Button>
           </motion.div>
