@@ -115,11 +115,11 @@ export function ChatWindow({
   return (
     <section
       className={cn(
-        "h-full min-h-0 flex-col bg-white dark:bg-zinc-950",
-        mobileOpen ? "fixed inset-0 z-40 flex lg:static" : "hidden lg:flex"
+        "h-full w-full bg-white dark:bg-zinc-950",
+        mobileOpen ? "fixed inset-0 z-40 flex flex-col lg:static" : "hidden lg:flex lg:flex-col"
       )}
     >
-      <header className="flex h-16 shrink-0 items-center gap-3 border-b border-zinc-200 dark:border-white/10 bg-white/95 dark:bg-zinc-950/95 px-4 backdrop-blur-xl">
+      <header className="flex-none flex h-16 items-center gap-3 border-b border-zinc-200 dark:border-white/10 bg-white/95 dark:bg-zinc-950/95 px-4 backdrop-blur-xl">
         <Button type="button" variant="ghost" size="icon" className="size-9 lg:hidden" onClick={onBack}>
           <ArrowLeft className="size-4" />
         </Button>
@@ -158,7 +158,7 @@ export function ChatWindow({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
+      <div className="relative flex-1 min-h-0 w-full overflow-y-auto px-4 py-5">
         {isLoading ? (
           <div className="text-sm text-zinc-500">Loading messages...</div>
         ) : messages.length ? (
@@ -182,7 +182,7 @@ export function ChatWindow({
             <div ref={bottomRef} />
           </div>
         ) : (
-          <div className="grid h-full place-items-center text-center">
+          <div className="absolute inset-0 flex items-center justify-center text-center pointer-events-none">
             <div>
               <CheckCheck className="mx-auto size-8 text-blue-300" />
               <p className="mt-3 text-sm font-medium text-zinc-900 dark:text-zinc-200">No messages yet</p>
@@ -192,7 +192,9 @@ export function ChatWindow({
         )}
       </div>
 
-      <MessageInput disabled={!conversationId} onSend={onSend} onTyping={onTyping} />
+      <div className="flex-none">
+        <MessageInput disabled={!conversationId} onSend={onSend} onTyping={onTyping} />
+      </div>
     </section>
   )
 }

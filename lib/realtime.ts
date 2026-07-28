@@ -60,12 +60,38 @@ async function publishPusher(userIds: number[], event: RealtimeEvent) {
 export async function publishRealtime(userIds: number[], event: RealtimeEvent) {
   for (const userId of userIds) {
     const subscribers = channels.get(userId)
-    if (!subscribers) continue
-
-    for (const subscriber of subscribers) subscriber(event)
+    if (subscribers) {
+      for (const subscriber of subscribers) subscriber(event)
+    }
   }
 
   await publishPusher(userIds, event)
+
+  // Send to our local WebSocket server via IPC route
+  try {
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http"
+    const host = process.env.NODE_ENV === "production" 
+      ? (process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, '')) 
+      : "127.0.0.1:3000"
+    
+    // Broadcast to each user in the participant list
+    for (const userId of userIds) {
+      await fetch(`${protocol}://${host}/api/internal/ws-broadcast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          payload: {
+            // Remap event.type to match frontend websocket-provider expectations
+            type: event.type === 'receive-message' ? 'chat_message' : event.type,
+            ...(event.payload as any),
+          },
+        }),
+      }).catch(() => undefined)
+    }
+  } catch (e) {
+    console.error("Failed to broadcast real-time event", e)
+  }
 }
 
 export function createRealtimeStream(userId: number) {

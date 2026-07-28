@@ -8,14 +8,22 @@ const demoUser = {
 
 export type CurrentUser = Awaited<ReturnType<typeof requireUser>>
 
-export async function requireUser() {
-  const email = "subbu@novalance.dev"
+import { auth } from "@/auth"
 
-  const user = await prisma.user.upsert({
-    where: { email },
-    update: { name: "Subbu Roy" },
-    create: { email, name: "Subbu Roy" },
+export async function requireUser() {
+  const session = await auth()
+  
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized: Please log in to continue.")
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
   })
+  
+  if (!user) {
+    throw new Error("User not found.")
+  }
 
   return user
 }

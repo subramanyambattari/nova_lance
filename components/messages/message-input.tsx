@@ -160,7 +160,7 @@ export function MessageInput({
   }
 
   return (
-    <div className="relative border-t border-zinc-200 dark:border-white/10 bg-white/90 dark:bg-zinc-950/90 p-3 backdrop-blur-xl">
+    <div className="relative border-t border-zinc-200 dark:border-white/10 bg-white/90 dark:bg-zinc-950/90 p-3 backdrop-blur-xl shrink-0">
       {attachment ? (
         <div className="mb-3 max-w-lg">
           <FilePreview

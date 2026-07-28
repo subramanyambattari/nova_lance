@@ -74,12 +74,27 @@ function WorkspaceInner() {
   const conversationsQuery = useQuery({
     queryKey: ["conversations", query, archived],
     queryFn: () => fetchConversations(query, archived),
+    placeholderData: (prev: any) => prev,
   })
   const notificationsQuery = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications })
   const usersQuery = useQuery({
     queryKey: ["users", userQuery],
     queryFn: () => fetchUsers(userQuery),
-    enabled: userQuery.trim().length > 1,
+    enabled: true,
+  })
+
+  const activeConversationId = activeId ?? (conversationsQuery.data?.conversations?.[0]?.id)
+  
+  const filesQuery = useQuery({
+    queryKey: ["messages-files", activeConversationId],
+    queryFn: async () => {
+      if (!activeConversationId) return []
+      const res = await fetch(`/api/messages?conversationId=${activeConversationId}&filter=files`)
+      if (!res.ok) return []
+      const data = await res.json()
+      return (data.messages || []) as MessageItem[]
+    },
+    enabled: Boolean(activeConversationId)
   })
 
   const currentUser = conversationsQuery.data?.currentUser
@@ -328,7 +343,7 @@ function WorkspaceInner() {
                     </Badge>
                   </button>
                 ))}
-                {userQuery.trim().length > 1 && !usersQuery.isLoading && !usersQuery.data?.users.length ? (
+                {userQuery.trim().length > 0 && !usersQuery.isLoading && !usersQuery.data?.users.length ? (
                   <p className="text-xs text-zinc-500">No users found.</p>
                 ) : null}
               </div>
@@ -358,7 +373,17 @@ function WorkspaceInner() {
                 <FileText className="size-4 text-blue-300" />
                 Shared files
               </div>
-              <p className="mt-2 text-xs text-zinc-500">Use message search filters to show files or images in this thread.</p>
+              <div className="mt-3 space-y-2">
+                {filesQuery.data?.slice(0, 5).map((msg) => (
+                  <a key={msg.id} href={msg.fileUrl!} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-md bg-zinc-200/50 dark:bg-zinc-950/70 p-2 hover:bg-zinc-200 dark:hover:bg-white/10 text-xs text-zinc-700 dark:text-zinc-300">
+                    <FileText className="size-3.5 shrink-0" />
+                    <span className="truncate">{msg.fileName || "Attachment"}</span>
+                  </a>
+                ))}
+                {!filesQuery.data?.length ? (
+                  <p className="text-xs text-zinc-500">No files shared in this conversation.</p>
+                ) : null}
+              </div>
             </div>
           </div>
           <div className="border-t border-zinc-200 dark:border-white/10 p-4">
