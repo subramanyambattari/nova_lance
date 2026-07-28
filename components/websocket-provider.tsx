@@ -28,52 +28,60 @@ export const WebSocketProvider = ({
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (!userId) return;
+    let reconnectTimeout: NodeJS.Timeout;
 
-    // Use current host for websocket
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    function connect() {
+      if (!userId) return;
 
-    const ws = new WebSocket(wsUrl);
-    socketRef.current = ws;
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
 
-    ws.onopen = () => {
-      setIsConnected(true);
-      // Send init message
-      ws.send(JSON.stringify({ type: "init", userId }));
-    };
+      const ws = new WebSocket(wsUrl);
+      socketRef.current = ws;
 
-    ws.onclose = () => {
-      setIsConnected(false);
-    };
+      ws.onopen = () => {
+        setIsConnected(true);
+        ws.send(JSON.stringify({ type: "init", userId }));
+      };
 
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        // We can handle global notifications here or just let components listen to ws.onmessage via effects
-        if (data.type === 'notification') {
-          // Fire a custom event or toast for notification
-          window.dispatchEvent(new CustomEvent('ws-notification', { detail: data }));
-        } else if (data.type === 'presence') {
-          window.dispatchEvent(new CustomEvent('ws-presence', { detail: data }));
-        } else if (data.type === 'chat_message') {
-          window.dispatchEvent(new CustomEvent('ws-chat-message', { detail: data }));
-        } else if (data.type === 'typing') {
-          window.dispatchEvent(new CustomEvent('ws-typing', { detail: data }));
-        } else if (data.type === 'ws-proposal-update') {
-          window.dispatchEvent(new CustomEvent('ws-proposal-update', { detail: data }));
-        } else if (data.type === 'ws-deliverable-upload') {
-          window.dispatchEvent(new CustomEvent('ws-deliverable-upload', { detail: data }));
+      ws.onclose = () => {
+        setIsConnected(false);
+        // Attempt to reconnect after 3 seconds
+        reconnectTimeout = setTimeout(connect, 3000);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'notification') {
+            window.dispatchEvent(new CustomEvent('ws-notification', { detail: data }));
+          } else if (data.type === 'presence') {
+            window.dispatchEvent(new CustomEvent('ws-presence', { detail: data }));
+          } else if (data.type === 'chat_message') {
+            window.dispatchEvent(new CustomEvent('ws-chat-message', { detail: data }));
+          } else if (data.type === 'typing') {
+            window.dispatchEvent(new CustomEvent('ws-typing', { detail: data }));
+          } else if (data.type === 'ws-proposal-update') {
+            window.dispatchEvent(new CustomEvent('ws-proposal-update', { detail: data }));
+          } else if (data.type === 'ws-deliverable-upload') {
+            window.dispatchEvent(new CustomEvent('ws-deliverable-upload', { detail: data }));
+          }
+        } catch (error) {
+          console.error("Failed to parse WS message", error);
         }
-      } catch (error) {
-        console.error("Failed to parse WS message", error);
-      }
-    };
+      };
 
-    setSocket(ws);
+      setSocket(ws);
+    }
+
+    connect();
 
     return () => {
-      ws.close();
+      clearTimeout(reconnectTimeout);
+      if (socketRef.current) {
+        socketRef.current.onclose = null; // Prevent reconnect on unmount
+        socketRef.current.close();
+      }
     };
   }, [userId]);
 

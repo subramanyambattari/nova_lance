@@ -300,7 +300,7 @@ function WorkspaceInner() {
               {activePeers.length ? activePeers.map((peer) => peer.name ?? peer.email).join(", ") : "No active chat selected"}
             </p>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-4">
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-28">
             <div className="rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/70 p-3">
               <div className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 <Users className="size-4 text-blue-300" />
@@ -329,7 +329,7 @@ function WorkspaceInner() {
                 placeholder="Search users by name or email"
                 className="mt-3 h-9 border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-950/80 text-xs text-zinc-900 dark:text-zinc-100"
               />
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 max-h-[240px] overflow-y-auto space-y-2 pr-1">
                 {(usersQuery.data?.users ?? []).map((user) => (
                   <button
                     key={user.id}

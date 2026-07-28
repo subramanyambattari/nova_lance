@@ -134,6 +134,27 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "One or more users do not exist." }, { status: 400 })
     }
 
+    // Check if a direct conversation already exists between these exact participants
+    if (!body.title && !body.projectId) {
+      const existingConversations = await prisma.conversation.findMany({
+        where: {
+          AND: participantIds.map((id) => ({
+            participants: { some: { userId: id } },
+          })),
+        },
+        include: {
+          participants: { include: { user: { select: { id: true, name: true, email: true, presence: true } } } },
+          messages: { orderBy: { createdAt: "desc" }, take: 1 },
+        },
+      })
+
+      // Find the one that has EXACTLY this number of participants (no extras)
+      const exactMatch = existingConversations.find((c) => c.participants.length === participantIds.length)
+      if (exactMatch) {
+        return Response.json({ conversation: exactMatch }, { status: 200 })
+      }
+    }
+
     const conversation = await prisma.conversation.create({
       data: {
         title: body.title || undefined,
