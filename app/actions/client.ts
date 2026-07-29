@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { requireUser } from "@/lib/auth"
-import type { ProposalStatus } from "@/app/generated/prisma/client"
+import type { ProposalStatus, JobPostStatus } from "@/app/generated/prisma/client"
 
 export async function createJob(data: {
   title: string
@@ -25,6 +25,7 @@ export async function createJob(data: {
       type: "Contract",
       experience: data.experience,
       clientId: user.id,
+      status: "PUBLISHED",
     },
   })
 
@@ -46,6 +47,18 @@ export async function updateProposalStatus(proposalId: string, status: string) {
 
 export async function updateJobStatus(jobId: string, status: string) {
   const user = await requireUser()
+  
+  // Need to map "Active", "Paused", "Draft" etc to actual enum
+  let dbStatus: JobPostStatus = "DRAFT"
+  if (status === "Active") dbStatus = "PUBLISHED"
+  else if (status === "Paused") dbStatus = "PAUSED"
+  else if (status === "Closed") dbStatus = "CLOSED"
+
+  await prisma.job.update({
+    where: { id: jobId },
+    data: { status: dbStatus },
+  })
+
   revalidatePath("/client-dashboard")
   return { success: true }
 }
@@ -71,6 +84,7 @@ export async function duplicateJob(jobId: string) {
       type: originalJob.type,
       experience: originalJob.experience,
       clientId: user.id,
+      status: "DRAFT",
     },
   })
   
