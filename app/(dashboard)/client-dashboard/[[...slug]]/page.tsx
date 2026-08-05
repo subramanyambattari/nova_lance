@@ -26,16 +26,10 @@ export default async function ClientDashboardRoute() {
     const hired = hiredProposals.length;
     const progress = hired > 0 ? hiredProposals.reduce((sum, p) => sum + (p.activeJob?.progress || 0), 0) / hired : 0;
 
-    let mappedStatus = "Draft";
-    if (job.status === "PUBLISHED") mappedStatus = "Active";
-    else if (job.status === "PAUSED") mappedStatus = "Paused";
-    else if (job.status === "CLOSED") mappedStatus = "Closed";
-    else if (job.status === "DRAFT") mappedStatus = "Draft";
-
     return {
       id: job.id,
       title: job.title,
-      status: mappedStatus,
+      status: hired > 0 ? "Active" : "Draft",
       proposals: job._count.proposals,
       hired,
       progress: Math.round(progress),

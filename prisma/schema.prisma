@@ -62,7 +62,6 @@ model Job {
   postedAt       DateTime   @default(now())
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-  status         JobPostStatus  @default(DRAFT)
   clientId       Int?
   client         User?      @relation(fields: [clientId], references: [id])
   proposals      Proposal[]

@@ -16,7 +16,7 @@ export type UnifiedJob = {
   location: string
   remote: boolean
   verifiedClient: boolean
-  source: "internal" | "remotive" | "remoteok" | "arbeitnow" | "adzuna"
+  source: "internal" | "remotive" | "remoteok" | "arbeitnow" | "adzuna" | "rapidapi"
   externalId?: string
   externalUrl?: string
   postedAt: string
@@ -86,12 +86,13 @@ function postedAfter(posted: string) {
   return null
 }
 
-async function fetchJson(url: string, timeoutMs = 3000) {
+async function fetchJson(url: string, timeoutMs = 3000, options?: RequestInit) {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     const response = await fetch(url, {
-      headers: { "User-Agent": "Nova-Lance/1.0" },
+      ...options,
+      headers: { "User-Agent": "Nova-Lance/1.0", ...options?.headers },
       next: { revalidate: 120 },
       signal: controller.signal
     })
@@ -104,116 +105,46 @@ async function fetchJson(url: string, timeoutMs = 3000) {
 }
 
 async function fetchExternalJobs(query: string): Promise<UnifiedJob[]> {
-  // Use a broad search term for external APIs to ensure they return a healthy pool of jobs.
-  // External APIs often fail or return 0 results on multi-word queries like "React Next.js".
-  // We will rely on our accurate local filtering (below) to refine this broad pool.
-  const broadQuery = query ? query.split(" ")[0] : "software engineer"
+  const broadQuery = query ? query : "software engineer"
   const keyword = encodeURIComponent(broadQuery)
-  const [remotive, remoteOk, arbeitnow, adzuna] = await Promise.all([
-    fetchJson(`https://remotive.com/api/remote-jobs?search=${keyword}`),
-    fetchJson("https://remoteok.com/api"),
-    fetchJson("https://www.arbeitnow.com/api/job-board-api"),
-    process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY
-      ? fetchJson(
-          `https://api.adzuna.com/v1/api/jobs/us/search/1?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&what=${keyword}&content-type=application/json&category=it-jobs`
-        )
-      : Promise.resolve(null),
-  ])
+  
+  const options = {
+    method: "GET",
+    headers: {
+      "x-rapidapi-key": process.env.RAPIDAPI_KEY || "",
+      "x-rapidapi-host": process.env.RAPIDAPI_HOST || "remote-jobs-api1.p.rapidapi.com",
+    },
+  };
+  
+  const url = `${process.env.RAPIDAPI_URL || "https://remote-jobs-api1.p.rapidapi.com/jobs/search"}?query=${keyword}`;
+  
+  const rapidApiData = await fetchJson(url, 5000, options);
+  
+  const jobs: UnifiedJob[] = [];
 
-  const jobs: UnifiedJob[] = []
+  // Assuming rapidApiData returns an array of jobs directly or inside a data property
+  const results = Array.isArray(rapidApiData) ? rapidApiData : rapidApiData?.data || rapidApiData?.jobs || rapidApiData?.results || [];
 
-  for (const item of remotive?.jobs?.slice?.(0, 25) ?? []) {
-    const text = `${item.title ?? ""} ${item.description ?? ""} ${item.tags?.join?.(" ") ?? ""}`
-    const skills = uniq([...(item.tags ?? []), ...inferSkills(text)]).slice(0, 6)
-    jobs.push({
-      id: `external:remotive:${item.id}`,
-      externalId: String(item.id),
-      externalUrl: item.url,
-      source: "remotive",
-      title: item.title ?? "Remote role",
-      company: item.company_name ?? "Remote client",
-      description: item.description ?? "",
-      budget: null,
-      salary: item.salary || "Budget not listed",
-      skills,
-      type: item.job_type || "Full-time",
-      experience: /senior|lead|principal/i.test(item.title ?? "") ? "Senior" : "Intermediate",
-      location: item.candidate_required_location || "Remote",
-      remote: true,
-      verifiedClient: true,
-      postedAt: new Date(item.publication_date ?? Date.now()).toISOString(),
-      match: 0,
-    })
-  }
-
-  for (const item of Array.isArray(remoteOk) ? remoteOk.slice(1, 26) : []) {
-    const text = `${item.position ?? ""} ${item.description ?? ""} ${item.tags?.join?.(" ") ?? ""}`
-    const skills = uniq([...(item.tags ?? []), ...inferSkills(text)]).slice(0, 6)
-    jobs.push({
-      id: `external:remoteok:${item.id}`,
-      externalId: String(item.id),
-      externalUrl: item.url,
-      source: "remoteok",
-      title: item.position ?? "Remote role",
-      company: item.company ?? "RemoteOK client",
-      description: item.description ?? "",
-      budget: null,
-      salary: item.salary_min ? `$${item.salary_min} - $${item.salary_max}` : "Budget not listed",
-      skills,
-      type: "Remote",
-      experience: /senior|lead|principal/i.test(item.position ?? "") ? "Senior" : "Intermediate",
-      location: item.location || "Remote",
-      remote: true,
-      verifiedClient: true,
-      postedAt: new Date(item.date ?? Date.now()).toISOString(),
-      match: 0,
-    })
-  }
-
-  for (const item of arbeitnow?.data?.slice?.(0, 25) ?? []) {
-    const text = `${item.title ?? ""} ${item.description ?? ""} ${item.tags?.join?.(" ") ?? ""}`
-    const skills = uniq([...(item.tags ?? []), ...inferSkills(text)]).slice(0, 6)
-    jobs.push({
-      id: `external:arbeitnow:${item.slug}`,
-      externalId: item.slug,
-      externalUrl: item.url,
-      source: "arbeitnow",
-      title: item.title ?? "Remote role",
-      company: item.company_name ?? "Arbeitnow client",
-      description: item.description ?? "",
-      budget: null,
-      salary: "Budget not listed",
-      skills,
-      type: item.job_types?.[0] ?? "Full-time",
-      experience: /senior|lead|principal/i.test(item.title ?? "") ? "Senior" : "Intermediate",
-      location: item.location || "Remote",
-      remote: item.remote ?? true,
-      verifiedClient: false,
-      postedAt: new Date((item.created_at ?? Date.now() / 1000) * 1000).toISOString(),
-      match: 0,
-    })
-  }
-
-  for (const item of adzuna?.results?.slice?.(0, 20) ?? []) {
+  for (const item of results.slice(0, 30)) {
     const text = `${item.title ?? ""} ${item.description ?? ""}`
     const skills = inferSkills(text).slice(0, 6)
     jobs.push({
-      id: `external:adzuna:${item.id}`,
-      externalId: String(item.id),
-      externalUrl: item.redirect_url,
-      source: "adzuna",
-      title: item.title ?? "Freelance role",
-      company: item.company?.display_name ?? "Adzuna client",
-      description: item.description ?? "",
+      id: `external:rapidapi:${item.id || item.slug || Math.random().toString()}`,
+      externalId: String(item.id || item.slug || ""),
+      externalUrl: item.url || item.applyUrl || item.link,
+      source: "rapidapi",
+      title: item.title || item.position || "Remote role",
+      company: item.company || item.company_name || "Remote client",
+      description: item.description || "No description provided.",
       budget: null,
-      salary: item.salary_min ? `$${item.salary_min} - $${item.salary_max}` : "Budget not listed",
+      salary: item.salary || item.salary_min ? `$${item.salary_min} - $${item.salary_max}` : "Budget not listed",
       skills,
-      type: item.contract_time ?? "Contract",
+      type: item.job_type || item.type || "Full-time",
       experience: /senior|lead|principal/i.test(item.title ?? "") ? "Senior" : "Intermediate",
-      location: item.location?.display_name || "Remote",
-      remote: /remote/i.test(`${item.location?.display_name ?? ""} ${item.title ?? ""}`),
+      location: item.location || "Remote",
+      remote: true,
       verifiedClient: true,
-      postedAt: new Date(item.created ?? Date.now()).toISOString(),
+      postedAt: new Date(item.publication_date || item.created_at || item.date || Date.now()).toISOString(),
       match: 0,
     })
   }

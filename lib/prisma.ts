@@ -19,15 +19,15 @@ if (connectionString) {
 const adapter = new PrismaNeon({ connectionString })
 
 const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient
+  prisma2?: PrismaClient
 }
 
 export const prisma =
-  globalForPrisma.prisma ??
+  globalForPrisma.prisma2 ??
   new PrismaClient({ adapter })
 
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma
+  globalForPrisma.prisma2 = prisma
 }
 
 // Force Turbopack to recompile this file
