@@ -199,10 +199,12 @@ export function OverviewPage({ stats }: { stats?: any }) {
   }, [])
 
   // Merge dynamic stats with command stats if available
+  const displayPriorityActions = stats && stats.priorityActions ? stats.priorityActions : priorityActions;
+
   const dynamicCommandStats = [
     {
       label: "Today focus",
-      value: "7",
+      value: stats ? (stats.unreadMessagesCount > 0 ? 1 : 0) + (stats.priorityActions?.length || 0) : "7",
       detail: "Actions need attention",
       icon: Radar,
       tone: "text-sky-300",
@@ -232,13 +234,12 @@ export function OverviewPage({ stats }: { stats?: any }) {
 
   const displayPipeline = stats ? stats.pipeline : pipeline;
   const displayActiveWork = stats ? stats.activeWork : activeWork;
-  const displayEarningsTrend = stats && stats.earningsTrend ? stats.earningsTrend : earningsTrend;
-  const displayPriorityActions = stats && stats.priorityActions ? stats.priorityActions : priorityActions;
-  const displayClientActivity = stats && stats.clientActivity && stats.clientActivity.length > 0 ? stats.clientActivity : messages;
-  const unreadMessagesCount = stats?.unreadMessagesCount ?? 3;
-  const healthScore = stats?.healthScore ?? 86;
-  const nextDeadline = stats?.nextDeadline ?? { value: "Today, 6:00 PM", detail: "Mobile onboarding scope update" };
-  const waitingProposals = stats?.waitingProposals ?? 3;
+  const displayEarningsTrend = stats ? stats.earningsTrend : earningsTrend;
+  const displayClientActivity = stats ? stats.clientActivity : messages;
+  const unreadMessagesCount = stats?.unreadMessagesCount ?? 0;
+  const healthScore = stats?.healthScore ?? 100;
+  const nextDeadline = stats?.nextDeadline ?? { value: "None", detail: "No upcoming deadlines" };
+  const waitingProposals = stats?.waitingProposals ?? 0;
   const userName = stats?.userName ? stats.userName.split(" ")[0] : "there";
 
   const currentDateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });

@@ -160,8 +160,8 @@ export function ClientDashboardPage({
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100 flex">
       <main className="flex-1 overflow-auto">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 pb-28 sm:px-6 lg:px-8">
-          <DashboardHeader onTabChange={handleTabChange} />
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
+          <DashboardHeader onTabChange={handleTabChange} stats={stats} />
 
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             <TabsContent value="overview" className="space-y-8">

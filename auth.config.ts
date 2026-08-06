@@ -41,7 +41,7 @@ export const authConfig = {
            if (role === "ADMIN" || isSuperAdmin) return Response.redirect(new URL("/admin", nextUrl))
            return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))
         }
-        if (nextUrl.pathname === "/login") {
+        if (nextUrl.pathname === "/login" || nextUrl.pathname === "/") {
            if (!role && !isSuperAdmin) return Response.redirect(new URL("/onboarding", nextUrl))
            if (role === "ADMIN" || isSuperAdmin) return Response.redirect(new URL("/admin", nextUrl))
            return Response.redirect(new URL(role === "CLIENT" ? "/client-dashboard" : "/user-dashboard", nextUrl))

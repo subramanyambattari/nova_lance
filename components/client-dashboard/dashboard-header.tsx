@@ -4,7 +4,40 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-export function DashboardHeader({ onTabChange }: { onTabChange?: (tab: string) => void }) {
+export function DashboardHeader({ onTabChange, stats }: { onTabChange?: (tab: string) => void, stats?: any }) {
+  // Generate dynamic 'Nova best action' based on stats
+  let bestActionText = "Post your first job to start hiring top talent."
+  let metrics = [
+    ["Fit", "N/A"],
+    ["Risk", "N/A"],
+    ["Savings", "$0"],
+  ]
+
+  if (stats) {
+    if (stats.interviewsHeld > 0) {
+      bestActionText = `Review ${stats.interviewsHeld} candidates currently in the interview phase.`
+      metrics = [
+        ["Fit", "High"],
+        ["Risk", "Low"],
+        ["Savings", "Pending"],
+      ]
+    } else if (stats.activeContractsCount > 0) {
+      bestActionText = `Manage ${stats.activeContractsCount} active contracts and monitor their progress.`
+      metrics = [
+        ["Health", "Good"],
+        ["Risk", "Low"],
+        ["Spent", `$${stats.totalSpent.toLocaleString()}`],
+      ]
+    } else if (stats.totalJobsPosted > 0) {
+      bestActionText = "Review incoming proposals for your posted jobs."
+      metrics = [
+        ["Fit", "TBD"],
+        ["Risk", "Low"],
+        ["Savings", "TBD"],
+      ]
+    }
+  }
+
   return (
     <header className="grid gap-5 border-b border-zinc-200 pb-6 dark:border-white/10 lg:grid-cols-[1fr_360px]">
       <div className="flex min-w-0 flex-col justify-end">
@@ -52,15 +85,11 @@ export function DashboardHeader({ onTabChange }: { onTabChange?: (tab: string) =
           </span>
           <div className="min-w-0">
             <p className="font-semibold">Nova best action</p>
-            <p className="text-sm text-zinc-500">Review 3 shortlisted AI engineers before May 26.</p>
+            <p className="text-sm text-zinc-500">{bestActionText}</p>
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
-          {[
-            ["Fit", "94%"],
-            ["Risk", "Low"],
-            ["Savings", "$1.2k"],
-          ].map(([label, value]) => (
+          {metrics.map(([label, value]) => (
             <div key={label} className="rounded-md border border-zinc-200 p-3 dark:border-white/10">
               <p className="text-xs text-zinc-500">{label}</p>
               <p className="mt-1 font-semibold">{value}</p>

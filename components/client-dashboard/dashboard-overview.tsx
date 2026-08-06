@@ -114,7 +114,7 @@ export function DashboardOverview({ jobsState, stats = { totalJobsPosted: 0, act
             <div className="space-y-2">
               {activity.map((item) => (
                 <div key={item} className="flex gap-3 rounded-lg border border-zinc-200 bg-white p-3 text-sm shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-                  <span className="mt-0.5 size-2 rounded-full bg-emerald-500" />
+                  <span className="mt-0.5 size-2 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                   <p>{item}</p>
                 </div>
               ))}

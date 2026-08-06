@@ -24,6 +24,13 @@ export const metadata: Metadata = {
   description: "Next-gen freelance platform",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1, // Prevents iOS auto-zoom on input focus
+  userScalable: false, // Prevents manual zooming, often preferred for web apps
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{

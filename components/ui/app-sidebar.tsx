@@ -38,13 +38,8 @@ const navItems: {
 }[] = [
   {
     title: "Overview",
-    href: "/",
+    href: "/user-dashboard",
     icon: Home,
-  },
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
   },
   {
     title: "Find Jobs",
@@ -143,7 +138,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
-              onClick={() => signOut({ callbackUrl: "/login" })} 
+              onClick={() => signOut({ callbackUrl: "/" })} 
               tooltip="Log Out"
               className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
             >

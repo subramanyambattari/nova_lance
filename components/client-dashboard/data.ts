@@ -291,14 +291,14 @@ export const paymentFeatures: IconFeature[] = [
   { label: "Spending breakdown", value: "$24.8k this month", icon: LineChart },
 ]
 
-export const initialSkills = ["Next.js", "AI chatbot", "Postgres", "UX writing"]
+export const initialSkills: string[] = []
 
 export const initialJobDraft = {
-  title: "AI customer support chatbot for SaaS platform",
+  title: "",
   budget: "$5,000-$8,000",
   timeline: "4 weeks",
-  priority: "High",
-  experience: "Expert",
+  priority: "Medium",
+  experience: "Intermediate",
 }
 
 export const jobFieldOptions: {
