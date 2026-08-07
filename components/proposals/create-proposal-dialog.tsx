@@ -228,6 +228,12 @@ export function CreateProposalDialog({
       return
     }
 
+    if (parsed.data.jobId && jobError) {
+      form.setError("jobId", { message: "Invalid internal Job ID. Leave blank if this is an external job." })
+      form.setFocus("jobId")
+      return
+    }
+
     const portfolioLinks = (parsed.data.portfolioLinks ?? "")
       .split(/\n|,/)
       .map((link) => link.trim())
@@ -336,7 +342,7 @@ export function CreateProposalDialog({
             </DialogPrimitive.Close>
           </div>
 
-          <form className="grid gap-4 pb-16" onSubmit={(event) => event.preventDefault()}>
+          <form className="grid gap-4 pb-4" onSubmit={(event) => event.preventDefault()}>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -354,7 +360,7 @@ export function CreateProposalDialog({
                 )}
                 {jobError && (
                   <p className="flex items-center gap-1.5 text-xs text-rose-400">
-                    <AlertCircle className="size-3.5" /> Job not found in database.
+                    <AlertCircle className="size-3.5" /> Job not found. Leave blank for external jobs.
                   </p>
                 )}
               </div>
@@ -453,7 +459,7 @@ export function CreateProposalDialog({
             ) : null}
           </form>
 
-          <div className="sticky bottom-0 -mx-5 -mb-5 flex flex-col-reverse gap-3 border-t border-white/10 bg-zinc-950/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end">
+          <div className="mt-2 -mx-5 -mb-5 flex flex-col-reverse gap-3 border-t border-white/10 bg-zinc-950 px-5 py-4 sm:flex-row sm:justify-end rounded-b-2xl">
             <Button type="button" variant="outline" disabled={loading} onClick={() => submitProposal(false)} className="rounded-xl border-white/10 hover:bg-white/5">
               {loading ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
               Save draft

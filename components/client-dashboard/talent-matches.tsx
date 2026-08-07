@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/lib/toast"
+import { useState } from "react"
+import { TalentProfileDialog } from "./talent-profile-dialog"
 
 const talents = [
   {
@@ -55,6 +57,7 @@ const talents = [
 
 export function TalentMatches({ matches = [] }: { matches?: any[] }) {
   const displayTalents = matches.length > 0 ? matches : talents;
+  const [selectedTalent, setSelectedTalent] = useState<any | null>(null)
 
   return (
     <div className="space-y-8">
@@ -200,7 +203,7 @@ export function TalentMatches({ matches = [] }: { matches?: any[] }) {
                     <Star className="mr-2 size-4" />
                     Save Freelancer
                   </Button>
-                  <Button variant="ghost" className="w-full justify-center mt-auto font-semibold text-violet-600 hover:text-violet-700 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-900/30" onClick={() => toast.success(`Opening ${talent.name}'s full profile...`)}>
+                  <Button variant="ghost" className="w-full justify-center mt-auto font-semibold text-violet-600 hover:text-violet-700 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-900/30" onClick={() => setSelectedTalent(talent)}>
                     View Full Profile &rarr;
                   </Button>
                 </div>
@@ -209,6 +212,8 @@ export function TalentMatches({ matches = [] }: { matches?: any[] }) {
           ))}
         </div>
       </section>
+
+      <TalentProfileDialog talent={selectedTalent} onClose={() => setSelectedTalent(null)} />
     </div>
   )
 }

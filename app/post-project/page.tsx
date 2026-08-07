@@ -1,18 +1,25 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, UploadCloud } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Sparkles, UploadCloud, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { postJob } from "./actions";
+import { toast } from "sonner";
 
 export default function PostProjectPage() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [description, setDescription] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   
   // Phase 2 State
   const [projectNature, setProjectNature] = useState("");
@@ -55,6 +62,61 @@ export default function PostProjectPage() {
         return ["Product catalog", "Shopping cart", "Payment gateway integration", "User authentication", "Order tracking"];
       default:
         return ["User authentication", "Database integration", "API development", "Admin dashboard", "Payment gateway integration"];
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setFiles((prev) => [...prev, ...Array.from(e.dataTransfer.files)]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+    }
+  };
+
+  const removeFile = (indexToRemove: number) => {
+    setFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleSubmit = async () => {
+    if (description.length < 30) {
+      toast.error("Please enter a longer description.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // In a real app, we would upload the files first and get their URLs
+      // For now, we'll just pass the description and title
+      const result = await postJob({
+        title: projectName || "New Custom Project",
+        description: description,
+        budget: null, // Let the user negotiate later
+        skills: features, // Using selected features as skills for now
+      });
+
+      if (result.success) {
+        toast.success("Project posted successfully!");
+        router.push("/client-dashboard");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to post project.");
+      setIsSubmitting(false);
     }
   };
 
@@ -269,23 +331,68 @@ export default function PostProjectPage() {
               </div>
 
               <div 
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer group"
+                className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group ${
+                  isDragging 
+                    ? "border-violet-500 bg-violet-50 dark:bg-violet-900/20" 
+                    : "border-zinc-300 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
+                }`}
               >
-                <UploadCloud className="size-10 text-zinc-400 group-hover:text-blue-500 transition-colors mb-3" />
+                <UploadCloud className={`size-10 mb-3 transition-colors ${isDragging ? "text-violet-500" : "text-zinc-400 group-hover:text-blue-500"}`} />
                 <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Drag & drop or <span className="text-blue-600 hover:underline">click to upload</span> any images or documents that might be helpful in explaining your brief.
                 </p>
                 <p className="text-xs text-zinc-500 mt-2">(Max 25 MB)</p>
-                <input type="file" ref={fileInputRef} className="hidden" multiple />
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  multiple 
+                  onChange={handleFileChange}
+                />
               </div>
+
+              {files.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-bold text-zinc-400">Attached Files</Label>
+                  <div className="grid gap-2">
+                    {files.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <div className="p-2 rounded-md bg-zinc-200 dark:bg-zinc-800 shrink-0">
+                            <FileText className="size-4 text-zinc-600 dark:text-zinc-400" />
+                          </div>
+                          <div className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                            {file.name}
+                          </div>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="shrink-0 size-8 text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeFile(idx);
+                          }}
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center gap-6 pt-4">
                 <Button 
-                  asChild
-                  className="bg-violet-600 hover:bg-violet-700 text-white px-10 py-6 text-lg font-bold rounded-xl"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || description.length < 30}
+                  className="bg-violet-600 hover:bg-violet-700 text-white px-10 py-6 text-lg font-bold rounded-xl disabled:opacity-50"
                 >
-                  <Link href="/login">Post Project</Link>
+                  {isSubmitting ? "Posting..." : "Post Project"}
                 </Button>
                 <button 
                   onClick={handleAIImprovement}

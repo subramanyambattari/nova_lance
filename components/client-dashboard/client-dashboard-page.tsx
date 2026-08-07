@@ -75,12 +75,8 @@ export function ClientDashboardPage({
   const [isPending, startTransition] = useTransition()
 
   const [activeTab, setActiveTab] = useState("overview")
-  const [jobsState, setJobsState] = useState<Job[]>(
-    initialJobs && initialJobs.length > 0 ? initialJobs : defaultJobs
-  )
-  const [proposalsState, setProposalsState] = useState<Proposal[]>(
-    initialProposals && initialProposals.length > 0 ? initialProposals : defaultProposals
-  )
+  const [jobsState, setJobsState] = useState<Job[]>(initialJobs || [])
+  const [proposalsState, setProposalsState] = useState<Proposal[]>(initialProposals || [])
 
   const [skills, setSkills] = useState(initialSkills)
   const [skillDraft, setSkillDraft] = useState("")
