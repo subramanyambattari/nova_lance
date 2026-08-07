@@ -1,59 +1,40 @@
 "use server"
 
-// Global fallback for when NeonDB is asleep or Prisma client is stale
-const globalAny = global as any;
-if (!globalAny.mockPlatformSettings) {
-  globalAny.mockPlatformSettings = {
-    platformName: "Nova Lance",
-    supportEmail: "support@novalance.dev",
-    maintenanceMode: false,
-    allowNewSignups: true,
-    platformFeePercent: 10.0,
-    minimumWithdrawal: 50.0,
-    require2FA: false,
-    sessionTimeoutMinutes: 60,
-    emailAlertsEnabled: true,
-    systemAnnouncements: true,
-  }
-}
+import { requireUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
+const defaultSettings = {
+  platformName: "Nova Lance",
+  supportEmail: "support@novalance.dev",
+  maintenanceMode: false,
+  allowNewSignups: true,
+  platformFeePercent: 10.0,
+  minimumWithdrawal: 50.0,
+  require2FA: false,
+  sessionTimeoutMinutes: 60,
+  emailAlertsEnabled: true,
+  systemAnnouncements: true,
+}
+
 export async function getPlatformSettings() {
   try {
-    // Prevent TypeError if Prisma client is not updated yet
-    if (!prisma.platformSettings) {
-      console.warn("Prisma client not updated yet. Using in-memory fallback.")
-      return globalAny.mockPlatformSettings
-    }
-
     let settings = await prisma.platformSettings.findUnique({
       where: { id: 1 }
     })
 
-    // If no settings exist yet, create the default one
     if (!settings) {
       settings = await prisma.platformSettings.create({
         data: {
           id: 1,
-          platformName: "Nova Lance",
-          supportEmail: "support@novalance.dev",
-          maintenanceMode: false,
-          allowNewSignups: true,
-          platformFeePercent: 10.0,
-          minimumWithdrawal: 50.0,
-          require2FA: false,
-          sessionTimeoutMinutes: 60,
-          emailAlertsEnabled: true,
-          systemAnnouncements: true,
+          ...defaultSettings
         }
       })
     }
     return settings
   } catch (error) {
-    // DB is asleep, use memory fallback
-    console.warn("Failed to fetch settings (DB might be asleep). Using in-memory fallback.")
-    return globalAny.mockPlatformSettings
+    console.error("Failed to fetch settings from DB. Returning defaults.", error)
+    return { id: 1, ...defaultSettings }
   }
 }
 
@@ -70,42 +51,33 @@ export async function updatePlatformSettings(data: {
   systemAnnouncements?: boolean
 }) {
   try {
-    if (!prisma.platformSettings) {
-      throw new Error("Stale Prisma Client")
+    const user = await requireUser()
+    if (user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
     }
-
     const settings = await prisma.platformSettings.upsert({
       where: { id: 1 },
       update: data,
       create: {
         id: 1,
-        platformName: data.platformName || "Nova Lance",
-        supportEmail: data.supportEmail || "support@novalance.dev",
-        maintenanceMode: data.maintenanceMode ?? false,
-        allowNewSignups: data.allowNewSignups ?? true,
-        platformFeePercent: data.platformFeePercent ?? 10.0,
-        minimumWithdrawal: data.minimumWithdrawal ?? 50.0,
-        require2FA: data.require2FA ?? false,
-        sessionTimeoutMinutes: data.sessionTimeoutMinutes ?? 60,
-        emailAlertsEnabled: data.emailAlertsEnabled ?? true,
-        systemAnnouncements: data.systemAnnouncements ?? true,
+        platformName: data.platformName ?? defaultSettings.platformName,
+        supportEmail: data.supportEmail ?? defaultSettings.supportEmail,
+        maintenanceMode: data.maintenanceMode ?? defaultSettings.maintenanceMode,
+        allowNewSignups: data.allowNewSignups ?? defaultSettings.allowNewSignups,
+        platformFeePercent: data.platformFeePercent ?? defaultSettings.platformFeePercent,
+        minimumWithdrawal: data.minimumWithdrawal ?? defaultSettings.minimumWithdrawal,
+        require2FA: data.require2FA ?? defaultSettings.require2FA,
+        sessionTimeoutMinutes: data.sessionTimeoutMinutes ?? defaultSettings.sessionTimeoutMinutes,
+        emailAlertsEnabled: data.emailAlertsEnabled ?? defaultSettings.emailAlertsEnabled,
+        systemAnnouncements: data.systemAnnouncements ?? defaultSettings.systemAnnouncements,
       }
     })
 
-    // Update fallback memory just in case
-    globalAny.mockPlatformSettings = { ...globalAny.mockPlatformSettings, ...settings }
     revalidatePath("/", "layout")
     return { success: true, settings }
 
-  } catch (error) {
-    console.warn("Saving to in-memory fallback because DB is offline or client is stale.")
-    
-    globalAny.mockPlatformSettings = {
-      ...globalAny.mockPlatformSettings,
-      ...data
-    }
-
-    revalidatePath("/", "layout")
-    return { success: true, settings: globalAny.mockPlatformSettings }
+  } catch (error: any) {
+    console.error("Failed to update platform settings:", error)
+    return { success: false, error: "Failed to update platform settings" }
   }
 }

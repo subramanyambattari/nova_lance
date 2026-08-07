@@ -2,7 +2,10 @@
 
 import crypto from "crypto"
 
+import { requireUser } from "@/lib/auth"
+
 export async function generateCloudinarySignature() {
+  await requireUser()
   const timestamp = Math.round(new Date().getTime() / 1000)
   const secret = process.env.CLOUDINARY_API_SECRET
   

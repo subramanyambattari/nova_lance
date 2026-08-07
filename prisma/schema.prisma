@@ -18,7 +18,7 @@ model User {
   role           Role?
   profile        UserProfile?
   settings       UserSettings?
-  posts          Post[]
+
   jobs           Job[]
   proposals      Proposal[]    @relation("FreelancerProposals")
   freelancerJobs ActiveJob[]   @relation("FreelancerJobs")
@@ -32,15 +32,6 @@ model User {
   savedSearches  SavedSearch[]
   accounts       Account[]
   sessions       Session[]
-}
-
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  authorId  Int
-  author    User    @relation(fields: [authorId], references: [id])
 }
 
 model Job {

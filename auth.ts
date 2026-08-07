@@ -62,7 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           user.password
         )
         
-        if (passwordsMatch) return user
+        if (passwordsMatch) return { ...user, id: String(user.id) }
         return null
       }
     })

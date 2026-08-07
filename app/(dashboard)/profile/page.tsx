@@ -17,7 +17,7 @@ export default async function ProfilePage() {
     phone: dbProfile.phone || defaultProfileValues.phone,
     location: dbProfile.location || defaultProfileValues.location,
     timezone: dbProfile.timezone || defaultProfileValues.timezone,
-    languages: dbProfile.languages || defaultProfileValues.languages,
+    languages: dbProfile.languages?.length > 0 ? dbProfile.languages.join(", ") : defaultProfileValues.languages,
     title: dbProfile.title || defaultProfileValues.title,
     bio: dbProfile.bio || defaultProfileValues.bio,
     experienceLevel: dbProfile.experienceLevel || defaultProfileValues.experienceLevel,

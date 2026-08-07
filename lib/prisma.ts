@@ -8,7 +8,7 @@ import ws from 'ws'
 neonConfig.webSocketConstructor = ws
 
 let connectionString = process.env.DATABASE_URL
-console.log("[SERVER] lib/prisma.ts: loaded DATABASE_URL =", connectionString ? "(present)" : "(MISSING)")
+
 if (connectionString) {
   // Strip potential leading/trailing quotes from environment variable
   connectionString = connectionString.replace(/^['"]|['"]$/g, '')

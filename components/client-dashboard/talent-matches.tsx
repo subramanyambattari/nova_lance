@@ -61,59 +61,7 @@ export function TalentMatches({ matches = [] }: { matches?: any[] }) {
 
   return (
     <div className="space-y-8">
-      {/* Top Widgets */}
-      <section className="grid gap-6 xl:grid-cols-3">
-        <div className="relative overflow-hidden rounded-2xl border border-emerald-200/50 bg-gradient-to-br from-emerald-50/50 to-white p-6 shadow-sm dark:border-emerald-900/30 dark:from-emerald-950/20 dark:to-zinc-900/40">
-           <div className="absolute -right-4 -top-4 size-24 rounded-full bg-emerald-500/10 blur-2xl" />
-           <div className="flex items-center gap-3 mb-5">
-              <div className="rounded-xl bg-emerald-100 p-2 dark:bg-emerald-900/40">
-                <TrendingUp className="size-5 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <h3 className="font-bold text-zinc-900 dark:text-white">Trending Skills</h3>
-           </div>
-           <div className="flex flex-wrap gap-2.5 relative z-10">
-              {["Next.js", "LangChain", "Figma", "Tailwind CSS", "Prisma"].map(skill => (
-                <Badge key={skill} variant="secondary" className="rounded-lg bg-white/80 border border-emerald-100/50 text-emerald-800 dark:bg-zinc-900/60 dark:border-emerald-900/50 dark:text-emerald-300 shadow-sm px-2.5 py-1">{skill}</Badge>
-              ))}
-           </div>
-        </div>
-        
-        <div className="relative overflow-hidden rounded-2xl border border-blue-200/50 bg-gradient-to-br from-blue-50/50 to-white p-6 shadow-sm dark:border-blue-900/30 dark:from-blue-950/20 dark:to-zinc-900/40">
-           <div className="absolute -right-4 -top-4 size-24 rounded-full bg-blue-500/10 blur-2xl" />
-           <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-xl bg-blue-100 p-2 dark:bg-blue-900/40">
-                <Users className="size-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="font-bold text-zinc-900 dark:text-white">Recently Active Talent</h3>
-           </div>
-           <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 mb-3 relative z-10">14 top-rated freelancers matching your drafts became available in the last 24h.</p>
-           <Button variant="ghost" className="relative z-10 px-0 h-auto font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-transparent transition-colors" onClick={() => toast.success("Opening active talent directory...")}>View active talent &rarr;</Button>
-        </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-violet-200/50 bg-gradient-to-br from-violet-50/50 to-white p-6 shadow-sm dark:border-violet-900/30 dark:from-violet-950/20 dark:to-zinc-900/40">
-           <div className="absolute -right-4 -top-4 size-24 rounded-full bg-violet-500/10 blur-2xl" />
-           <div className="flex items-center gap-3 mb-5">
-              <div className="rounded-xl bg-violet-100 p-2 dark:bg-violet-900/40">
-                <Map className="size-5 text-violet-600 dark:text-violet-400" />
-              </div>
-              <h3 className="font-bold text-zinc-900 dark:text-white">Talent Heatmap</h3>
-           </div>
-           <div className="space-y-3 text-sm relative z-10">
-             <div className="flex justify-between items-center bg-white/60 dark:bg-zinc-900/50 p-2.5 rounded-lg border border-zinc-100 dark:border-white/5">
-                <span className="text-zinc-600 dark:text-zinc-400 font-medium">North America</span>
-                <span className="font-bold text-zinc-900 dark:text-white">45%</span>
-             </div>
-             <div className="flex justify-between items-center bg-white/60 dark:bg-zinc-900/50 p-2.5 rounded-lg border border-zinc-100 dark:border-white/5">
-                <span className="text-zinc-600 dark:text-zinc-400 font-medium">Europe</span>
-                <span className="font-bold text-zinc-900 dark:text-white">35%</span>
-             </div>
-             <div className="flex justify-between items-center bg-white/60 dark:bg-zinc-900/50 p-2.5 rounded-lg border border-zinc-100 dark:border-white/5">
-                <span className="text-zinc-600 dark:text-zinc-400 font-medium">Asia Pacific</span>
-                <span className="font-bold text-zinc-900 dark:text-white">20%</span>
-             </div>
-           </div>
-        </div>
-      </section>
 
       {/* Talent Matches List */}
       <section>
@@ -149,7 +97,7 @@ export function TalentMatches({ matches = [] }: { matches?: any[] }) {
                   
                   <div className="mt-5 flex flex-wrap items-center gap-2.5">
                     <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 mr-1">Matched Skills</span>
-                    {talent.skills.map((skill) => (
+                    {talent.skills.map((skill: string) => (
                       <Badge key={skill} variant="outline" className="rounded-lg border-emerald-200 bg-emerald-50/50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300 px-2.5 py-1">
                         {skill}
                       </Badge>

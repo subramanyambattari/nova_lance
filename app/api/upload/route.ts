@@ -2,10 +2,17 @@ import { NextRequest } from "next/server"
 import { writeFile, mkdir } from "fs/promises"
 import path from "path"
 
+import { requireUser } from "@/lib/auth"
+
 export const dynamic = "force-dynamic"
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await requireUser()
+    if (!user) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const formData = await request.formData()
     const file = formData.get("file") as File | null
 

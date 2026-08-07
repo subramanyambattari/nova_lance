@@ -1,7 +1,7 @@
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { ZodError } from "zod"
 
-import { getDemoUser, getOptionalUser, isDatabaseUnavailableError, requireUser, withTimeout } from "@/lib/auth"
+import { getOptionalUser, isDatabaseUnavailableError, requireUser, withTimeout } from "@/lib/auth"
 import { getConversationParticipantIds, typingSchema } from "@/lib/messages"
 import { prisma } from "@/lib/prisma"
 import { publishRealtime } from "@/lib/realtime"
@@ -9,7 +9,10 @@ import { publishRealtime } from "@/lib/realtime"
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const user = (await getOptionalUser()) ?? getDemoUser()
+  const user = await getOptionalUser()
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
   if (user.id === 0) {
     return Response.json({
       user,

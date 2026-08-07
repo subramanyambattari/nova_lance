@@ -1,4 +1,4 @@
-import { getDemoUser, getOptionalUser, isDatabaseUnavailableError, withTimeout } from "@/lib/auth"
+import { getOptionalUser, isDatabaseUnavailableError, withTimeout } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { createRealtimeStream, publishRealtime } from "@/lib/realtime"
 
@@ -6,7 +6,10 @@ export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
 export async function GET() {
-  const user = (await getOptionalUser()) ?? getDemoUser()
+  const user = await getOptionalUser()
+  if (!user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
+  }
 
   if (user.id !== 0) {
     try {

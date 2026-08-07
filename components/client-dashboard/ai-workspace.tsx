@@ -34,63 +34,6 @@ export function AIWorkspace() {
 
   return (
     <div className="space-y-8">
-      {/* Hiring Funnel & Market Insights (New Phase 1 Widgets) */}
-      <section className="grid gap-6 xl:grid-cols-2">
-        <div className="relative overflow-hidden rounded-2xl border border-blue-200/50 bg-gradient-to-br from-blue-50/50 to-white p-6 shadow-sm dark:border-blue-900/30 dark:from-blue-950/20 dark:to-zinc-900/40">
-          <div className="absolute -right-4 -top-4 size-24 rounded-full bg-blue-500/10 blur-2xl" />
-          <div className="flex items-center gap-3 mb-6">
-            <div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/40">
-              <Target className="size-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <h3 className="font-semibold text-zinc-900 dark:text-white text-lg">Hiring Funnel Prediction</h3>
-          </div>
-          <div className="space-y-5 relative z-10">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-zinc-500 font-medium dark:text-zinc-400">Total Invites Sent</span>
-              <span className="font-bold text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-md shadow-sm border border-zinc-100 dark:border-white/5">45</span>
-            </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-zinc-500 font-medium dark:text-zinc-400">Proposals Received</span>
-              <span className="font-bold text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-md shadow-sm border border-zinc-100 dark:border-white/5">12 (26%)</span>
-            </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-zinc-500 font-medium dark:text-zinc-400">Shortlisted Candidates</span>
-              <span className="font-bold text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-md shadow-sm border border-zinc-100 dark:border-white/5">3 (25%)</span>
-            </div>
-            <div className="flex justify-between items-center text-sm pt-4 border-t border-zinc-200/60 dark:border-white/10 mt-2">
-              <span className="font-semibold text-zinc-900 dark:text-zinc-200">Estimated Time to Hire</span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <Gauge className="size-4" /> 4 Days
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-2xl border border-violet-200/50 bg-gradient-to-br from-violet-50/50 to-white p-6 shadow-sm dark:border-violet-900/30 dark:from-violet-950/20 dark:to-zinc-900/40">
-          <div className="absolute -right-4 -top-4 size-24 rounded-full bg-violet-500/10 blur-2xl" />
-          <div className="flex items-center gap-3 mb-6">
-            <div className="rounded-xl bg-violet-100 p-2.5 dark:bg-violet-900/40">
-              <TrendingUp className="size-5 text-violet-600 dark:text-violet-400" />
-            </div>
-            <h3 className="font-semibold text-zinc-900 dark:text-white text-lg">Talent Market Insights</h3>
-          </div>
-          <div className="space-y-4 relative z-10">
-             <div className="flex items-center justify-between p-3 rounded-xl bg-white/60 dark:bg-zinc-900/50 border border-zinc-100 dark:border-white/5">
-                <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Avg. Rate for Next.js Developers</span>
-                <Badge variant="outline" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">$65 - $85/hr</Badge>
-             </div>
-             <div className="flex items-center justify-between p-3 rounded-xl bg-white/60 dark:bg-zinc-900/50 border border-zinc-100 dark:border-white/5">
-                <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Availability Trend</span>
-                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"><TrendingUp className="size-3.5" /> High Supply</span>
-             </div>
-             <div className="flex items-center justify-between p-3 rounded-xl bg-white/60 dark:bg-zinc-900/50 border border-zinc-100 dark:border-white/5">
-                <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Top Required Skill (This Week)</span>
-                <Badge variant="outline" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">AI Integrations</Badge>
-             </div>
-          </div>
-        </div>
-      </section>
-
       {/* AI Tools Grid */}
       <section>
         <div className="mb-4 flex items-center justify-between">

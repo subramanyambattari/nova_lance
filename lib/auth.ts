@@ -1,11 +1,5 @@
 import { prisma } from "@/lib/prisma"
 
-const demoUser = {
-  id: 0,
-  email: "subbu@novalance.dev",
-  name: "Subbu Roy",
-}
-
 export type CurrentUser = Awaited<ReturnType<typeof requireUser>>
 
 import { auth } from "@/auth"
@@ -40,9 +34,7 @@ export async function getOptionalUser(timeoutMs = 2500) {
   }
 }
 
-export function getDemoUser() {
-  return demoUser
-}
+
 
 export function isDatabaseUnavailableError(error: unknown) {
   if (!(error instanceof Error)) return false
