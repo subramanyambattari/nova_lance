@@ -10,6 +10,8 @@ import { jobFieldOptions, initialJobDraft, initialSkills } from "./data"
 import type { Job } from "./types"
 
 export function PostJobTab({
+  editingJobId,
+  setEditingJobId,
   jobDraft,
   setJobDraft,
   skills,
@@ -22,6 +24,8 @@ export function PostJobTab({
   setJobsState,
   handleTabChange,
 }: {
+  editingJobId?: string | null
+  setEditingJobId?: React.Dispatch<React.SetStateAction<string | null>>
   jobDraft: typeof initialJobDraft
   setJobDraft: React.Dispatch<React.SetStateAction<typeof initialJobDraft>>
   skills: string[]
@@ -159,39 +163,75 @@ export function PostJobTab({
             ))}
           </div>
           <div className="mt-8 flex justify-end gap-3">
-            <Button variant="outline" className="rounded-xl h-11 px-6 shadow-sm">Save as draft</Button>
+            <Button
+              variant="outline"
+              className="rounded-xl h-11 px-6 shadow-sm"
+              disabled={isPending}
+              onClick={() => {
+                setJobsState((prev) => [
+                  {
+                    title: jobDraft.title || "Untitled Job Post",
+                    status: "Draft",
+                    proposals: 0,
+                    hired: 0,
+                    progress: 0,
+                    budget: jobDraft.budget,
+                  },
+                  ...prev,
+                ])
+                toast.success("Job saved as draft!")
+                setJobDraft(initialJobDraft)
+                setSkills(initialSkills)
+                if (setEditingJobId) setEditingJobId(null)
+                handleTabChange("jobs")
+              }}
+            >
+              Save as draft
+            </Button>
             <Button
               disabled={isPending}
               className="rounded-xl h-11 px-6 bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20 transition-all"
               onClick={() => {
                 startTransition(async () => {
-                  await createJob({
-                    title: jobDraft.title,
-                    budget: jobDraft.budget,
-                    timeline: jobDraft.timeline,
-                    priority: jobDraft.priority,
-                    experience: jobDraft.experience,
-                    skills: skills,
-                  })
-                  setJobsState((prev) => [
-                    {
+                  if (editingJobId) {
+                    setJobsState((prev) => 
+                      prev.map((job) => 
+                        job.id === editingJobId 
+                          ? { ...job, title: jobDraft.title, budget: jobDraft.budget } 
+                          : job
+                      )
+                    )
+                    toast.success("Job updated successfully!")
+                  } else {
+                    await createJob({
                       title: jobDraft.title,
-                      status: "Active",
-                      proposals: 0,
-                      hired: 0,
-                      progress: 0,
                       budget: jobDraft.budget,
-                    },
-                    ...prev,
-                  ])
-                  toast.success("Job posted successfully!")
+                      timeline: jobDraft.timeline,
+                      priority: jobDraft.priority,
+                      experience: jobDraft.experience,
+                      skills: skills,
+                    })
+                    setJobsState((prev) => [
+                      {
+                        title: jobDraft.title,
+                        status: "Active",
+                        proposals: 0,
+                        hired: 0,
+                        progress: 0,
+                        budget: jobDraft.budget,
+                      },
+                      ...prev,
+                    ])
+                    toast.success("Job posted successfully!")
+                  }
                   setJobDraft(initialJobDraft)
                   setSkills(initialSkills)
+                  if (setEditingJobId) setEditingJobId(null)
                   handleTabChange("jobs")
                 })
               }}
             >
-              {isPending ? "Posting..." : "Post job"}
+              {isPending ? (editingJobId ? "Updating..." : "Posting...") : (editingJobId ? "Update job" : "Post job")}
               <ArrowUpRight className="size-4 ml-1.5" />
             </Button>
           </div>

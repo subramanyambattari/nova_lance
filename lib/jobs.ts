@@ -105,46 +105,34 @@ async function fetchJson(url: string, timeoutMs = 3000, options?: RequestInit) {
 }
 
 async function fetchExternalJobs(query: string): Promise<UnifiedJob[]> {
-  const broadQuery = query ? query : "software engineer"
-  const keyword = encodeURIComponent(broadQuery)
+  const keyword = encodeURIComponent(query ? query : "software")
+  const url = `https://remotive.com/api/remote-jobs?search=${keyword}`
   
-  const options = {
-    method: "GET",
-    headers: {
-      "x-rapidapi-key": process.env.RAPIDAPI_KEY || "",
-      "x-rapidapi-host": process.env.RAPIDAPI_HOST || "remote-jobs-api1.p.rapidapi.com",
-    },
-  };
-  
-  const url = `${process.env.RAPIDAPI_URL || "https://remote-jobs-api1.p.rapidapi.com/jobs/search"}?query=${keyword}`;
-  
-  const rapidApiData = await fetchJson(url, 5000, options);
-  
+  const data = await fetchJson(url, 5000);
   const jobs: UnifiedJob[] = [];
-
-  // Assuming rapidApiData returns an array of jobs directly or inside a data property
-  const results = Array.isArray(rapidApiData) ? rapidApiData : rapidApiData?.data || rapidApiData?.jobs || rapidApiData?.results || [];
+  
+  const results = data?.jobs || [];
 
   for (const item of results.slice(0, 30)) {
     const text = `${item.title ?? ""} ${item.description ?? ""}`
     const skills = inferSkills(text).slice(0, 6)
     jobs.push({
-      id: `external:rapidapi:${item.id || item.slug || Math.random().toString()}`,
-      externalId: String(item.id || item.slug || ""),
-      externalUrl: item.url || item.applyUrl || item.link,
-      source: "rapidapi",
-      title: item.title || item.position || "Remote role",
-      company: item.company || item.company_name || "Remote client",
+      id: `external:remotive:${item.id || Math.random().toString()}`,
+      externalId: String(item.id || ""),
+      externalUrl: item.url,
+      source: "remotive",
+      title: item.title || "Remote role",
+      company: item.company_name || "Remote client",
       description: item.description || "No description provided.",
       budget: null,
-      salary: item.salary || item.salary_min ? `$${item.salary_min} - $${item.salary_max}` : "Budget not listed",
+      salary: item.salary || "Budget not listed",
       skills,
-      type: item.job_type || item.type || "Full-time",
+      type: item.job_type || "Full-time",
       experience: /senior|lead|principal/i.test(item.title ?? "") ? "Senior" : "Intermediate",
-      location: item.location || "Remote",
+      location: item.candidate_required_location || "Remote",
       remote: true,
       verifiedClient: true,
-      postedAt: new Date(item.publication_date || item.created_at || item.date || Date.now()).toISOString(),
+      postedAt: new Date(item.publication_date || Date.now()).toISOString(),
       match: 0,
     })
   }
@@ -336,7 +324,7 @@ export async function getUnifiedJobs(params: z.infer<typeof jobSearchSchema>, us
       if (minDate && new Date(job.postedAt) < minDate) return false
       return true
     })
-    .sort((a, b) => b.match - a.match || +new Date(b.postedAt) - +new Date(a.postedAt))
+    .sort((a, b) => +new Date(b.postedAt) - +new Date(a.postedAt) || b.match - a.match)
 
   const start = (params.page - 1) * params.limit
   const end = start + params.limit

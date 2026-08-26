@@ -33,7 +33,7 @@ Return ONLY the suggested text or feedback, nothing else. Do not use markdown bl
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "mixtral-8x7b-32768",
+        model: "qwen/qwen3.8-27b",
         messages: [{ role: "user", content: prompt }],
       })
     });

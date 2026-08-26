@@ -166,7 +166,7 @@ export default async function Home() {
   const healthScore = Math.min(100, Math.round((totalCompleted / totalJobs) * 50 + 50)) // Base 50% health
 
   const stats = {
-    userName: user.name || "Freelancer",
+    userName: user.username || user.name || "Freelancer",
     pipeline,
     availableBalance,
     activeWorkCount: activeWork.length,

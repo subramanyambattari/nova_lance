@@ -13,8 +13,8 @@ import { SavedJobs } from "@/components/jobs/saved-jobs"
 import type { JobFilters } from "@/components/jobs/types"
 
 const initialFilters: JobFilters = {
-  q: "React Next.js",
-  remoteOnly: true,
+  q: "",
+  remoteOnly: false,
   experience: "all",
   type: "all",
   minBudget: 0,

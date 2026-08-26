@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
           "Authorization": `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "mixtral-8x7b-32768",
+          model: "qwen/qwen3.8-27b",
           messages: [
             { role: "system", content: systemInstruction },
             ...messages

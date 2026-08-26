@@ -72,6 +72,7 @@ export default async function ClientDashboardRoute() {
   }))
 
   const stats = {
+    userName: user.username || user.name || "Client",
     totalJobsPosted: dbJobs.length,
     activeContractsCount: activeContracts.length,
     totalSpent: dbActiveContracts.reduce((sum, c) => sum + (c.budget || 0), 0),

@@ -58,60 +58,6 @@ export function JobsGrid({
     if (firstPage) onMetaChange({ total: firstPage.total, updatedAt: firstPage.updatedAt })
   }, [onMetaChange, query.data])
 
-  // Simulate Real-time Feed Updates
-  useEffect(() => {
-    const realisticTitles = [
-      "Senior Full Stack Engineer", "React Native Developer", "Lead Frontend Architect",
-      "Backend Node.js Developer", "Principal DevOps Engineer", "UI/UX Product Designer",
-      "Typescript Specialist", "Data Engineer", "Cloud Security Engineer", "Blockchain Developer"
-    ]
-    const realisticCompanies = [
-      "Vercel", "Stripe", "Airbnb", "Discord", "Figma", "OpenAI",
-      "Netflix", "Shopify", "Coinbase", "Linear", "Supabase", "GitHub"
-    ]
-    
-    const interval = setInterval(() => {
-      // Simulate receiving a new job every 30 seconds
-      if (jobs.length > 0) {
-        queryClient.setQueriesData<{ pages: JobsResponse[] }>(
-          { queryKey: ["jobs"] },
-          (old) => {
-            if (!old) return old
-            
-            const randomTitle = realisticTitles[Math.floor(Math.random() * realisticTitles.length)]
-            const randomCompany = realisticCompanies[Math.floor(Math.random() * realisticCompanies.length)]
-            const baseJob = jobs[Math.floor(Math.random() * jobs.length)]
-            
-            const newJob: Job = {
-              ...baseJob,
-              id: `live-${Date.now()}`,
-              title: filters.q ? `[Live] ${filters.q} Role` : randomTitle,
-              company: randomCompany,
-              salary: `$${Math.max(filters.minBudget || 70, 70)},000 - $${Math.max((filters.minBudget || 70) + 50, 150)},000`,
-              postedAt: new Date().toISOString(),
-              match: Math.floor(Math.random() * 30) + 70, // Random match 70-99
-              remote: filters.remoteOnly,
-              experience: filters.experience === "all" ? baseJob.experience : filters.experience,
-              type: filters.type === "all" ? baseJob.type : filters.type,
-              verifiedClient: filters.verified ? true : baseJob.verifiedClient,
-              skills: filters.skills ? filters.skills.split(",").map(s => s.trim()).filter(Boolean) : baseJob.skills,
-            }
-            
-            return {
-              ...old,
-              pages: old.pages.map((page, index) => 
-                index === 0 ? { ...page, jobs: [newJob, ...page.jobs] } : page
-              )
-            }
-          }
-        )
-        import("@/lib/toast").then(({ toast }) => toast.success("New job posted in real-time feed!"))
-      }
-    }, 30000)
-
-    return () => clearInterval(interval)
-  }, [jobs, queryClient])
-
   useEffect(() => {
     const element = loadMoreRef.current
     if (!element) return

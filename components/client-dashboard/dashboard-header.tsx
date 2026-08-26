@@ -38,6 +38,13 @@ export function DashboardHeader({ onTabChange, stats }: { onTabChange?: (tab: st
     }
   }
 
+  const currentHour = new Date().getHours();
+  let greeting = "Good evening";
+  if (currentHour < 12) greeting = "Good morning";
+  else if (currentHour < 17) greeting = "Good afternoon";
+
+  const userName = stats?.userName ? stats.userName.split(" ")[0] : "Client";
+
   return (
     <header className="grid gap-5 border-b border-zinc-200 pb-6 dark:border-white/10 lg:grid-cols-[1fr_360px]">
       <div className="flex min-w-0 flex-col justify-end">
@@ -53,7 +60,7 @@ export function DashboardHeader({ onTabChange, stats }: { onTabChange?: (tab: st
           </Badge>
         </div>
         <h1 className="mt-4 text-3xl font-semibold tracking-normal sm:text-4xl">
-          Hire, manage, and pay talent with Nova AI.
+          {greeting}, {userName}
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400 sm:text-base">
           A complete client command center for posting jobs, reviewing proposals, managing contracts,

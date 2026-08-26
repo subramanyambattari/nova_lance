@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   return Response.json(data, {
     headers: {
-      "Cache-Control": "private, max-age=30, stale-while-revalidate=120",
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
     },
   })
 }

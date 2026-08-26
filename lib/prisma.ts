@@ -1,7 +1,7 @@
 import "dotenv/config"
 import { PrismaClient } from "@/app/generated/prisma/client"
 import { PrismaNeon } from '@prisma/adapter-neon'
-import { neonConfig } from '@neondatabase/serverless'
+import { Pool, neonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
 
 // Set up WebSocket constructor for Node environment
@@ -14,9 +14,11 @@ if (connectionString) {
   connectionString = connectionString.replace(/^['"]|['"]$/g, '')
 }
 
+// Initialize Neon Pool
+const pool = new Pool({ connectionString })
 
-// Pass the connection string config directly to the PrismaNeon factory adapter
-const adapter = new PrismaNeon({ connectionString })
+// Pass the pool to the PrismaNeon factory adapter
+const adapter = new PrismaNeon(pool)
 
 const globalForPrisma = globalThis as unknown as {
   prisma2?: PrismaClient

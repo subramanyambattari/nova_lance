@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   XCircle,
   Trash2,
+  Inbox,
   MessageCircle,
   ChevronDown,
   TrendingUp,
@@ -84,6 +85,7 @@ export function ClientDashboardPage({
   const [proposalSort, setProposalSort] = useState("Match")
   const [attachments, setAttachments] = useState<string[]>([])
   const [jobDraft, setJobDraft] = useState(initialJobDraft)
+  const [editingJobId, setEditingJobId] = useState<string | null>(null)
   const [expandedStates, setExpandedStates] = useState<Record<string, "notes" | "ai" | null>>({})
   const [notificationPrefs, setNotificationPrefs] = useState<Record<string, boolean>>(() =>
     notifications.reduce((acc, curr) => ({ ...acc, [curr.label]: true }), {})
@@ -170,6 +172,8 @@ export function ClientDashboardPage({
 
             <TabsContent value="post" className="space-y-8">
               <PostJobTab
+                editingJobId={editingJobId}
+                setEditingJobId={setEditingJobId}
                 jobDraft={jobDraft}
                 setJobDraft={setJobDraft}
                 skills={skills}
@@ -228,7 +232,18 @@ export function ClientDashboardPage({
                           variant="outline"
                           size="sm"
                           className="rounded-lg border-zinc-200/80 hover:bg-violet-50 hover:text-violet-700 dark:border-white/10 dark:hover:bg-violet-900/30 dark:hover:text-violet-300 transition-colors shadow-sm"
-                          onClick={() => toast.success(`Editing job: ${job.title}`)}
+                          onClick={() => {
+                            setJobDraft({
+                              title: job.title,
+                              budget: job.budget,
+                              timeline: "4 weeks",
+                              priority: "Medium",
+                              experience: "Intermediate"
+                            })
+                            setEditingJobId(job.id || null)
+                            handleTabChange("post")
+                            toast.success(`Editing job: ${job.title}`)
+                          }}
                         >
                           <Edit3 className="size-3.5 mr-1.5" />
                           Edit
@@ -362,8 +377,19 @@ export function ClientDashboardPage({
                   }
                 />
                 <div className="space-y-4">
-                  {filteredProposals.map((proposal) => (
-                    <div
+                  {filteredProposals.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-zinc-200 dark:border-white/10 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/20">
+                      <div className="p-4 bg-zinc-100 dark:bg-zinc-800 rounded-full mb-4">
+                        <Inbox className="size-8 text-zinc-400 dark:text-zinc-500" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">No proposals found</h3>
+                      <p className="mt-2 text-sm text-zinc-500 max-w-sm mx-auto">
+                        There are currently no proposals matching your criteria. Once freelancers submit proposals to your jobs, they will appear here.
+                      </p>
+                    </div>
+                  ) : (
+                    filteredProposals.map((proposal) => (
+                      <div
                       key={proposal.name}
                       className="group relative overflow-hidden rounded-2xl border border-zinc-200/60 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-violet-300 dark:border-white/10 dark:bg-zinc-900/40 dark:hover:border-violet-500/50"
                     >
@@ -534,7 +560,7 @@ export function ClientDashboardPage({
                         </div>
                       )}
                     </div>
-                  ))}
+                  )))}
                 </div>
               </section>
             </TabsContent>

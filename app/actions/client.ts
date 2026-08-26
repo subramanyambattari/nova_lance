@@ -25,6 +25,8 @@ export async function createJob(data: {
       type: "Contract",
       experience: data.experience,
       clientId: user.id,
+      remote: true,
+      verifiedClient: true,
     },
   })
 
