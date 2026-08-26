@@ -140,10 +140,10 @@ export function AppSidebar() {
             <SidebarMenuButton 
               onClick={() => signOut({ callbackUrl: "/" })} 
               tooltip="Log Out"
-              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
+              className="flex items-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
             >
-              <LogOut className="size-4" />
-              <span>Log Out</span>
+              <LogOut className="size-4 shrink-0" />
+              <span className="truncate">Log Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

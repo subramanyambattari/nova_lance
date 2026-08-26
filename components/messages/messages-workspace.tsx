@@ -69,6 +69,10 @@ function WorkspaceInner() {
   const [liveMessages, setLiveMessages] = useState<MessageItem[]>([])
   const [typing, setTyping] = useState<Record<string, UserSummary | undefined>>({})
   const [userQuery, setUserQuery] = useState("")
+  
+  // Custom dialog state for deleting conversations without browser alert
+  const [conversationToDelete, setConversationToDelete] = useState<string | null>(null)
+  
   const client = useQueryClient()
 
   const conversationsQuery = useQuery({
@@ -174,6 +178,21 @@ function WorkspaceInner() {
     onSuccess: () => void client.invalidateQueries({ queryKey: ["conversations"] }),
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: async (conversationId: string) => {
+      const response = await fetch(`/api/conversations?conversationId=${conversationId}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) throw new Error("Unable to delete conversation.")
+    },
+    onSuccess: (_, conversationId) => {
+      client.invalidateQueries({ queryKey: ["conversations"] })
+      if (activeId === conversationId) {
+        setActiveId(undefined)
+      }
+    },
+  })
+
   const createConversationMutation = useMutation({
     mutationFn: async (participantId: number) => {
       const response = await fetch("/api/conversations", {
@@ -249,11 +268,10 @@ function WorkspaceInner() {
       </div>
     )
   }
-
   return (
-    <div className="h-[calc(100vh-3rem)] overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
-      <div className="grid h-full min-h-0 lg:grid-cols-[360px_minmax(0,1fr)_300px]">
-        <div className={cn(mobileChatOpen && "hidden lg:block")}>
+    <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      <div className="grid flex-1 min-h-0 lg:grid-cols-[360px_minmax(0,1fr)_300px]">
+        <div className={cn("min-h-0 flex flex-col", mobileChatOpen && "hidden lg:block lg:flex lg:flex-col")}>
           <ConversationsSidebar
             conversations={conversations}
             currentUserId={currentUser.id}
@@ -270,9 +288,9 @@ function WorkspaceInner() {
             onTogglePinned={(conversation) =>
               toggleMutation.mutate({ conversationId: conversation.id, pinned: !conversation.pinned })
             }
-            onToggleArchived={(conversation) =>
-              toggleMutation.mutate({ conversationId: conversation.id, archived: !conversation.archived })
-            }
+            onToggleArchived={(conversation) => {
+              setConversationToDelete(conversation.id)
+            }}
           />
         </div>
 
@@ -398,6 +416,37 @@ function WorkspaceInner() {
           </div>
         </aside>
       </div>
+
+      {conversationToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Delete conversation?</h3>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              This action cannot be undone. This will permanently delete your chat history.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setConversationToDelete(null)}
+                className="rounded-xl border-zinc-200 dark:border-white/10"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => {
+                  deleteMutation.mutate(conversationToDelete)
+                  setConversationToDelete(null)
+                }}
+                className="rounded-xl bg-red-600 hover:bg-red-700 text-white"
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? "Deleting..." : "Delete forever"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

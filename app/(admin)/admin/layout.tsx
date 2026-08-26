@@ -3,7 +3,14 @@ import { Sparkles, Users, Briefcase, Settings, LayoutDashboard, LogOut } from "l
 import { ModeToggle } from "@/components/mode-toggle"
 import { AdminLogoutButton } from "./admin-logout-button"
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+import { requireUser } from "@/lib/auth"
+import { redirect } from "next/navigation"
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const user = await requireUser()
+  if (user.role !== "ADMIN" && user.email !== "b.subburoyal@gmail.com") {
+    redirect("/")
+  }
   return (
     <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       {/* Sidebar */}

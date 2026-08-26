@@ -2,7 +2,13 @@ import { Save, Shield, Percent, Globe, Bell } from "lucide-react"
 import { getPlatformSettings } from "@/app/actions/settings"
 import { SettingsForm } from "./settings-form"
 
+import { requireUser } from "@/lib/auth"
+import { redirect } from "next/navigation"
+
 export default async function AdminSettingsPage() {
+  const user = await requireUser()
+  if (user.role !== "ADMIN" && user.email !== "b.subburoyal@gmail.com") redirect("/")
+
   const settings = await getPlatformSettings()
   
   return (

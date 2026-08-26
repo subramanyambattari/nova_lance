@@ -34,5 +34,5 @@ export default async function ProfilePage() {
     twoFactor: dbSettings?.twoFactor ?? defaultProfileValues.twoFactor,
   } : defaultProfileValues
 
-  return <ProfileSettingsPage initialData={initialData} />
+  return <ProfileSettingsPage initialData={initialData} currentImage={user.image} />
 }

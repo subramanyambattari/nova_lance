@@ -4,7 +4,7 @@ import { z } from "zod"
 import { rateLimit } from "@/lib/rate-limit"
 
 const messageSchema = z.object({
-  role: z.enum(["user", "model"]),
+  role: z.enum(["user", "model", "assistant"]),
   content: z.string().trim().min(1).max(4000),
 })
 
@@ -12,34 +12,23 @@ const chatSchema = z.object({
   messages: z.array(messageSchema).min(1).max(20),
 })
 
-type GeminiResponse = {
-  candidates?: Array<{
-    content?: {
-      parts?: Array<{ text?: string }>
-    }
-    finishReason?: string
-  }>
-  error?: {
-    message?: string
-  }
-}
-
 export const dynamic = "force-dynamic"
 
 function normalizeMessages(messages: z.infer<typeof messageSchema>[]) {
-  const normalized: z.infer<typeof messageSchema>[] = []
+  const normalized: { role: string; content: string }[] = []
 
   for (const message of messages) {
     const previous = normalized.at(-1)
+    const mappedRole = message.role === "model" ? "assistant" : message.role
 
-    if (previous?.role === message.role) {
+    if (previous?.role === mappedRole) {
       previous.content = `${previous.content}\n\n${message.content}`
     } else {
-      normalized.push({ ...message })
+      normalized.push({ role: mappedRole, content: message.content })
     }
   }
 
-  while (normalized[0]?.role === "model") {
+  while (normalized[0]?.role === "assistant") {
     normalized.shift()
   }
 
@@ -54,11 +43,11 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Too many AI messages. Please wait a moment." }, { status: 429 })
   }
 
-  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  const apiKey = process.env.GROQ_API_KEY
 
   if (!apiKey) {
     return Response.json(
-      { error: "Gemini is not configured. Add GEMINI_API_KEY to your environment." },
+      { error: "Groq is not configured. Add GROQ_API_KEY to your environment." },
       { status: 500 }
     )
   }
@@ -71,51 +60,38 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "Send a message to start the chat." }, { status: 400 })
     }
 
-    const model = (process.env.GEMINI_MODEL ?? "gemini-2.5-flash").replace(/^models\//, "")
+    const systemInstruction = "You are Nova, a concise AI assistant inside Nova Lance, a freelance work dashboard. Help users with proposals, project planning, profile improvements, client replies, pricing, deadlines, and navigating freelance work. Keep answers practical and friendly. Do not claim access to private account data unless the user provides it in the chat."
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      "https://api.groq.com/openai/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          "content-type": "application/json",
-          "x-goog-api-key": apiKey,
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          systemInstruction: {
-            parts: [
-              {
-                text:
-                  "You are Nova, a concise AI assistant inside Nova Lance, a freelance work dashboard. Help users with proposals, project planning, profile improvements, client replies, pricing, deadlines, and navigating freelance work. Keep answers practical and friendly. Do not claim access to private account data unless the user provides it in the chat.",
-              },
-            ],
-          },
-          contents: messages.map((message) => ({
-            role: message.role,
-            parts: [{ text: message.content }],
-          })),
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 700,
-          },
+          model: "mixtral-8x7b-32768",
+          messages: [
+            { role: "system", content: systemInstruction },
+            ...messages
+          ],
+          temperature: 0.7,
+          max_tokens: 700,
         }),
       }
     )
 
-    const data = (await response.json()) as GeminiResponse
-    const reply = data.candidates
-      ?.flatMap((candidate) => candidate.content?.parts ?? [])
-      .map((part) => part.text)
-      .filter(Boolean)
-      .join("\n")
-      .trim()
+    const data = await response.json()
+    const reply = data.choices?.[0]?.message?.content?.trim()
 
     if (!response.ok) {
-      console.error("Gemini API error", data.error?.message ?? data)
-      return Response.json({ error: "Gemini could not answer right now." }, { status: response.status })
+      console.error("Groq API error", data.error?.message ?? data)
+      return Response.json({ error: `Groq error: ${data.error?.message ?? "Unknown error"}` }, { status: response.status })
     }
 
     if (!reply) {
-      return Response.json({ error: "Gemini returned an empty response. Try rephrasing your message." }, { status: 502 })
+      return Response.json({ error: "Nova AI returned an empty response. Try rephrasing your message." }, { status: 502 })
     }
 
     return Response.json({ reply })

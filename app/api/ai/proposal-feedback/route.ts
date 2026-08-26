@@ -1,24 +1,17 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-
-// Assuming GEMINI_API_KEY is available in the environment
-const apiKey = process.env.GEMINI_API_KEY || "";
-const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(req: Request) {
   try {
     const { coverLetter, jobId } = await req.json();
+    const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      // Fallback for development if API key isn't provided
       return NextResponse.json({
-        suggestion: "To use real AI feedback, please add GEMINI_API_KEY to your .env file. " +
+        suggestion: "To use real AI feedback, please add GROQ_API_KEY to your .env file. " +
           "However, I suggest focusing your proposal on your relevant experience, setting clear milestones, " +
           "and offering a frequent communication cadence."
       });
     }
-
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
 You are an expert freelance career coach. Your task is to provide constructive feedback or a better version of the following freelance proposal cover letter. 
@@ -33,15 +26,30 @@ ${jobId ? `Job ID Context: ${jobId}` : ""}
 Return ONLY the suggested text or feedback, nothing else. Do not use markdown blocks unless necessary.
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "mixtral-8x7b-32768",
+        messages: [{ role: "user", content: prompt }],
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error?.message || "Groq API error");
+    }
+
+    const text = data.choices?.[0]?.message?.content?.trim() || "";
 
     return NextResponse.json({ suggestion: text });
   } catch (error) {
     console.error("AI Feedback Error:", error);
     return NextResponse.json(
-      { error: "Failed to generate AI feedback." },
+      { error: `Failed to generate AI feedback. ${error instanceof Error ? error.message : ""}` },
       { status: 500 }
     );
   }

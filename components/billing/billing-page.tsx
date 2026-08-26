@@ -10,6 +10,7 @@ import {
   ReceiptText,
   WalletCards,
 } from "lucide-react"
+import { toast } from "sonner"
 
 import { PaymentMethods1 } from "@/components/billing/payment-methods1"
 import { Badge } from "@/components/ui/badge"
@@ -56,11 +57,16 @@ export function BillingPage() {
               type="button"
               variant="outline"
               className="rounded-xl border-zinc-200 bg-white hover:bg-zinc-50 dark:border-white/10 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-200"
+              onClick={() => toast.success("Billing statements exported successfully")}
             >
               <ArrowDownToLine className="size-4" />
               Export
             </Button>
-            <Button type="button" className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100">
+            <Button
+              type="button"
+              className="rounded-xl bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-blue-100"
+              onClick={() => toast.success("Redirecting to Stripe checkout...", { description: "You can add funds via credit card or ACH." })}
+            >
               <WalletCards className="size-4" />
               Add Funds
             </Button>

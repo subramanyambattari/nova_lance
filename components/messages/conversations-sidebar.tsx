@@ -1,6 +1,6 @@
 "use client"
 
-import { Archive, Pin, Search } from "lucide-react"
+import { Archive, Pin, Search, Trash2 } from "lucide-react"
 
 import { OnlineStatus } from "@/components/messages/online-status"
 import { TypingIndicator } from "@/components/messages/typing-indicator"
@@ -153,7 +153,7 @@ export function ConversationsSidebar({
                       }}
                       className="rounded-md p-1 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/10 hover:text-zinc-950 dark:hover:text-zinc-100"
                     >
-                      <Archive className="size-3" />
+                      <Trash2 className="size-3" />
                     </span>
                   </div>
                 </div>

@@ -14,7 +14,7 @@ export default async function SettingsRoute() {
     displayName: dbSettings.displayName || user.name || "",
     email: user.email || "",
     timezone: dbProfile?.timezone || "Asia/Kolkata",
-    language: dbProfile?.languages || "English",
+    language: (dbProfile?.languages && dbProfile.languages.length > 0) ? dbProfile.languages[0] : "English",
     workspaceName: dbSettings.workspaceName || "",
     defaultRate: dbProfile?.hourlyRate?.toString() || "85",
     bio: dbProfile?.bio || "",

@@ -91,7 +91,7 @@ export function ProposalsTable({
               <TableCell>
                 <ProposalStatusBadge status={proposal.status} />
               </TableCell>
-              <TableCell className="font-medium text-zinc-500 dark:text-zinc-400">
+              <TableCell className="font-medium text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
                 {proposal.submittedAt ? new Date(proposal.submittedAt).toLocaleDateString() : "Draft"}
               </TableCell>
               <TableCell className="font-medium text-zinc-600 dark:text-zinc-300">{proposal.timeline ?? "Flexible"}</TableCell>

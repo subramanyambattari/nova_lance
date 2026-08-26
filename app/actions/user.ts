@@ -7,13 +7,17 @@ import { requireUser } from "@/lib/auth"
 export async function updateProfile(data: any) {
   const user = await requireUser()
 
+  const languagesArray = data.languages 
+    ? data.languages.split(",").map((s: string) => s.trim()).filter(Boolean)
+    : []
+
   await prisma.userProfile.upsert({
     where: { userId: user.id },
     update: {
       phone: data.phone,
       location: data.location,
       timezone: data.timezone,
-      languages: data.languages,
+      languages: languagesArray,
       title: data.title,
       bio: data.bio,
       experienceLevel: data.experienceLevel,
@@ -33,7 +37,7 @@ export async function updateProfile(data: any) {
       phone: data.phone,
       location: data.location,
       timezone: data.timezone,
-      languages: data.languages,
+      languages: languagesArray,
       title: data.title,
       bio: data.bio,
       experienceLevel: data.experienceLevel,
@@ -121,23 +125,40 @@ export async function updateSettings(data: any) {
     })
   }
 
+  const settingsLanguagesArray = data.language 
+    ? data.language.split(",").map((s: string) => s.trim()).filter(Boolean)
+    : undefined
+
   await prisma.userProfile.upsert({
     where: { userId: user.id },
     update: {
       ...(data.timezone && { timezone: data.timezone }),
-      ...(data.language && { languages: data.language }),
+      ...(settingsLanguagesArray && { languages: settingsLanguagesArray }),
       ...(data.bio && { bio: data.bio }),
       ...(data.defaultRate && { hourlyRate: parseFloat(data.defaultRate) }),
     },
     create: {
       userId: user.id,
       ...(data.timezone && { timezone: data.timezone }),
-      ...(data.language && { languages: data.language }),
+      ...(settingsLanguagesArray && { languages: settingsLanguagesArray }),
       ...(data.bio && { bio: data.bio }),
       ...(data.defaultRate && { hourlyRate: parseFloat(data.defaultRate) }),
     }
   })
 
   revalidatePath("/settings")
+  return { success: true }
+}
+
+export async function updateProfileImage(imageUrl: string) {
+  const user = await requireUser()
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { image: imageUrl },
+  })
+
+  revalidatePath("/profile")
+  revalidatePath("/")
   return { success: true }
 }

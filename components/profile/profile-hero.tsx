@@ -1,14 +1,84 @@
 "use client"
 
-import { Camera, CheckCircle2, Upload } from "lucide-react"
+import { Camera, CheckCircle2, Upload, Loader2 } from "lucide-react"
 import { motion } from "framer-motion"
+import { toast } from "sonner"
+import { useRef, useState } from "react"
+import { updateProfileImage } from "@/app/actions/user"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
-export function ProfileHero() {
+async function uploadFile(file: File) {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+
+  if (cloudName && uploadPreset) {
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("upload_preset", uploadPreset)
+      formData.append("folder", "nova-lance/profiles")
+
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+        method: "POST",
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = (await response.json()) as { secure_url: string }
+        return data.secure_url
+      }
+    } catch (e) {
+      console.warn("Cloudinary upload failed, trying local upload fallback...", e)
+    }
+  }
+
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  })
+
+  if (!response.ok) {
+    throw new Error("Failed to upload file.")
+  }
+
+  const data = (await response.json()) as { url: string }
+  return data.url
+}
+
+export function ProfileHero({ currentImage }: { currentImage?: string | null }) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImage || null)
+  const [isUploading, setIsUploading] = useState(false)
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0]
+      const localUrl = URL.createObjectURL(file)
+      setPreviewUrl(localUrl)
+      
+      setIsUploading(true)
+      try {
+        const uploadedUrl = await uploadFile(file)
+        await updateProfileImage(uploadedUrl)
+        setPreviewUrl(uploadedUrl)
+        toast.success("Profile image updated successfully")
+      } catch (error) {
+        toast.error("Failed to upload image. Please try again.")
+        setPreviewUrl(currentImage || null)
+      } finally {
+        setIsUploading(false)
+        e.target.value = ""
+      }
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
@@ -21,7 +91,15 @@ export function ProfileHero() {
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="relative w-fit">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
                 <Avatar className="size-24 border border-zinc-200 dark:border-white/15 shadow-2xl shadow-blue-500/10">
+                  {previewUrl && <AvatarImage src={previewUrl} alt="Profile preview" className="object-cover" />}
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-500 text-3xl font-semibold text-white">
                     SR
                   </AvatarFallback>
@@ -30,6 +108,7 @@ export function ProfileHero() {
                   type="button"
                   aria-label="Edit avatar"
                   className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-blue-600 shadow-xl transition hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900 dark:text-blue-200 dark:hover:bg-zinc-800"
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   <Camera className="size-4" />
                 </button>
@@ -65,6 +144,7 @@ export function ProfileHero() {
                 type="button"
                 variant="outline"
                 className="rounded-xl border-zinc-200 bg-zinc-50 text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200 dark:hover:bg-white/[0.08]"
+                onClick={() => fileInputRef.current?.click()}
               >
                 <Upload className="size-4" />
                 Upload profile image

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import {
   ArrowDownToLine,
   ArrowUpRight,
@@ -158,11 +159,16 @@ export function EarningsPage() {
               type="button"
               variant="outline"
               className="rounded-xl border-zinc-200 bg-zinc-50 text-zinc-800 hover:bg-zinc-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-200"
+              onClick={() => toast.success("Earnings report exported successfully")}
             >
               <Download className="size-4" />
               Export
             </Button>
-            <Button type="button" className="rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-emerald-100">
+            <Button
+              type="button"
+              className="rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-emerald-100"
+              onClick={() => toast.success("Withdrawal initiated", { description: "Funds will arrive in 2-3 business days" })}
+            >
               <ArrowDownToLine className="size-4" />
               Withdraw
             </Button>

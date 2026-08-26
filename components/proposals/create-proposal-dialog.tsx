@@ -6,6 +6,7 @@ import { Check, Loader2, Paperclip, Save, Send, Sparkles, X, AlertCircle } from 
 import { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -262,7 +263,14 @@ export function CreateProposalDialog({
     const name = form.getValues("attachmentName")?.trim()
     const url = form.getValues("attachmentUrl")?.trim()
 
-    if (!name || !url) return
+    if (!url) {
+      form.setError("attachmentUrl", { message: "Enter an attachment URL first." })
+      return
+    }
+    if (!name) {
+      form.setError("attachmentName", { message: "Please provide a name for this attachment." })
+      return
+    }
     if (!isValidUrl(url)) {
       form.setError("attachmentUrl", { message: "Enter a valid attachment URL." })
       form.setFocus("attachmentUrl")
@@ -276,7 +284,7 @@ export function CreateProposalDialog({
   }
 
   async function useAiSuggestion() {
-    const current = form.getValues("coverLetter")
+    const current = form.getValues("coverLetter") || ""
     const jobId = form.getValues("jobId")
     
     setAiLoading(true)
@@ -289,14 +297,22 @@ export function CreateProposalDialog({
       const data = await res.json()
       
       if (data.suggestion) {
-        form.setValue(
-          "coverLetter", 
-          current ? `${current}\n\n[AI Feedback]: ${data.suggestion}` : data.suggestion, 
-          { shouldValidate: true }
-        )
+        const newValue = current.trim() 
+          ? `${current}\n\n[AI Feedback]: ${data.suggestion}` 
+          : data.suggestion
+
+        form.setValue("coverLetter", newValue, { 
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        })
+        toast.success("AI suggestion applied!")
+      } else if (data.error) {
+        toast.error(data.error)
       }
     } catch (e) {
       console.error("AI feedback failed", e)
+      toast.error("Failed to connect to AI service.")
     } finally {
       setAiLoading(false)
     }

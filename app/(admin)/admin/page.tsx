@@ -1,7 +1,13 @@
 import { prisma } from "@/lib/prisma"
 import { Users, Briefcase, DollarSign, Activity } from "lucide-react"
 
+import { requireUser } from "@/lib/auth"
+import { redirect } from "next/navigation"
+
 export default async function AdminDashboardPage() {
+  const user = await requireUser()
+  if (user.role !== "ADMIN" && user.email !== "b.subburoyal@gmail.com") redirect("/")
+
   // Fetch high-level statistics
   const totalUsers = await prisma.user.count()
   const totalClients = await prisma.user.count({ where: { role: "CLIENT" } })

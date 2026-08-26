@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button"
 
 const draftKey = "nova-lance-profile-draft"
 
-export function ProfileSettingsPage({ initialData }: { initialData?: ProfileFormValues }) {
+export function ProfileSettingsPage({ initialData, currentImage }: { initialData?: ProfileFormValues, currentImage?: string | null }) {
   const [isPending, startTransition] = useTransition()
   const [toast, setToast] = useState<string | null>(null)
 
@@ -70,7 +70,7 @@ export function ProfileSettingsPage({ initialData }: { initialData?: ProfileForm
         className="relative z-0 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
       >
         <ProfileHeader isSaving={isPending} onCancel={onCancel} />
-        <ProfileHero />
+        <ProfileHero currentImage={currentImage} />
         <AnalyticsCard />
         <div className="grid gap-4 xl:grid-cols-[1.35fr_0.85fr]">
           <div className="space-y-4">

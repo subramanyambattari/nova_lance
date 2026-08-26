@@ -137,13 +137,16 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "One or more users do not exist." }, { status: 400 })
     }
 
-    // Check if a direct conversation already exists between these exact participants
-    if (!body.title && !body.projectId) {
+    // Check if a direct conversation already exists
+    if (!body.title) {
       const existingConversations = await prisma.conversation.findMany({
         where: {
-          AND: participantIds.map((id) => ({
-            participants: { some: { userId: id } },
-          })),
+          AND: [
+            ...participantIds.map((id) => ({
+              participants: { some: { userId: id } },
+            })),
+            ...(body.projectId ? [{ projectId: body.projectId }] : [{ projectId: null }]),
+          ],
         },
         include: {
           participants: { include: { user: { select: { id: true, name: true, email: true, presence: true } } } },
@@ -213,4 +216,30 @@ export async function PATCH(request: NextRequest) {
   })
 
   return Response.json({ participant: updated })
+}
+
+export async function DELETE(request: NextRequest) {
+  const user = await requireUser()
+  const conversationId = request.nextUrl.searchParams.get("conversationId")
+
+  if (!conversationId) {
+    return Response.json({ error: "conversationId is required." }, { status: 400 })
+  }
+
+  // Find the participant to ensure they are part of the conversation
+  const participant = await prisma.conversationParticipant.findUnique({
+    where: { userId_conversationId: { userId: user.id, conversationId } },
+  })
+
+  if (!participant) {
+    return Response.json({ error: "Conversation not found or unauthorized." }, { status: 404 })
+  }
+
+  // We delete the entire conversation if requested (or we could just remove the participant)
+  // Deleting the conversation will cascade and delete participants and messages
+  await prisma.conversation.delete({
+    where: { id: conversationId },
+  })
+
+  return Response.json({ success: true })
 }

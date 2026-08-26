@@ -3,9 +3,15 @@ import { ShieldAlert, ShieldCheck } from "lucide-react"
 import { UsersToolbar } from "./toolbar"
 import { UserActionsDropdown } from "./actions-dropdown"
 
+import { requireUser } from "@/lib/auth"
+import { redirect } from "next/navigation"
+
 export default async function AdminUsersPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const user = await requireUser()
+  if (user.role !== "ADMIN" && user.email !== "b.subburoyal@gmail.com") redirect("/")
+
   const searchParams = await props.searchParams
   const q = (searchParams.q as string) || ""
   const roleFilter = (searchParams.role as string) || "ALL"

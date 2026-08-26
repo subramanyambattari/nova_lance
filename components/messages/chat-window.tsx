@@ -115,7 +115,7 @@ export function ChatWindow({
   return (
     <section
       className={cn(
-        "h-full w-full bg-white dark:bg-zinc-950",
+        "min-h-0 h-full w-full bg-white dark:bg-zinc-950",
         mobileOpen ? "fixed inset-0 z-40 flex flex-col lg:static" : "hidden lg:flex lg:flex-col"
       )}
     >
