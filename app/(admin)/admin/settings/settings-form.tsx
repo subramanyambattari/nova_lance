@@ -49,9 +49,11 @@ export function SettingsForm({ initialSettings }: { initialSettings: any }) {
           if (maintenanceMode) {
              toast.warning("Maintenance Mode is now ENABLED. Non-admins cannot access the platform.", { duration: 5000 })
           }
+        } else {
+          toast.error(result.error || "Failed to save settings.")
         }
       } catch (error) {
-        toast.error("Failed to save settings.")
+        toast.error("An unexpected error occurred.")
       }
     })
   }

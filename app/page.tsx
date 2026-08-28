@@ -352,36 +352,36 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold mb-4">For Clients</h4>
               <ul className="space-y-3 text-muted-foreground text-sm">
-                <li><Link href="#" className="hover:text-foreground">How to Hire</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Talent Marketplace</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Project Catalog</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Enterprise</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">How to Hire</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Talent Marketplace</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Project Catalog</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Enterprise</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-4">For Freelancers</h4>
               <ul className="space-y-3 text-muted-foreground text-sm">
-                <li><Link href="#" className="hover:text-foreground">How to Find Work</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Direct Contracts</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Win Work Safely</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">How to Find Work</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Direct Contracts</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Win Work Safely</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-4">Resources</h4>
               <ul className="space-y-3 text-muted-foreground text-sm">
-                <li><Link href="#" className="hover:text-foreground">Help & Support</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Success Stories</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Blog</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Community</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Help & Support</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Success Stories</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Blog</Link></li>
+                <li><Link href="/login" className="hover:text-foreground">Community</Link></li>
               </ul>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>&copy; {new Date().getFullYear()} Nova Lance Global Inc.</p>
             <div className="flex gap-6">
-              <Link href="#" className="hover:text-foreground">Terms of Service</Link>
-              <Link href="#" className="hover:text-foreground">Privacy Policy</Link>
-              <Link href="#" className="hover:text-foreground">Accessibility</Link>
+              <Link href="/login" className="hover:text-foreground">Terms of Service</Link>
+              <Link href="/login" className="hover:text-foreground">Privacy Policy</Link>
+              <Link href="/login" className="hover:text-foreground">Accessibility</Link>
             </div>
           </div>
         </div>

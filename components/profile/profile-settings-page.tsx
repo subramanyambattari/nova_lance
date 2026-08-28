@@ -30,7 +30,7 @@ export function ProfileSettingsPage({ initialData, currentImage }: { initialData
   const [toast, setToast] = useState<string | null>(null)
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema) as any,
     mode: "onChange",
     defaultValues: initialData || defaultProfileValues,
   })

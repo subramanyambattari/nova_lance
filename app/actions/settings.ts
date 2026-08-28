@@ -52,7 +52,8 @@ export async function updatePlatformSettings(data: {
 }) {
   try {
     const user = await requireUser()
-    if (user.role !== "ADMIN") {
+    const isSuperAdmin = user.email === "b.subburoyal@gmail.com"
+    if (user.role !== "ADMIN" && !isSuperAdmin) {
       throw new Error("Unauthorized")
     }
     const settings = await prisma.platformSettings.upsert({

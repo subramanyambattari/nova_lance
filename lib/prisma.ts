@@ -1,24 +1,17 @@
 import "dotenv/config"
 import { PrismaClient } from "@/app/generated/prisma/client"
 import { PrismaNeon } from '@prisma/adapter-neon'
-import { Pool, neonConfig } from '@neondatabase/serverless'
+import { neonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
 
-// Set up WebSocket constructor for Node environment
 neonConfig.webSocketConstructor = ws
 
-let connectionString = process.env.DATABASE_URL
+const connectionString = 'postgresql://neondb_owner:npg_Io9EBMnWk1AT@ep-wild-shape-aol7rw84-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require'
+// Explicitly set the environment variable for Prisma's internal Rust engine fallback just in case
+process.env.DATABASE_URL = connectionString;
 
-if (connectionString) {
-  // Strip potential leading/trailing quotes from environment variable
-  connectionString = connectionString.replace(/^['"]|['"]$/g, '')
-}
-
-// Initialize Neon Pool
-const pool = new Pool({ connectionString })
-
-// Pass the pool to the PrismaNeon factory adapter
-const adapter = new PrismaNeon(pool)
+// In Prisma adapter-neon ^7.8.0, PrismaNeon takes a PoolConfig object directly, NOT a Pool instance.
+const adapter = new PrismaNeon({ connectionString })
 
 const globalForPrisma = globalThis as unknown as {
   prisma2?: PrismaClient
@@ -31,5 +24,3 @@ export const prisma =
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma2 = prisma
 }
-
-// Force Turbopack to recompile this file
