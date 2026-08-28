@@ -113,6 +113,9 @@ export default function PostProjectPage() {
       if (result.success) {
         toast.success("Project posted successfully!");
         router.push("/client-dashboard");
+      } else {
+        toast.error(result.error || "Failed to post project.");
+        setIsSubmitting(false);
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to post project.");
